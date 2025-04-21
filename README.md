@@ -9,3 +9,14 @@
 - 获取课程资源
 
 > 浙江大学2025春夏软件工程项目
+
+## Structure
+
+```shell
+.
+├── README.md
+├── docs
+│   ├── HLD.pdf # 总体设计报告
+│   └── SRS.pdf # 软件需求规格说明书
+└── src
+```
