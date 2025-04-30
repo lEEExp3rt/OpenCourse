@@ -1,0 +1,63 @@
+services:
+  # app-frontend:
+  app:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: opencourse
+    volumes:
+      - ..:/home/opencourse/OpenCourse:cached
+    env_file:
+      - ../.envs/app.env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+    networks:
+      - opencourse-network
+
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    user: "1000:1000"
+    env_file:
+      - ../.envs/mysql.env
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - 3307:3306
+    networks:
+      - opencourse-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    container_name: redis
+    image: redis:7.2-alpine
+    volumes:
+      - redis_data:/data
+    ports:
+      - 6379:6379
+    env_file:
+      - ../.envs/redis.env
+    networks:
+      - opencourse-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "{REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+networks:
+  opencourse-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:

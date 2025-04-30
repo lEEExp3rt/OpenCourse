@@ -1,0 +1,19 @@
+{
+	"name": "OpenCourse Dev-Container",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"workspaceFolder": "/home/opencourse/OpenCourse",
+
+	"forwardPorts": [
+		8080, // Spring Boot Application.
+		3307, // MySQL Database.
+		6379  // Redis.
+	],
+
+	"postStartCommand": "clear && echo 'Welcome to OpenCourse Dev-Container!'",
+	"postCreateCommand": "mvn clean dependency:go-offline",
+	"shutdownAction": "stopCompose",
+
+
+	"remoteUser": "opencourse"
+}
