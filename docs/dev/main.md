@@ -138,3 +138,28 @@ src/
 使用 SpringBoot 提供的测试套件进行测试，每个文件都应该进行测试，测试代码应存放在 `src/test/java/` 下，测试文件命名应该为 `被测试类名 + Test.java`
 
 > 例如，需要测试 `src/main/java/folder/MyClass.java` 下的类 `MyClass`，其测试文件名应为 `src/test/java/folder/MyClassTest.java`
+
+### 1.6 Utilitis
+
+#### 1.6.1 Connect To Database Through Container
+
+如果你使用多容器开发，主容器内并没有数据库服务器，而只有一个客户端，因此请你采用以下方式连接到数据库容器：
+
+```shell
+# 容器内使用数据库的端口号为 3306.
+$ mysql -h mysql -P 3306 -u opencourse_user -p
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is xxxx
+Server version: 8.0.42 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its affiliates. Other names may be trademarks of their respective owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+```
+
+同理，你的 JDBC 路径也需要作对应修改
