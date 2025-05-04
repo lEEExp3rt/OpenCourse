@@ -14,6 +14,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
     ports:
       - 8080:8080
     networks:
@@ -53,6 +55,24 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
+  
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    volumes:
+      - minio_data:/data
+    ports:
+      - 9000:9000
+    env_file:
+      - ../.envs/minio.env
+    networks:
+      - opencourse-network
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
 
 networks:
   opencourse-network:
@@ -61,3 +81,4 @@ networks:
 volumes:
   mysql_data:
   redis_data:
+  minio_data:

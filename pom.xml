@@ -56,6 +56,14 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
             <version>3.4.5</version>
         </dependency>
+
+        <!-- MinIO -->
+        <!-- https://mvnrepository.com/artifact/io.minio/minio -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.17</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -14,6 +14,7 @@ if [ ! -d ".envs" ]; then
     echo "# Environment variables for app container." > .envs/app.env
     echo "# Environment variables for mysql container." > .envs/mysql.env
     echo "# Environment variables for redis container." > .envs/redis.env
+    echo "# Environment variables for minio container." > .envs/minio.env
     echo "Please set the environment variables in .envs/ and run the script again to build the container."
 else
     echo "Start building the development container..."
