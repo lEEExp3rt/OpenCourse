@@ -113,16 +113,17 @@ mvn package            # 打包项目
 
 ```shell
 src/
-├── main/
-│   ├── java/                 # 后端代码目录
-│   │   └── opencourse/
-│   │       ├── controllers/  # 控制层：负责处理客户端请求并返回响应
-│   │       ├── services/     # 服务层：核心业务逻辑
-│   │       ├── repositories/ # 数据层：处理服务端逻辑对象和持久化数据
-│   │       ├── models/       # 模型层：业务实体定义
-│   │       ├── configs/      # 配置相关
-│   │       ├── utils/        # 其它工具
-│   │       └── Main.java     # 主程序
+├── main/                         # 后端代码目录
+│   ├── java/
+│   │   └── org/
+│   │       └── opencourse/
+│   │           ├── controllers/  # 控制层：负责处理客户端请求并返回响应
+│   │           ├── services/     # 服务层：核心业务逻辑
+│   │           ├── repositories/ # 数据层：处理服务端逻辑对象和持久化数据
+│   │           ├── models/       # 模型层：业务实体定义
+│   │           ├── configs/      # 配置相关
+│   │           ├── utils/        # 其它工具
+│   │           └── Main.java     # 主程序
 │   │ 
 │   └── resources/            # 资源目录
 │       ├── application.yml   # 程序的配置信息，如数据库连接路径
