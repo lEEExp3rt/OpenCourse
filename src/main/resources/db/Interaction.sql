@@ -16,7 +16,6 @@ create table `Interaction` if not exists (
     `dislikes` int default 0,
     /* Time Metadata */
     `created_at` datetime default current_timestamp,
-    `updated_at` datetime default current_timestamp on update current_timestamp,
     foreign key (`course_id`) references `Course`(`id`),
     foreign key (`user_id`) references `User`(`id`)
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;

@@ -4,10 +4,10 @@
  * @Author !EEExp3rt
  * @note Types of changes:
  *     1. Create / Update user account
- *     2. Create / Update course information
+ *     2. Create / Update course and department information
  *     3. Create / Update resource post
- *     4. Create / Update interaction comment
- *     5. Like / Dislike interaction
+ *     4. Create / Delete interaction comment
+ *     5. Like / Unlike / Dislike / Undislike interaction
  *     6. Rate course
  */
 
