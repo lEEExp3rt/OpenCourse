@@ -124,7 +124,15 @@ src/
 │   │   └── Main.java       # 主程序
 │   │ 
 │   └── resources/          # 资源目录
-│       └── application.yml # 程序的配置信息，如数据库连接路径
+│       ├── application.yml # 程序的配置信息，如数据库连接路径
+│       └── db              # 数据库表定义和初始化脚本
+│           ├── Course.sql
+│           ├── Department.sql
+│           ├── History.sql
+│           ├── Interaction.sql
+│           ├── Resource.sql
+│           ├── Type.sql
+│           └── User.sql
 │
 └── test/                   # 测试目录
     ├── java/               # 测试代码
@@ -163,3 +171,7 @@ mysql>
 ```
 
 同理，你的 JDBC 路径也需要作对应修改
+
+### 1.7 Database And Tables
+
+数据库表定义和说明，详见 [database.md](./database.md)
