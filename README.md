@@ -14,9 +14,19 @@
 
 ```shell
 .
-├── README.md
-├── docs
-│   ├── HLD.pdf # 总体设计报告
-│   └── SRS.pdf # 软件需求规格说明书
-└── src
+├── .devcontainer/ # 开发容器配置
+│   ├── devcontainer.json
+│   ├── docker-compose.yml
+│   └── Dockerfile
+├── .envs/         # 环境变量
+├── .gitignore     # Git 忽略文件
+├── build.sh       # 开发容器构建与项目初始化脚本
+├── docs/          # 项目文档
+│   ├── dev/       # # 开发文档
+│   ├── HLD.pdf    # # 总体设计报告
+│   └── SRS.pdf    # # 软件需求分析说明书
+├── pom.xml        # 项目依赖
+├── README.md      # 自述文件
+├── src/           # 源代码
+└── target/        # 构建产物
 ```
