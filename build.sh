@@ -3,9 +3,9 @@
 # Author: !EEExp3rt
 
 # Set source code directory.
-mkdir -p src/main/java/{configs,controllers,models,repositories,services,utils}
+mkdir -p src/main/java/opencourse/{configs,controllers,models,repositories,services,utils}
 mkdir -p src/main/resources
-mkdir -p src/test/java/{configs,controllers,models,repositories,services,utils}
+mkdir -p src/test/java/opencourse/{configs,controllers,models,repositories,services,utils}
 mkdir -p src/test/resources
 
 # Set environment variables and build the container.
