@@ -17,5 +17,6 @@ create table `History` if not exists (
     `action_id` tinyint not null,
     `object_id` int default null,
     `timestamp` timestamp default current_timestamp,
-    foreign key (`user_id`) references `User`(`id`)
+    foreign key (`user_id`) references `User`(`id`),
+    foreign key (`action_id`) references `Type`(`id`)
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
