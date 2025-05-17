@@ -15,7 +15,8 @@
     <!-- Project mata information -->
     <groupId>org.opencourse</groupId>
     <artifactId>OpenCourse</artifactId>
-    <version>0.1.0</version>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
     <name>OpenCourse</name>
     <description>OpenCourse, an open platform for students to share knowledge</description>
 
@@ -39,6 +40,14 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Spring Boot Starter Data JPA -->
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>3.4.5</version>
         </dependency>
 
         <!-- JDBC For MySQL -->
