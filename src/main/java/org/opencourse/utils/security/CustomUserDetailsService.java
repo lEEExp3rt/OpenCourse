@@ -1,4 +1,4 @@
-package org.opencourse.security;
+package org.opencourse.utils.security;
 
 import org.opencourse.models.User;
 import org.opencourse.repositories.UserRepository;

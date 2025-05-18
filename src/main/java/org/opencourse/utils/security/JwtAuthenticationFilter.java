@@ -1,4 +1,4 @@
-package org.opencourse.security;
+package org.opencourse.utils.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,4 +1,4 @@
-package org.opencourse.models.dto;
+package org.opencourse.utils.dto;
 
 /**
  * 通用响应DTO，用于返回API调用结果

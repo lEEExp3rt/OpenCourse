@@ -2,9 +2,9 @@ package org.opencourse.services;
 
 import jakarta.mail.MessagingException;
 import org.opencourse.models.User;
-import org.opencourse.models.dto.PasswordResetDto;
-import org.opencourse.models.dto.UserLoginDto;
-import org.opencourse.models.dto.UserRegistrationDto;
+import org.opencourse.utils.dto.PasswordResetDto;
+import org.opencourse.utils.dto.UserLoginDto;
+import org.opencourse.utils.dto.UserRegistrationDto;
 import org.opencourse.repositories.UserRepository;
 import org.opencourse.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,6 @@
 package org.opencourse.configs;
 
-import org.opencourse.security.JwtAuthenticationFilter;
-import org.opencourse.security.JwtAuthorizationFilter;
+import org.opencourse.utils.security.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

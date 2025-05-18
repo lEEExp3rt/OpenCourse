@@ -1,4 +1,4 @@
-package org.opencourse.models.dto;
+package org.opencourse.utils.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,7 +1,7 @@
 package org.opencourse.controllers;
 
 import org.opencourse.models.User;
-import org.opencourse.models.dto.ApiResponse;
+import org.opencourse.utils.dto.ApiResponse;
 import org.opencourse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

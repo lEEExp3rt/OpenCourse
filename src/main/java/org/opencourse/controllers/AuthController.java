@@ -3,14 +3,13 @@ package org.opencourse.controllers;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.opencourse.models.User;
-import org.opencourse.models.dto.ApiResponse;
-import org.opencourse.models.dto.PasswordResetDto;
-import org.opencourse.models.dto.UserLoginDto;
-import org.opencourse.models.dto.UserRegistrationDto;
+import org.opencourse.utils.dto.ApiResponse;
+import org.opencourse.utils.dto.PasswordResetDto;
+import org.opencourse.utils.dto.UserLoginDto;
+import org.opencourse.utils.dto.UserRegistrationDto;
 import org.opencourse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
