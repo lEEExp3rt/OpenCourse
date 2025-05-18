@@ -34,6 +34,7 @@ insert into `Type` (`id`, `name`, `description`) values
     (33, 'Dislike-Interaction',   '点踩评论'),
     (34, 'Undislike-Interaction', '取消点踩'),
     (35, 'Rate-Course',           '评分课程'),
+    (36, 'View-Resource',         '查看资源'),
     -- Resource types.
     (51, 'Exam',       '历年卷'),
     (52, 'Assignment', '作业'),

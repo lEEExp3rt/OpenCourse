@@ -57,6 +57,7 @@ public class TypeManager {
         types.add(new Type((byte) 33, "Dislike-Interaction", "点踩评论"));
         types.add(new Type((byte) 34, "Undislike-Interaction", "取消点踩"));
         types.add(new Type((byte) 35, "Rate-Course", "评分课程"));
+        types.add(new Type((byte) 36, "View-Resource", "查看资源"));
         // Resource types.
         types.add(new Type((byte) 51, "Exam", "历年卷"));
         types.add(new Type((byte) 52, "Assignment", "作业"));

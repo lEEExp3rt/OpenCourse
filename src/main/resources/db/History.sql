@@ -9,6 +9,7 @@
  *     4. Create / Delete interaction comment
  *     5. Like / Unlike / Dislike / Undislike interaction
  *     6. Rate course
+ *     7. View resource post
  */
 
 create table `History` if not exists (
