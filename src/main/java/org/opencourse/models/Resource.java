@@ -112,7 +112,7 @@ public class Resource extends ActionObject {
     @Embedded
     private ResourceFile resourceFile;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
@@ -128,13 +128,13 @@ public class Resource extends ActionObject {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer views;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer likes;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer dislikes;
 
     /**
@@ -310,4 +310,21 @@ public class Resource extends ActionObject {
         this.dislikes--;
     }
 
+    @Override
+    public String toString() {
+        return "Resource{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", resourceType=" + resourceType +
+            ", resourceFile=" + resourceFile +
+            ", createdAt=" + createdAt +
+            ", updatedAt=" + updatedAt +
+            ", course=" + course +
+            ", user=" + user +
+            ", views=" + views +
+            ", likes=" + likes +
+            ", dislikes=" + dislikes +
+            '}';
+    }
 }
