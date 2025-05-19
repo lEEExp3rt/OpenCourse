@@ -33,6 +33,21 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     chsh -s /usr/bin/fish opencourse
 
+# Change source of maven
+RUN mkdir -p /home/opencourse/.m2 && \
+    echo '<?xml version="1.0" encoding="UTF-8"?>\
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">\
+  <mirrors>\
+    <mirror>\
+      <id>aliyun</id>\
+      <name>Aliyun Maven Repository</name>\
+      <url>https://maven.aliyun.com/repository/public</url>\
+      <mirrorOf>central</mirrorOf>\
+    </mirror>\
+  </mirrors>\
+</settings>' > /home/opencourse/.m2/settings.xml && \
+    chown -R opencourse:opencourse /home/opencourse/.m2
+
 # Working directory
 WORKDIR /home/opencourse/OpenCourse
 
