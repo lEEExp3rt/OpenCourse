@@ -32,8 +32,7 @@ public class Department {
     /**
      * Constructor.
      * 
-     * @param id   the ID of the department
-     * @param name the name of the department
+     * @param name The name of the department.
      */
     public Department(String name) {
         this.name = name;
