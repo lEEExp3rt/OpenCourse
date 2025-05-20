@@ -72,18 +72,4 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("服务器内部错误: " + ex.getMessage()));
     }
-    
-    // 支持响应中携带数据的ApiResponse
-    private static class DataApiResponse<T> extends ApiResponse<Void> {
-        private final T data;
-        
-        public DataApiResponse(boolean success, String message, T data) {
-            super(success, message);
-            this.data = data;
-        }
-        
-        public T getData() {
-            return data;
-        }
-    }
 }

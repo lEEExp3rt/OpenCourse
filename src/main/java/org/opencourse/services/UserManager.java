@@ -20,10 +20,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 /**
- * 用户服务
+ * User service manager.
+ * 
+ * @author LJX
  */
 @Service
-public class UserService {
+public class UserManager {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
@@ -33,7 +35,7 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
     @Autowired
-    public UserService(UserRepo userRepo, PasswordEncoder passwordEncoder,
+    public UserManager(UserRepo userRepo, PasswordEncoder passwordEncoder,
                        EmailService emailService, VerificationService verificationService,
                        AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         this.userRepo = userRepo;

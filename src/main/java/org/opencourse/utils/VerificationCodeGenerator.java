@@ -3,17 +3,20 @@ package org.opencourse.utils;
 import java.security.SecureRandom;
 
 /**
- * 验证码生成工具类
+ * Verification code generator.
+ * 
+ * @author LJX
  */
 public class VerificationCodeGenerator {
     
     private static final String CHARACTERS = "0123456789";
     private static final int CODE_LENGTH = 6;
     private static final SecureRandom random = new SecureRandom();
-    
+
     /**
-     * 生成6位数字验证码
-     * @return 验证码
+     * Generate a random verification code of 6 digits.
+     * 
+     * @return The generated verification code.
      */
     public static String generateCode() {
         StringBuilder code = new StringBuilder(CODE_LENGTH);
