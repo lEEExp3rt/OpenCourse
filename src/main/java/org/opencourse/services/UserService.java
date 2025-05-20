@@ -25,7 +25,7 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserRepo userRepository;
+    private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final VerificationService verificationService;
@@ -33,10 +33,10 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
     @Autowired
-    public UserService(UserRepo userRepository, PasswordEncoder passwordEncoder,
+    public UserService(UserRepo userRepo, PasswordEncoder passwordEncoder,
                        EmailService emailService, VerificationService verificationService,
                        AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
-        this.userRepository = userRepository;
+        this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
         this.verificationService = verificationService;
@@ -52,7 +52,7 @@ public class UserService {
      */
     public boolean sendRegistrationVerificationCode(String email) throws MessagingException {
         // 检查邮箱是否已注册
-        if (userRepository.existsByEmail(email)) {
+        if (userRepo.existsByEmail(email)) {
             return false;
         }
 
@@ -82,7 +82,7 @@ public class UserService {
         );
 
         // 保存用户
-        User savedUser = userRepository.save(user);
+        User savedUser = userRepo.save(user);
 
         // 删除验证码
         verificationService.removeVerificationCode(registrationDto.getEmail());
@@ -105,7 +105,7 @@ public class UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 获取用户信息
-        Optional<User> userOptional = userRepository.findByEmail(loginDto.getEmail());
+        Optional<User> userOptional = userRepo.findByEmail(loginDto.getEmail());
         if (userOptional.isEmpty()) {
             return null;
         }
@@ -122,7 +122,7 @@ public class UserService {
      */
     public boolean sendPasswordResetVerificationCode(String email) throws MessagingException {
         // 检查邮箱是否存在
-        if (!userRepository.existsByEmail(email)) {
+        if (!userRepo.existsByEmail(email)) {
             return false;
         }
 
@@ -144,7 +144,7 @@ public class UserService {
         }
 
         // 查找用户
-        Optional<User> userOptional = userRepository.findByEmail(resetDto.getEmail());
+        Optional<User> userOptional = userRepo.findByEmail(resetDto.getEmail());
         if (userOptional.isEmpty()) {
             return false;
         }
@@ -152,7 +152,7 @@ public class UserService {
         // 更新密码
         User user = userOptional.get();
         user.setPassword(passwordEncoder.encode(resetDto.getNewPassword()));
-        userRepository.save(user);
+        userRepo.save(user);
 
         // 删除验证码
         verificationService.removeVerificationCode(resetDto.getEmail());
@@ -166,7 +166,7 @@ public class UserService {
      * @return 用户信息
      */
     public Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepo.findByEmail(email);
     }
 
     /**
@@ -177,14 +177,14 @@ public class UserService {
      */
     @Transactional
     public boolean updateUserRole(Integer userId, User.UserRole role) {
-        Optional<User> userOptional = userRepository.findById(userId);
+        Optional<User> userOptional = userRepo.findById(userId);
         if (userOptional.isEmpty()) {
             return false;
         }
 
         User user = userOptional.get();
         user.setRole(role);
-        userRepository.save(user);
+        userRepo.save(user);
         return true;
     }
 }

@@ -18,16 +18,16 @@ import java.util.List;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepo userRepository;
+    private final UserRepo userRepo;
 
     @Autowired
-    public CustomUserDetailsService(UserRepo userRepository) {
-        this.userRepository = userRepository;
+    public CustomUserDetailsService(UserRepo userRepo) {
+        this.userRepo = userRepo;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.findByEmail(email)
+        User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("未找到邮箱为: " + email + " 的用户"));
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();

@@ -9,54 +9,57 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 /**
- * 邮件服务
+ * Email service manager.
+ * 
+ * @author LJX
  */
 @Service
 public class EmailService {
 
     private final JavaMailSender mailSender;
     private final VerificationService verificationService;
-    
+
+    /**
+     * Constructor.
+     * 
+     * @param mailSender          The mail sender.
+     * @param verificationService The verification service.
+     */
     @Autowired
     public EmailService(JavaMailSender mailSender, VerificationService verificationService) {
         this.mailSender = mailSender;
         this.verificationService = verificationService;
     }
-    
+
     /**
-     * 发送验证码邮件
-     * @param to 收件人邮箱
-     * @param subject 邮件主题
-     * @param purpose 用途描述
-     * @return 生成的验证码
-     * @throws MessagingException 邮件发送异常
+     * Send verification code to the specified email address.
+     * 
+     * @param to      Recipient email address.
+     * @param subject Email subject.
+     * @param purpose Purpose of the email (e.g., "Register", "Reset Password").
+     * @return Generated verification code.
+     * @throws MessagingException If an error occurs while sending the email.
      */
     public String sendVerificationCode(String to, String subject, String purpose) throws MessagingException {
         String verificationCode = VerificationCodeGenerator.generateCode();
-        
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        
+
         helper.setTo(to);
         helper.setSubject(subject);
-        
+
         String htmlContent = createVerificationEmailTemplate(verificationCode, purpose);
         helper.setText(htmlContent, true);
-        
+
         mailSender.send(message);
-        
+
         // 存储验证码
         verificationService.saveVerificationCode(to, verificationCode);
-        
+
         return verificationCode;
     }
-    
-    /**
-     * 创建验证码邮件模板
-     * @param code 验证码
-     * @param purpose 用途描述
-     * @return HTML格式的邮件内容
-     */
+
     private String createVerificationEmailTemplate(String code, String purpose) {
         return "<div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;'>"
                 + "<h2 style='color: #333; text-align: center;'>OpenCourse 验证码</h2>"
