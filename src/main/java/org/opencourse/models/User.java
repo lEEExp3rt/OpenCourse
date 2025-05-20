@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 /**
  * User entity class in OpenCourse.
  * 
- * @author !EEExp3rt
  * @author LJX
+ * @author !EEExp3rt
  */
 @Entity
 @Table(name = "User")
@@ -40,9 +40,9 @@ public class User extends ActionObject {
     private UserRole role;
 
     @Column(name = "activity", columnDefinition = "int default 1")
-    private Integer activity = 1;
+    private Integer activity;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
@@ -60,13 +60,14 @@ public class User extends ActionObject {
      * @param name     The name of the user.
      * @param email    The email of the user.
      * @param password The password of the user after hashing.
-     * @param role    The role of the user.
+     * @param role     The role of the user.
      */
     public User(String name, String email, String password, UserRole role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
+        this.activity = 1;
     }
 
     /**
