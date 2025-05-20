@@ -1,11 +1,12 @@
 package org.opencourse.services;
 
 import jakarta.mail.MessagingException;
+
+import org.opencourse.dto.request.PasswordResetDto;
+import org.opencourse.dto.request.UserLoginDto;
+import org.opencourse.dto.request.UserRegistrationDto;
 import org.opencourse.models.User;
-import org.opencourse.utils.dto.PasswordResetDto;
-import org.opencourse.utils.dto.UserLoginDto;
-import org.opencourse.utils.dto.UserRegistrationDto;
-import org.opencourse.repositories.UserRepository;
+import org.opencourse.repositories.UserRepo;
 import org.opencourse.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,7 +25,7 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final VerificationService verificationService;
@@ -32,7 +33,7 @@ public class UserService {
     private final JwtUtils jwtUtils;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+    public UserService(UserRepo userRepository, PasswordEncoder passwordEncoder,
                        EmailService emailService, VerificationService verificationService,
                        AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
         this.userRepository = userRepository;
@@ -73,11 +74,12 @@ public class UserService {
         }
 
         // 创建新用户
-        User user = new User();
-        user.setName(registrationDto.getName());
-        user.setEmail(registrationDto.getEmail());
-        user.setPassword(passwordEncoder.encode(registrationDto.getPassword()));
-        user.setRole(User.UserRole.USER); // 默认为普通用户角色
+        User user = new User(
+            registrationDto.getName(),
+            registrationDto.getEmail(),
+            passwordEncoder.encode(registrationDto.getPassword()),
+            User.UserRole.USER // 默认为普通用户角色
+        );
 
         // 保存用户
         User savedUser = userRepository.save(user);

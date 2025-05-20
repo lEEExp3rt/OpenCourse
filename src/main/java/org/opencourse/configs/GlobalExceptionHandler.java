@@ -1,6 +1,6 @@
 package org.opencourse.configs;
 
-import org.opencourse.utils.dto.ApiResponse;
+import org.opencourse.dto.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;

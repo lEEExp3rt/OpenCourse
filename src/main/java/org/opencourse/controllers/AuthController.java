@@ -2,11 +2,12 @@ package org.opencourse.controllers;
 
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
+
+import org.opencourse.dto.request.PasswordResetDto;
+import org.opencourse.dto.request.UserLoginDto;
+import org.opencourse.dto.request.UserRegistrationDto;
+import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.User;
-import org.opencourse.utils.dto.ApiResponse;
-import org.opencourse.utils.dto.PasswordResetDto;
-import org.opencourse.utils.dto.UserLoginDto;
-import org.opencourse.utils.dto.UserRegistrationDto;
 import org.opencourse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

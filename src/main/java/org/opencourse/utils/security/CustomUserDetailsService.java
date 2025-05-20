@@ -1,7 +1,7 @@
 package org.opencourse.utils.security;
 
 import org.opencourse.models.User;
-import org.opencourse.repositories.UserRepository;
+import org.opencourse.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,10 +18,10 @@ import java.util.List;
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserRepo userRepository;
 
     @Autowired
-    public CustomUserDetailsService(UserRepository userRepository) {
+    public CustomUserDetailsService(UserRepo userRepository) {
         this.userRepository = userRepository;
     }
 
