@@ -26,11 +26,11 @@ public class Course extends ActionObject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Short id;
 
-    @Column(name = "code", length = 31, nullable = false, unique = true)
-    private String code;
-
     @Column(name = "name", length = 31, nullable = false)
     private String name;
+
+    @Column(name = "code", length = 31, nullable = false, unique = true)
+    private String code;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id", nullable = false)
@@ -52,15 +52,15 @@ public class Course extends ActionObject {
     /**
      * Constructor.
      * 
-     * @param code       The course code.
      * @param name       The course name.
+     * @param code       The course code in official academic system.
      * @param department The department offering the course.
      * @param courseType The type of the course.
      * @param credits    The number of credits for the course.
      */
-    public Course(String code, String name, Department department, CourseType courseType, Float credits) {
-        this.code = code;
+    public Course(String name, String code, Department department, CourseType courseType, Float credits) {
         this.name = name;
+        this.code = code;
         this.department = department;
         this.courseType = courseType;
         this.credits = credits;
@@ -73,20 +73,20 @@ public class Course extends ActionObject {
         return id;
     }
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public Department getDepartment() {

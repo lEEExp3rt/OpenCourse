@@ -14,8 +14,8 @@ create table `Department` if not exists (
 -- `Course` table records the courses information.
 create table `Course` if not exists (
     `id` smallint primary key auto_increment,
-    `code` varchar(31) unique not null,
     `name` varchar(31) not null,
+    `code` varchar(31) unique not null,
     `department_id` tinyint not null,
     `course_type` enum(
         'GENERAL_REQUIRED',
