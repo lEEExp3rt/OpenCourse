@@ -59,11 +59,16 @@ public class DepartmentManager {
     }
 
     /**
-     * Get all departments in order.
+     * Get departments by the fuzzy matching name.
      * 
-     * @return A list of all departments.
+     * If no name is provided, all departments are returned in order.
+     * 
+     * @param name The name of the department.
+     * @return The departments matching the given name.
      */
-    public List<Department> getDepartments() {
-        return repo.findAllByOrderByNameAsc();
+    public List<Department> getDepartments(String name) {
+        return name == null || name.isEmpty() ?
+            repo.findAllByOrderByNameAsc() :
+            repo.findByNameContainingIgnoreCase(name);
     }
 }
