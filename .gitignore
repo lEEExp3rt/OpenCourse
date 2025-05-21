@@ -30,3 +30,8 @@ release.properties
 # Other
 .DS_Store
 Thumbs.db
+
+#vue3
+node_modules
+dist/
+.env*:
