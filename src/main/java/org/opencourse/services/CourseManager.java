@@ -47,7 +47,7 @@ public class CourseManager {
      * @throws IllegalArgumentException if the department is not found.
      */
     @Transactional
-    public Course addCourse(CourseCreationDto dto) {
+    public Course addCourse(CourseCreationDto dto) throws IllegalArgumentException {
         // Find the department by name.
         Department department = departmentRepo.findByName(dto.getDepartmentName()).orElse(null);
         if (department == null) {
@@ -77,7 +77,7 @@ public class CourseManager {
      * @return The course if found, null otherwise.
      * @throws IllegalArgumentException if the keyword is null or empty.
      */
-    public Course getCourse(String keyword) {
+    public Course getCourse(String keyword) throws IllegalArgumentException {
         if (keyword == null || keyword.isEmpty()) {
             throw new IllegalArgumentException("Keyword cannot be null or empty.");
         }

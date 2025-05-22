@@ -37,7 +37,7 @@ public class DepartmentManager {
      * @throws IllegalArgumentException if the name is null or empty.
      */
     @Transactional
-    public Department addDepartment(String name) {
+    public Department addDepartment(String name) throws IllegalArgumentException {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Department name cannot be null or empty");
         }
@@ -51,7 +51,7 @@ public class DepartmentManager {
      * @return The department with the given name or null if it doesn't exist.
      * @throws IllegalArgumentException if the name is null or empty.
      */
-    public Department getDepartment(String name) {
+    public Department getDepartment(String name) throws IllegalArgumentException {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Department name cannot be null or empty");
         }
