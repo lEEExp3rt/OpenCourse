@@ -26,10 +26,10 @@ public interface FileStorageService {
     /**
      * Get a file.
      * 
-     * @param filePath The file path.
+     * @param file The file to be retrieved.
      * @return The file content as an {@link InputStream} or null if error.
      */
-    InputStream getFile(String filePath);
+    InputStream getFile(ResourceFile file);
 
     /**
      * Delete a file.

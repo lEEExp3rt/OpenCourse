@@ -62,12 +62,12 @@ public class MinioFileStorageService implements FileStorageService {
     }
 
     @Override
-    public InputStream getFile(String filePath) {
+    public InputStream getFile(ResourceFile file) {
         try {
             return minioClient.getObject(
                 GetObjectArgs.builder()
                     .bucket(bucketName)
-                    .object(filePath)
+                    .object(file.getFilePath())
                     .build()
             );
         } catch (Exception e) {
