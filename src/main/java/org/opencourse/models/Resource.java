@@ -52,7 +52,24 @@ public class Resource extends ActionObject {
          * Resource file type.
          */
         public enum FileType {
-            PDF, TEXT, OTHER;
+
+            PDF,
+            TEXT,
+            OTHER;
+
+            /**
+             * Get the file type from a string.
+             * 
+             * @param fileTypeName The name of the file type.
+             * @return The corresponding FileType enum value if matched or OTHER if not.
+             */
+            public static FileType from(String fileTypeName) {
+                try {
+                    return FileType.valueOf(fileTypeName.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return OTHER;
+                }
+            }
         }
     
         @Enumerated(EnumType.STRING)
