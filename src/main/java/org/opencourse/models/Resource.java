@@ -256,6 +256,14 @@ public class Resource extends ActionObject {
         this.resourceType = resourceType;
     }
 
+    public ResourceFile getResourceFile() {
+        return resourceFile;
+    }
+
+    public void setResourceFile(ResourceFile resourceFile) {
+        this.resourceFile = resourceFile;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
