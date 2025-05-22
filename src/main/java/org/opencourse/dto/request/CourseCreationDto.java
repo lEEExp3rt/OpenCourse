@@ -116,7 +116,7 @@ public class CourseCreationDto {
         this.courseType = courseType;
     }
 
-    public void setCourseTypeById(Byte courseTypeId) {
+    public void setCourseType(Byte courseTypeId) {
         this.courseType = CourseType.getById(courseTypeId.byteValue());
     }
 
