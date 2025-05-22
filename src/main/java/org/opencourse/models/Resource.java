@@ -132,9 +132,6 @@ public class Resource extends ActionObject {
     @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     // The course to which the resource belongs.
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
@@ -181,7 +178,6 @@ public class Resource extends ActionObject {
         this.resourceType = resourceType;
         this.resourceFile = resourceFile;
         this.createdAt = null;
-        this.updatedAt = null;
         this.course = course;
         this.user = user;
         this.views = 0;
@@ -212,7 +208,6 @@ public class Resource extends ActionObject {
         this.resourceType = resourceType;
         this.resourceFile = resourceFile;
         this.createdAt = null;
-        this.updatedAt = null;
         this.course = course;
         this.user = user;
         this.views = 0;
@@ -228,16 +223,6 @@ public class Resource extends ActionObject {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-    }
-
-    /**
-     * Set update timestamp on update.
-     * 
-     * @apiNote This method is called by JPA automatically.
-     */
-    @PrePersist
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 
     // Getters and Setters
@@ -273,10 +258,6 @@ public class Resource extends ActionObject {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     public Course getCourse() {
@@ -336,7 +317,6 @@ public class Resource extends ActionObject {
             ", resourceType=" + resourceType +
             ", resourceFile=" + resourceFile +
             ", createdAt=" + createdAt +
-            ", updatedAt=" + updatedAt +
             ", course=" + course +
             ", user=" + user +
             ", views=" + views +

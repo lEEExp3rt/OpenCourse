@@ -59,7 +59,6 @@ create table `Resource` if not exists (
     `file_path` varchar(255) not null,
     /* Time Metadata */
     `created_at` timestamp default current_timestamp,
-    `updated_at` timestamp default null on update current_timestamp,
     /* Relevant Information */
     `course_id` smallint not null,
     `user_id` int not null,
