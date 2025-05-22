@@ -7,6 +7,8 @@ import org.opencourse.dto.request.UserLoginDto;
 import org.opencourse.dto.request.UserRegistrationDto;
 import org.opencourse.models.User;
 import org.opencourse.repositories.UserRepo;
+import org.opencourse.services.email.EmailService;
+import org.opencourse.services.email.VerificationService;
 import org.opencourse.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
