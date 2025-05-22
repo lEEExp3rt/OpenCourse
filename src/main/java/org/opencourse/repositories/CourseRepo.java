@@ -79,13 +79,4 @@ public interface CourseRepo extends JpaRepository<Course, Short> {
      * @return List of all courses ordered by name.
      */
     List<Course> findAllByOrderByNameAsc();
-
-    /**
-     * Find courses by department and course type.
-     * 
-     * @param department The department.
-     * @param courseType The course type.
-     * @return List of matching courses.
-     */
-    List<Course> findByDepartmentAndCourseType(Department department, CourseType courseType);
 }
