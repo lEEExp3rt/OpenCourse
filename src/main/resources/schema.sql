@@ -30,7 +30,7 @@ create table `Course` if not exists (
 -- `User` table records the users information.
 create table `User` if not exists (
     `id` int auto_increment primary key,
-    `name` varchar(31),
+    `name` varchar(31) not null unique,
     `email` varchar(63) not null unique,
     `password` varchar(255) not null,
     `role` enum('user', 'visitor', 'admin') not null,
