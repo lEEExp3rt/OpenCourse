@@ -56,9 +56,8 @@ public class MinioFileStorageService implements FileStorageService {
             BigDecimal fileSize = calculateFileSizeMB(file.getSize());
             // Return the resource file object.
             return new ResourceFile(fileType, fileSize, objectPath);
-
         } catch (Exception e) {
-            throw new RuntimeException("Failed to upload resource file " + e.getMessage(), e);
+            return null;
         }
     }
 
@@ -72,7 +71,7 @@ public class MinioFileStorageService implements FileStorageService {
                     .build()
             );
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get file " + e.getMessage(), e);
+            return null;
         }
     }
 

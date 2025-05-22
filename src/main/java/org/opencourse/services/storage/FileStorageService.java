@@ -19,8 +19,7 @@ public interface FileStorageService {
      * @param file     The file to be stored.
      * @param fileType The type of the file.
      * @param courseId The ID of the course associated with the file.
-     * @return The stored file information.
-     * @throws RuntimeException If the file storage fails.
+     * @return The stored file information in {@link ResourceFile} if stored successfully, null otherwise.
      */
     ResourceFile storeFile(MultipartFile file, ResourceFile.FileType fileType, Short courseId);
 
@@ -28,8 +27,7 @@ public interface FileStorageService {
      * Get a file.
      * 
      * @param filePath The file path.
-     * @return The file content as an {@link InputStream}.
-     * @throws RuntimeException If the file access fails.
+     * @return The file content as an {@link InputStream} or null if error.
      */
     InputStream getFile(String filePath);
 
