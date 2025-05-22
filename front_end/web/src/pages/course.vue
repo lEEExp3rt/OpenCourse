@@ -13,8 +13,6 @@ const courses = [
 const goToProfile = () => {
   console.log("跳转到个人中心");
 };
-
-import { Search } from '@element-plus/icons-vue'
 </script>
 
 <template>
@@ -23,33 +21,15 @@ import { Search } from '@element-plus/icons-vue'
         <el-header>
             <!--logo和文字-->
             <div style="display: flex; align-items: center;">
-              <img src="../../resources/Logo.png" style="width: 40px; height: 40px; margin-right: 10px;" />
-              <span style="font-size: 20px; font-weight: bold;"> OpenCourse </span>
+            <img src="../../resources/Logo.png" style="height: 32px; margin-right: 10px;" />
+            <span style="font-size: 20px; font-weight: bold;">OpenCourse</span>
             </div>
-        <!-- 搜索框和个人中心 -->
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-          <!-- 搜索框 -->
-          <el-input
-            v-model="input3"
-            style="max-width: 600px; margin-right: 16px;"
-            placeholder="输入要搜索的内容"
-            class="input-with-select"
-          >
-            <template #prepend>
-              <el-button :icon="Search" />
-            </template>
-          </el-input>
-
-          <!-- 头像 -->
-          <div style="display: flex; align-items: center; cursor: pointer;" @click="goToProfile">
-            <el-avatar :size="40" src="/images/default_person.jpeg" style="margin-right: 8px;" />
-          </div>
-        </div>
-
-            
+            <div class="profile-box" @click="goToProfile">
+                <el-avatar :size="50" :src="public/images/default_person.jpeg" />
+            </div>
         </el-header>
 
-        <el-container class="layout-container2" >
+        <el-container class="layout-container-demo" >
             <el-aside width="200px">
                 <el-scrollbar>
                 <el-menu>
@@ -72,7 +52,7 @@ import { Search } from '@element-plus/icons-vue'
                 </el-sub-menu>
                 <el-sub-menu index="2">
                     <template #title>
-                    <el-icon><icon-menu /></el-icon>老师评价
+                    <el-icon><icon-menu /></el-icon>Navigator Two
                     </template>
                     <el-menu-item-group>
                     <template #title>Group 1</template>
@@ -87,14 +67,29 @@ import { Search } from '@element-plus/icons-vue'
                     <el-menu-item index="2-4-1">Option 4-1</el-menu-item>
                     </el-sub-menu>
                 </el-sub-menu>
+
+                <!-- <el-sub-menu index="3">
+                    <template #title>
+                    <el-icon><setting /></el-icon>Navigator Three
+                    </template>
+                    <el-menu-item-group>
+                    <template #title>Group 1</template>
+                    <el-menu-item index="3-1">Option 1</el-menu-item>
+                    <el-menu-item index="3-2">Option 2</el-menu-item>
+                    </el-menu-item-group>
+                    <el-menu-item-group title="Group 2">
+                    <el-menu-item index="3-3">Option 3</el-menu-item>
+                    </el-menu-item-group>
+                    <el-sub-menu index="3-4">
+                    <template #title>Option 4</template>
+                    <el-menu-item index="3-4-1">Option 4-1</el-menu-item>
+                    </el-sub-menu>
+                </el-sub-menu> -->
                 </el-menu>
             </el-scrollbar>
             </el-aside>
-            <el-main>
-
-              最近浏览
-            </el-main>
         </el-container>
+        <el-main>Main</el-main>
         </el-container>
   </div>
 
@@ -107,22 +102,19 @@ import { Search } from '@element-plus/icons-vue'
   body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    
   }
-.base{
-  box-sizing: border-box;
-}
 .base .el-header {
   position: relative;
-  background-color: var(--el-color-success-light-7);
+  background-color: var(--el-color-primary-light-7);
   color: var(--el-text-color-primary);
+  padding: 0 20px;
   display: flex;
   align-items: center; /* 垂直居中 */
-  justify-content: space-between;
+  justify-content: space-between; 
 }
-.layout-layout-container2 .el-main {
+.layout-container-demo .el-aside {
 color: var(--el-text-color-primary);
-background: var(--el-color-primary-light-7);
+background: var(--el-color-primary-light-8);
 }
 
 
