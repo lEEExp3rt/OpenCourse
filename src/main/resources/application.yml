@@ -81,6 +81,14 @@ jwt:
   secret: your_jwt_secret_key_here_make_it_long_and_random_for_security
   expiration: 86400000 # 1天，单位为毫秒
 
+# MinIO
+minio:
+  endpoint: http://localhost:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket:
+    name: opencourse-files
+
 # 自定义应用配置
 app:
   verification:
