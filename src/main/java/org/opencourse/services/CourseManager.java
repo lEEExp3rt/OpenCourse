@@ -4,6 +4,7 @@ import org.opencourse.dto.request.CourseCreationDto;
 import org.opencourse.models.Course;
 import org.opencourse.models.Department;
 import org.opencourse.repositories.CourseRepo;
+import org.opencourse.repositories.DepartmentRepo;
 import org.opencourse.utils.typeinfo.CourseType;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +23,20 @@ import java.util.stream.Collectors;
 @Service
 public class CourseManager {
 
-    private final CourseRepo courseRepo; // Data access object.
-    private final DepartmentManager departmentManager;
+    // Data Access Object.
+    private final CourseRepo courseRepo;
+    private final DepartmentRepo departmentRepo;
 
     /**
      * Constructor.
      * 
-     * @param courseRepo        The course repository.
-     * @param departmentManager The department manager.
+     * @param courseRepo     The course repository.
+     * @param departmentRepo The department repository.
      */
     @Autowired
-    public CourseManager(CourseRepo courseRepo, DepartmentManager departmentManager) {
+    public CourseManager(CourseRepo courseRepo, DepartmentRepo departmentRepo) {
         this.courseRepo = courseRepo;
-        this.departmentManager = departmentManager;
+        this.departmentRepo = departmentRepo;
     }
 
     /**
@@ -47,7 +49,7 @@ public class CourseManager {
     @Transactional
     public Course addCourse(CourseCreationDto dto) {
         // Find the department by name.
-        Department department = departmentManager.getDepartment(dto.getDepartmentName());
+        Department department = departmentRepo.findByName(dto.getDepartmentName()).orElse(null);
         if (department == null) {
             throw new IllegalArgumentException(
                 "Department " + dto.getDepartmentName() + " not found."
