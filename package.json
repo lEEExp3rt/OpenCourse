@@ -1,7 +1,0 @@
-{
-  "devDependencies": {
-    "element-plus": "^2.9.10",
-    "install": "^0.13.0",
-    "unplugin-vue-components": "^28.5.0"
-  }
-}
