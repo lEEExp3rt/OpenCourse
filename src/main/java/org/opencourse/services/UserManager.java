@@ -24,7 +24,7 @@ import java.util.Optional;
  * 
  * @author LJX
  */
-@Service
+@Service  // 把当前类注册为spring的一个bean
 public class UserManager implements UserService {
 
     private final UserRepo userRepo;
@@ -78,6 +78,9 @@ public class UserManager implements UserService {
         }
 
         // 创建新用户
+        // DTO 是数据传输对象 用于接收前端传入的数据
+        // 但是 userRepo 需要的是 User 实体类
+        // 所以需要把 DTO 转换为 User 实体类
         User user = new User(
             registrationDto.getName(),
             registrationDto.getEmail(),
@@ -86,6 +89,8 @@ public class UserManager implements UserService {
         );
 
         // 保存用户
+        // 直接调用 UserRepo 的 save 方法 该方法继承自 JpaRepository 接口
+        // 该方法会根据实体类的id是否为空 来决定是更新还是插入
         User savedUser = userRepo.save(user);
 
         // 删除验证码
@@ -102,22 +107,22 @@ public class UserManager implements UserService {
     @Override
     public String login(UserLoginDto loginDto) {
         try {
-            // 进行认证
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
-            );
+        // 进行认证
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+        );
 
-            // 认证成功，更新安全上下文
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        // 认证成功，更新安全上下文
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            // 获取用户信息
-            Optional<User> userOptional = userRepo.findByEmail(loginDto.getEmail());
-            if (userOptional.isEmpty()) {
-                return null;
-            }
+        // 获取用户信息
+        Optional<User> userOptional = userRepo.findByEmail(loginDto.getEmail());
+        if (userOptional.isEmpty()) {
+            return null;
+        }
 
-            // 生成JWT令牌
-            return jwtUtils.generateToken(userOptional.get());
+        // 生成JWT令牌
+        return jwtUtils.generateToken(userOptional.get());
         } catch (Exception e) {
             return null;
         }

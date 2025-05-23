@@ -44,7 +44,8 @@ spring:
     # - create: 每次启动都删除并重新创建 schema (测试或开发初期常用)
     # - create-drop: 启动时创建 schema，关闭时删除 schema (测试常用)
     hibernate:
-      ddl-auto: update # 根据你的需求选择，生产环境请谨慎使用 update/create/create-drop
+      # update 表明每次启动时更新数据库结构
+      ddl-auto: update # 根据需求选择，生产环境请谨慎使用 update/create/create-drop
     # JPA 属性配置
     properties:
       hibernate: # 格式化输出的 SQL 语句 (如果 show-sql 为 true)
@@ -99,6 +100,6 @@ app:
 #   configuration:
 #     map-underscore-to-camel-case: true # 开启驼峰命名转换
 
-# 服务器端口配置 (可选)
+# 服务器端口配置
 # server:
 #   port: 8080

@@ -17,13 +17,13 @@ import java.util.Optional;
 /**
  * 用户控制器
  */
-@RestController
-@RequestMapping("/api/users")
+@RestController   // 接口方法可以直接返回对象 并且对象会被自动转换为json
+@RequestMapping("/api/users")  // localhost:8080/api/users/**
 public class UserController {
 
     private final UserService userService;
 
-    @Autowired
+    @Autowired  // 自动注入userService 之前已经在UserManager中注册为bean
     public UserController(UserService userService) {
         this.userService = userService;
     }
