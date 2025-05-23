@@ -18,6 +18,13 @@ public interface UserRepo extends JpaRepository<User, Integer> {
     // JpaRepository: 继承JpaRepository接口 提供基本的CRUD操作
     // 不需要实现任何方法 只需要继承JpaRepository接口
     /**
+     * Find a user by their username.
+     * @param name The username.
+     * @return The user if found.
+     */
+    Optional<User> findByName(String name);
+
+    /**
      * Find a user by their email address.
      * @param email The email address.
      * @return The user if found.

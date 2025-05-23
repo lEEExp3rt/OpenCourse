@@ -21,7 +21,7 @@ create table `Course` if not exists (
         'GENERAL_REQUIRED',
         'GENERAL_OPTIONAL',
         'MAJOR_REQUIRED',
-        'MAJOR_OPTIONAL',
+        'MAJOR_OPTIONAL'
     ) not null,
     `credits` decimal(3, 1) not null,
     foreign key (`department_id`) references `Department`(`id`)
@@ -30,7 +30,7 @@ create table `Course` if not exists (
 -- `User` table records the users information.
 create table `User` if not exists (
     `id` int auto_increment primary key,
-    `name` varchar(31),
+    `name` varchar(31) not null unique,
     `email` varchar(63) not null unique,
     `password` varchar(255) not null,
     `role` enum('user', 'visitor', 'admin') not null,
@@ -59,7 +59,6 @@ create table `Resource` if not exists (
     `file_path` varchar(255) not null,
     /* Time Metadata */
     `created_at` timestamp default current_timestamp,
-    `updated_at` timestamp default null on update current_timestamp,
     /* Relevant Information */
     `course_id` smallint not null,
     `user_id` int not null,
@@ -91,7 +90,7 @@ create table `Interaction` if not exists (
 
 -- `History` table records the history of user actions.
 create table `History` if not exists (
-    `id` int auto_increment primary key,
+    `id` bigint auto_increment primary key,
     `user_id` int not null,
     `action_type` enum(
         'CREATE_USER',
@@ -101,7 +100,11 @@ create table `History` if not exists (
         'CREATE_COURSE',
         'UPDATE_COURSE',
         'CREATE_RESOURCE',
-        'UPDATE_RESOURCE',
+        'DELETE_RESOURCE',
+        'LIKE_RESOURCE',
+        'UNLIKE_RESOURCE',
+        'DISLIKE_RESOURCE',
+        'UNDISLIKE_RESOURCE',
         'CREATE_INTERACTION',
         'DELETE_INTERACTION',
         'LIKE_INTERACTION',

@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * 用户注册请求DTO
+ * DTO for user registration.
+ * 
+ * @author LJX
  */
 public class UserRegistrationDto {
 
@@ -25,6 +27,7 @@ public class UserRegistrationDto {
     private String verificationCode;
 
     // Getters and Setters
+
     public String getName() {
         return name;
     }

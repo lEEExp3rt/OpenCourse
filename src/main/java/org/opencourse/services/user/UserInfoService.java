@@ -1,4 +1,4 @@
-package org.opencourse.utils.security;
+package org.opencourse.services.user;
 
 import org.opencourse.models.User;
 import org.opencourse.repositories.UserRepo;
@@ -13,15 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 自定义UserDetailsService实现，用于从数据库加载用户信息
+ * User information details service manager.
+ * 
+ * @author LJX
  */
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class UserInfoService implements UserDetailsService {
 
     private final UserRepo userRepo;
 
     @Autowired
-    public CustomUserDetailsService(UserRepo userRepo) {
+    public UserInfoService(UserRepo userRepo) {
         this.userRepo = userRepo;
     }
 
