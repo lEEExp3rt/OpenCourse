@@ -21,7 +21,7 @@ create table `Course` if not exists (
         'GENERAL_REQUIRED',
         'GENERAL_OPTIONAL',
         'MAJOR_REQUIRED',
-        'MAJOR_OPTIONAL',
+        'MAJOR_OPTIONAL'
     ) not null,
     `credits` decimal(3, 1) not null,
     foreign key (`department_id`) references `Department`(`id`)
@@ -90,7 +90,7 @@ create table `Interaction` if not exists (
 
 -- `History` table records the history of user actions.
 create table `History` if not exists (
-    `id` int auto_increment primary key,
+    `id` bigint auto_increment primary key,
     `user_id` int not null,
     `action_type` enum(
         'CREATE_USER',

@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  * @author !EEExp3rt
  */
 @Repository
-public interface HistoryRepo extends JpaRepository<History, Integer> {
+public interface HistoryRepo extends JpaRepository<History, Long> {
 }
