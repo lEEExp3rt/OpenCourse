@@ -8,7 +8,7 @@ import org.opencourse.dto.request.UserLoginDto;
 import org.opencourse.dto.request.UserRegistrationDto;
 import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.User;
-import org.opencourse.services.UserManager;
+import org.opencourse.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +24,11 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserManager userManager;
+    private final UserService userService;
 
     @Autowired
-    public AuthController(UserManager userManager) {
-        this.userManager = userManager;
+    public AuthController(UserService userService) {
+        this.userService = userService;
     }
 
     /**
@@ -39,7 +39,7 @@ public class AuthController {
     @PostMapping("/register/send-code")
     public ResponseEntity<ApiResponse<Void>> sendRegistrationVerificationCode(@RequestParam String email) {
         try {
-            boolean result = userManager.sendRegistrationVerificationCode(email);
+            boolean result = userService.sendRegistrationVerificationCode(email);
             if (result) {
                 return ResponseEntity.ok(ApiResponse.success("验证码已发送，请注意查收"));
             } else {
@@ -57,7 +57,7 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Map<String, Object>>> register(@Valid @RequestBody UserRegistrationDto registrationDto) {
-        User user = userManager.registerUser(registrationDto);
+        User user = userService.registerUser(registrationDto);
         if (user == null) {
             return ResponseEntity.badRequest().body(ApiResponse.error("注册失败，验证码错误或已过期"));
         }
@@ -77,13 +77,13 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, Object>>> login(@Valid @RequestBody UserLoginDto loginDto) {
-        String token = userManager.login(loginDto);
+        String token = userService.login(loginDto);
         if (token == null) {
             return ResponseEntity.badRequest().body(ApiResponse.error("用户名或密码错误"));
         }
 
         // 获取用户信息
-        Optional<User> userOptional = userManager.getUserByEmail(loginDto.getEmail());
+        Optional<User> userOptional = userService.getUserByEmail(loginDto.getEmail());
         if (userOptional.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiResponse.error("用户不存在"));
         }
@@ -109,7 +109,7 @@ public class AuthController {
     @PostMapping("/password/send-reset-code")
     public ResponseEntity<ApiResponse<Void>> sendPasswordResetVerificationCode(@RequestParam String email) {
         try {
-            boolean result = userManager.sendPasswordResetVerificationCode(email);
+            boolean result = userService.sendPasswordResetVerificationCode(email);
             if (result) {
                 return ResponseEntity.ok(ApiResponse.success("验证码已发送，请注意查收"));
             } else {
@@ -127,7 +127,7 @@ public class AuthController {
      */
     @PostMapping("/password/reset")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody PasswordResetDto resetDto) {
-        boolean result = userManager.resetPassword(resetDto);
+        boolean result = userService.resetPassword(resetDto);
         if (result) {
             return ResponseEntity.ok(ApiResponse.success("密码重置成功"));
         } else {

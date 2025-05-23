@@ -25,7 +25,7 @@ import java.util.Optional;
  * @author LJX
  */
 @Service
-public class UserManager {
+public class UserManager implements UserService {
 
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
@@ -52,6 +52,7 @@ public class UserManager {
      * @return 操作结果
      * @throws MessagingException 邮件发送异常
      */
+    @Override
     public boolean sendRegistrationVerificationCode(String email) throws MessagingException {
         // 检查邮箱是否已注册
         if (userRepo.existsByEmail(email)) {
@@ -68,6 +69,7 @@ public class UserManager {
      * @param registrationDto 注册信息
      * @return 注册结果
      */
+    @Override
     @Transactional
     public User registerUser(UserRegistrationDto registrationDto) {
         // 验证验证码
@@ -97,23 +99,28 @@ public class UserManager {
      * @param loginDto 登录信息
      * @return JWT令牌
      */
+    @Override
     public String login(UserLoginDto loginDto) {
-        // 进行认证
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
-        );
+        try {
+            // 进行认证
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+            );
 
-        // 认证成功，更新安全上下文
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            // 认证成功，更新安全上下文
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        // 获取用户信息
-        Optional<User> userOptional = userRepo.findByEmail(loginDto.getEmail());
-        if (userOptional.isEmpty()) {
+            // 获取用户信息
+            Optional<User> userOptional = userRepo.findByEmail(loginDto.getEmail());
+            if (userOptional.isEmpty()) {
+                return null;
+            }
+
+            // 生成JWT令牌
+            return jwtUtils.generateToken(userOptional.get());
+        } catch (Exception e) {
             return null;
         }
-
-        // 生成JWT令牌
-        return jwtUtils.generateToken(userOptional.get());
     }
 
     /**
@@ -122,6 +129,7 @@ public class UserManager {
      * @return 操作结果
      * @throws MessagingException 邮件发送异常
      */
+    @Override
     public boolean sendPasswordResetVerificationCode(String email) throws MessagingException {
         // 检查邮箱是否存在
         if (!userRepo.existsByEmail(email)) {
@@ -138,6 +146,7 @@ public class UserManager {
      * @param resetDto 重置信息
      * @return 操作结果
      */
+    @Override
     @Transactional
     public boolean resetPassword(PasswordResetDto resetDto) {
         // 验证验证码
@@ -167,6 +176,7 @@ public class UserManager {
      * @param email 用户邮箱
      * @return 用户信息
      */
+    @Override
     public Optional<User> getUserByEmail(String email) {
         return userRepo.findByEmail(email);
     }
@@ -177,6 +187,7 @@ public class UserManager {
      * @param role 新角色
      * @return 操作结果
      */
+    @Override
     @Transactional
     public boolean updateUserRole(Integer userId, User.UserRole role) {
         Optional<User> userOptional = userRepo.findById(userId);
@@ -186,6 +197,44 @@ public class UserManager {
 
         User user = userOptional.get();
         user.setRole(role);
+        userRepo.save(user);
+        return true;
+    }
+    
+    /**
+     * 禁用用户
+     * @param userId 用户ID
+     * @return 操作结果
+     */
+    @Override
+    @Transactional
+    public boolean disableUser(Integer userId) {
+        Optional<User> userOptional = userRepo.findById(userId);
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+        
+        User user = userOptional.get();
+        user.setActivity(0); // 设置活跃度为0表示禁用
+        userRepo.save(user);
+        return true;
+    }
+    
+    /**
+     * 启用用户
+     * @param userId 用户ID
+     * @return 操作结果
+     */
+    @Override
+    @Transactional
+    public boolean enableUser(Integer userId) {
+        Optional<User> userOptional = userRepo.findById(userId);
+        if (userOptional.isEmpty()) {
+            return false;
+        }
+        
+        User user = userOptional.get();
+        user.setActivity(1); // 设置活跃度为1表示启用
         userRepo.save(user);
         return true;
     }

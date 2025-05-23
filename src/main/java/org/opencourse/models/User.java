@@ -133,6 +133,10 @@ public class User extends ActionObject {
         return activity;
     }
 
+    public void setActivity(Integer activity) {
+        this.activity = activity;
+    }
+
     public void addActivity(Integer activity) {
         this.activity += activity;
     }
