@@ -33,7 +33,7 @@ public class Course extends ActionObject {
     private String code;
 
     @ManyToOne
-    @JoinColumn(name = "teacher_id", nullable = false)
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
     @Enumerated(EnumType.STRING)
