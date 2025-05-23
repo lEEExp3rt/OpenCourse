@@ -190,6 +190,15 @@ public class UserManager {
 
     /**
      * 获取用户信息
+     * @param name 用户名
+     * @return 用户信息
+     */
+    public User getUserByName(String name) {
+        return userRepo.findByName(name).orElse(null);
+    }
+
+    /**
+     * 获取用户信息
      * @param userId 用户ID
      * @return 用户信息
      */
