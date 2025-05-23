@@ -2,7 +2,7 @@ package org.opencourse.controllers;
 
 import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.User;
-import org.opencourse.services.UserService;
+import org.opencourse.services.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,11 +20,15 @@ import java.util.Map;
 @RequestMapping("/api/users")  // localhost:8080/api/users/**
 public class UserController {
 
-    private final UserService userService;
+    // private final UserService userService;
+    private final UserManager userManager;
 
     @Autowired  // 自动注入userService 之前已经在UserManager中注册为bean
-    public UserController(UserService userService) {
-        this.userService = userService;
+    // public UserController(UserService userService) {
+    //     this.userService = userService;
+    // }
+    public UserController(UserManager userManager) {
+        this.userManager = userManager;
     }
 
     /**
@@ -64,7 +68,8 @@ public class UserController {
             @PathVariable Integer userId,
             @RequestParam User.UserRole role) {
         
-        boolean result = userService.updateUserRole(userId, role);
+        // boolean result = userService.updateUserRole(userId, role);
+        boolean result = userManager.updateUserRole(userId, role);
         if (result) {
             return ResponseEntity.ok(ApiResponse.success("用户角色更新成功"));
         } else {

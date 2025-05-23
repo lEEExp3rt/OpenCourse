@@ -2,7 +2,8 @@ package org.opencourse.controllers;
 
 import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.User;
-import org.opencourse.services.UserService;
+// import org.opencourse.services.UserService;
+import org.opencourse.services.UserManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,11 +26,15 @@ import java.util.stream.Collectors;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
-    private final UserService userService;
+    // private final UserService userService;
+    private final UserManager userManager;
 
     @Autowired
-    public AdminController(UserService userService) {
-        this.userService = userService;
+    // public AdminController(UserService userService) {
+    //     this.userService = userService;
+    // }
+    public AdminController(UserManager userManager) {
+        this.userManager = userManager;
     }
 
     /**
@@ -65,7 +70,8 @@ public class AdminController {
             @PathVariable Integer userId,
             @RequestParam User.UserRole role) {
         
-        boolean result = userService.updateUserRole(userId, role);
+        // boolean result = userService.updateUserRole(userId, role);
+        boolean result = userManager.updateUserRole(userId, role);
         if (result) {
             return ResponseEntity.ok(ApiResponse.success("用户角色更新成功"));
         } else {
@@ -80,7 +86,8 @@ public class AdminController {
      */
     @PutMapping("/users/{userId}/disable")
     public ResponseEntity<ApiResponse<Void>> disableUser(@PathVariable Integer userId) {
-        boolean result = userService.disableUser(userId);
+        // boolean result = userService.disableUser(userId);
+        boolean result = userManager.disableUser(userId);
         if (result) {
             return ResponseEntity.ok(ApiResponse.success("用户已禁用"));
         } else {
@@ -95,7 +102,8 @@ public class AdminController {
      */
     @PutMapping("/users/{userId}/enable")
     public ResponseEntity<ApiResponse<Void>> enableUser(@PathVariable Integer userId) {
-        boolean result = userService.enableUser(userId);
+        // boolean result = userService.enableUser(userId);
+        boolean result = userManager.enableUser(userId);
         if (result) {
             return ResponseEntity.ok(ApiResponse.success("用户已启用"));
         } else {
