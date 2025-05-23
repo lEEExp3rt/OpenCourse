@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * 用户认证控制器
@@ -83,12 +82,11 @@ public class AuthController {
         }
 
         // 获取用户信息
-        Optional<User> userOptional = userManager.getUserByEmail(loginDto.getEmail());
-        if (userOptional.isEmpty()) {
+        User user = userManager.getUserByEmail(loginDto.getEmail());
+        if (user == null) {
             return ResponseEntity.badRequest().body(ApiResponse.error("用户不存在"));
         }
 
-        User user = userOptional.get();
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
         result.put("user", Map.of(

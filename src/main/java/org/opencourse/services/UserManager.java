@@ -36,10 +36,25 @@ public class UserManager {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
 
+    /**
+     * Constructor.
+     * 
+     * @param userRepo              User repository.
+     * @param passwordEncoder       Password encoder.
+     * @param emailService          Email service.
+     * @param verificationService   Verification service.
+     * @param authenticationManager Authentication manager.
+     * @param jwtUtils              JWT utils.
+     */
     @Autowired
-    public UserManager(UserRepo userRepo, PasswordEncoder passwordEncoder,
-                       EmailService emailService, VerificationService verificationService,
-                       AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+    public UserManager(
+        UserRepo userRepo,
+        PasswordEncoder passwordEncoder,
+        EmailService emailService,
+        VerificationService verificationService,
+        AuthenticationManager authenticationManager,
+        JwtUtils jwtUtils
+    ) {
         this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.emailService = emailService;
@@ -102,7 +117,7 @@ public class UserManager {
     public String login(UserLoginDto loginDto) {
         // 进行认证
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
+            new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword())
         );
 
         // 认证成功，更新安全上下文
@@ -169,8 +184,17 @@ public class UserManager {
      * @param email 用户邮箱
      * @return 用户信息
      */
-    public Optional<User> getUserByEmail(String email) {
-        return userRepo.findByEmail(email);
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email).orElse(null);
+    }
+
+    /**
+     * 获取用户信息
+     * @param userId 用户ID
+     * @return 用户信息
+     */
+    public User getUser(Integer userId) {
+        return userRepo.findById(userId).orElse(null);
     }
 
     /**
