@@ -6,7 +6,7 @@ package org.opencourse.utils.typeinfo;
  * @author !EEExp3rt
  */
 public enum ActionType implements TypeInfo {
-    
+
     CREATE_COURSE((byte) 21, "Create-Course", "创建课程"),
     UPDATE_COURSE((byte) 22, "Update-Course", "更新课程"),
 
@@ -24,35 +24,35 @@ public enum ActionType implements TypeInfo {
     LIKE_INTERACTION((byte) 32, "Like-Interaction", "点赞评论"),
     UNLIKE_INTERACTION((byte) 33, "Unlike-Interaction", "取消点赞"),
     RATE_COURSE((byte) 34, "Rate-Course", "评分课程"),
-    
+
     CREATE_USER((byte) 35, "Create-User", "创建用户"),
     UPDATE_USER((byte) 36, "Update-User", "更新用户");
 
     private final byte id;
     private final String name;
     private final String description;
-    
+
     ActionType(byte id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
     }
-    
+
     @Override
     public byte getId() {
         return id;
     }
-    
+
     @Override
     public String getName() {
         return name;
     }
-    
+
     @Override
     public String getDescription() {
         return description;
     }
-    
+
     /**
      * Get ActionType by ID.
      * 
