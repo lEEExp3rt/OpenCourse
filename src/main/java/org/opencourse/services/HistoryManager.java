@@ -1,9 +1,9 @@
 package org.opencourse.services;
 
-import org.opencourse.models.ActionObject;
-import org.opencourse.models.History;
-import org.opencourse.models.User;
+import org.opencourse.models.*;
 import org.opencourse.repositories.HistoryRepo;
+import org.opencourse.repositories.UserRepo;
+import org.opencourse.services.history.HistoryObjectService;
 import org.opencourse.utils.typeinfo.ActionType;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,42 +21,24 @@ import java.util.List;
 public class HistoryManager {
 
     private final HistoryRepo historyRepo; // Data access object.
+    private final UserRepo userRepo; // Data access object.
+    private final HistoryObjectService historyObjectService;
 
     /**
      * Constructor.
      * 
-     * @param historyRepo The history repository
+     * @param historyRepo The history repository.
+     * @param userRepo The user repository.
      */
     @Autowired
-    public HistoryManager(HistoryRepo historyRepo) {
+    public HistoryManager(
+        HistoryRepo historyRepo,
+        UserRepo userRepo,
+        HistoryObjectService historyObjectService
+    ) {
         this.historyRepo = historyRepo;
-    }
-
-    /**
-     * Add a history record.
-     * 
-     * @param user The user who performed the action.
-     * @param type The action type.
-     * @return True if the history was added successfully, false otherwise.
-     */
-    @Transactional
-    public Boolean addHistory(User user, ActionType type) {
-        History history = new History(user, type);
-        return historyRepo.save(history) != null;
-    }
-
-    /**
-     * Add a history record.
-     * 
-     * @param user The user who performed the action.
-     * @param type The action type.
-     * @param object The action object.
-     * @return True if the history was added successfully, false otherwise.
-     */
-    @Transactional
-    public Boolean addHistory(User user, ActionType type, ActionObject object) {
-        History history = new History(user, type, object);
-        return historyRepo.save(history) != null;
+        this.userRepo = userRepo;
+        this.historyObjectService = historyObjectService;
     }
 
     /**
@@ -67,5 +49,95 @@ public class HistoryManager {
      */
     public List<History> getHistories(Integer userId) {
         return historyRepo.findAllByUserId(userId);
+    }
+
+    // Course actions.
+
+    @Transactional
+    public void logCourseCreation() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logCourseUpdate() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logCourseRate() {
+        // TODO: Implement this method.
+    }
+
+    // Department actions.
+
+    @Transactional
+    public void logDepartmentCreation() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logDepartmentUpdate() {
+        // TODO: Implement this method.
+    }
+
+    // Resource actions.
+
+    @Transactional
+    public void logResourceCreation() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logResourceDelete() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logResourceLike() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logResourceUnlike() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logResourceView() {
+        // TODO: Implement this method.
+    }
+
+    // Interaction actions.
+
+    @Transactional
+    public void logInteractionCreation() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logInteractionDelete() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logInteractionLike() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logInteractionUnlike() {
+        // TODO: Implement this method.
+    }
+
+    // User actions.
+
+    @Transactional
+    public void logUserCreation() {
+        // TODO: Implement this method.
+    }
+
+    @Transactional
+    public void logUserUpdate() {
+        // TODO: Implement this method.
     }
 }

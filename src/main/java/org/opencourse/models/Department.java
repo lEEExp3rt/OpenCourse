@@ -14,7 +14,7 @@ import jakarta.persistence.Column;
  */
 @Entity
 @Table(name = "Department")
-public class Department {
+public class Department extends Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

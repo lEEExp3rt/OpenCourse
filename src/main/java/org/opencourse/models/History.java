@@ -23,7 +23,7 @@ import org.opencourse.utils.typeinfo.ActionType;
  */
 @Entity
 @Table(name = "History")
-public class History {
+public class History extends Model {
 
     // The ID of the history record.
     @Id
@@ -43,7 +43,7 @@ public class History {
 
     // The object related to the action.
     @Column(name = "object_id")
-    private ActionObject actionObject;
+    private Integer objectId;
     
     // The timestamp of when the action was performed.
     @Column(name = "timestamp", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -60,12 +60,12 @@ public class History {
      *
      * @param user         The user who performed the action.
      * @param actionType   The action type performed by the user.
-     * @param actionObject The object related to the action.
+     * @param objectId     The ID of the object related to the action.
      */
-    public History(User user, ActionType actionType, ActionObject actionObject) {
+    public History(User user, ActionType actionType, Integer objectId) {
         this.user = user;
         this.actionType = actionType;
-        this.actionObject = actionObject;
+        this.objectId = objectId;
         this.timestamp = null;
     }
 
@@ -78,7 +78,7 @@ public class History {
     public History(User user, ActionType actionType) {
         this.user = user;
         this.actionType = actionType;
-        this.actionObject = null;
+        this.objectId = null;
         this.timestamp = null;
     }
 
@@ -118,12 +118,12 @@ public class History {
         this.actionType = actionType;
     }
 
-    public ActionObject getActionObject() {
-        return actionObject;
+    public Integer getObjectId() {
+        return objectId;
     }
 
-    public void setActionObject(ActionObject actionObject) {
-        this.actionObject = actionObject;
+    public void setObjectId(Integer objectId) {
+        this.objectId = objectId;
     }
 
     public LocalDateTime getTimestamp() {
@@ -140,7 +140,7 @@ public class History {
                 "id=" + id +
                 ", user=" + user +
                 ", actionType=" + actionType +
-                ", actionObject=" + actionObject +
+                ", objectId=" + objectId +
                 ", timestamp=" + timestamp +
                 '}';
     }
