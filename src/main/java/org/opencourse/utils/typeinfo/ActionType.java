@@ -7,27 +7,27 @@ package org.opencourse.utils.typeinfo;
  */
 public enum ActionType implements TypeInfo {
     
-    CREATE_USER((byte) 21, "Create-User", "创建用户"),
-    UPDATE_USER((byte) 22, "Update-User", "更新用户"),
+    CREATE_COURSE((byte) 21, "Create-Course", "创建课程"),
+    UPDATE_COURSE((byte) 22, "Update-Course", "更新课程"),
+
     CREATE_DEPARTMENT((byte) 23, "Create-Department", "创建院系"),
-    UPDATE_DEPARTMENT((byte) 24, "Update-Department", "更新院系"), // TODO: Not implemented.
-    CREATE_COURSE((byte) 25, "Create-Course", "创建课程"),
-    UPDATE_COURSE((byte) 26, "Update-Course", "更新课程"), // TODO: Not implemented.
-    CREATE_RESOURCE((byte) 27, "Create-Resource", "创建资源"),
-    DELETE_RESOURCE((byte) 28, "Delete-Resource", "删除资源"),
-    LIKE_RESOURCE((byte) 29, "Like-Resource", "点赞资源"),
-    UNLIKE_RESOURCE((byte) 30, "Unlike-Resource", "取消点赞"),
-    DISLIKE_RESOURCE((byte) 31, "Dislike-Resource", "点踩资源"),
-    UNDISLIKE_RESOURCE((byte) 32, "Undislike-Resource", "取消点踩"),
-    CREATE_INTERACTION((byte) 33, "Create-Interaction", "发表评论"),
-    DELETE_INTERACTION((byte) 34, "Delete-Interaction", "删除评论"),
-    LIKE_INTERACTION((byte) 35, "Like-Interaction", "点赞评论"),
-    UNLIKE_INTERACTION((byte) 36, "Unlike-Interaction", "取消点赞"),
-    DISLIKE_INTERACTION((byte) 37, "Dislike-Interaction", "点踩评论"),
-    UNDISLIKE_INTERACTION((byte) 38, "Undislike-Interaction", "取消点踩"),
-    RATE_COURSE((byte) 39, "Rate-Course", "评分课程"),
-    VIEW_RESOURCE((byte) 40, "View-Resource", "查看资源");
+    UPDATE_DEPARTMENT((byte) 24, "Update-Department", "更新院系"),
+
+    CREATE_RESOURCE((byte) 25, "Create-Resource", "创建资源"),
+    DELETE_RESOURCE((byte) 26, "Delete-Resource", "删除资源"),
+    LIKE_RESOURCE((byte) 27, "Like-Resource", "点赞资源"),
+    UNLIKE_RESOURCE((byte) 28, "Unlike-Resource", "取消点赞"),
+    VIEW_RESOURCE((byte) 29, "View-Resource", "查看资源"),
+
+    CREATE_INTERACTION((byte) 30, "Create-Interaction", "发表评论"),
+    DELETE_INTERACTION((byte) 31, "Delete-Interaction", "删除评论"),
+    LIKE_INTERACTION((byte) 32, "Like-Interaction", "点赞评论"),
+    UNLIKE_INTERACTION((byte) 33, "Unlike-Interaction", "取消点赞"),
+    RATE_COURSE((byte) 34, "Rate-Course", "评分课程"),
     
+    CREATE_USER((byte) 35, "Create-User", "创建用户"),
+    UPDATE_USER((byte) 36, "Update-User", "更新用户");
+
     private final byte id;
     private final String name;
     private final String description;
