@@ -3,12 +3,10 @@ package org.opencourse.services;
 import org.opencourse.models.Interaction;
 import org.opencourse.models.Course;
 import org.opencourse.models.User;
-import org.opencourse.models.UserInteractionRecord;
 import org.opencourse.repositories.InteractionRepo;
 import org.opencourse.repositories.CourseRepo;
 import org.opencourse.repositories.UserRepo;
-import org.opencourse.repositories.UserInteractionRecordRepo;
-import org.opencourse.exceptions.ResourceNotFoundException;
+import org.opencourse.utils.typeinfo.ActionType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,7 @@ public class InteractionManager {
     private final InteractionRepo interactionRepo; // Data access object.
     private final CourseRepo courseRepo;
     private final UserRepo userRepo;
-    private final UserInteractionRecordRepo userInteractionRecordRepo;
+    private final HistoryManager historyManager;
 
     /**
      * Constructor.
@@ -36,15 +34,15 @@ public class InteractionManager {
      * @param interactionRepo The interaction repository.
      * @param courseRepo The course repository.
      * @param userRepo The user repository.
-     * @param userInteractionRecordRepo The user interaction record repository.
+     * @param historyManager The history manager.
      */
     @Autowired
     public InteractionManager(InteractionRepo interactionRepo, CourseRepo courseRepo, UserRepo userRepo, 
-            UserInteractionRecordRepo userInteractionRecordRepo) {
+            HistoryManager historyManager) {
         this.interactionRepo = interactionRepo;
         this.courseRepo = courseRepo;
         this.userRepo = userRepo;
-        this.userInteractionRecordRepo = userInteractionRecordRepo;
+        this.historyManager = historyManager;
     }
 
     /**
@@ -64,10 +62,15 @@ public class InteractionManager {
         }
         
         // 获取课程和用户
-        Course course = courseRepo.findById(courseId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到课程"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到用户"));
+        Optional<Course> courseOpt = courseRepo.findById(courseId);
+        Optional<User> userOpt = userRepo.findById(userId);
+        
+        if (courseOpt.isEmpty() || userOpt.isEmpty()) {
+            throw new IllegalArgumentException("课程或用户不存在");
+        }
+        
+        Course course = courseOpt.get();
+        User user = userOpt.get();
             
         // 检查用户是否已经对该课程进行过评论
         Interaction existingInteraction = interactionRepo.findByCourseAndUser(course, user);
@@ -84,7 +87,17 @@ public class InteractionManager {
         
         // 创建新评论
         Interaction interaction = new Interaction(course, user, content, rating);
-        return interactionRepo.save(interaction);
+        Interaction savedInteraction = interactionRepo.save(interaction);
+        
+        // 添加创建评论的历史记录
+        historyManager.addHistory(user, ActionType.CREATE_INTERACTION, savedInteraction);
+        
+        // 如果包含评分，添加评分的历史记录
+        if (rating != null) {
+            historyManager.addHistory(user, ActionType.RATE_COURSE, savedInteraction);
+        }
+        
+        return savedInteraction;
     }
 
     /**
@@ -103,9 +116,11 @@ public class InteractionManager {
      * @return List of interactions for the course.
      */
     public List<Interaction> getInteractionsByCourse(Short courseId) {
-        Course course = courseRepo.findById(courseId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到课程"));
-        return interactionRepo.findByCourse(course);
+        Optional<Course> courseOpt = courseRepo.findById(courseId);
+        if (courseOpt.isEmpty()) {
+            return List.of(); // 返回空列表
+        }
+        return interactionRepo.findByCourse(courseOpt.get());
     }
     
     /**
@@ -115,9 +130,11 @@ public class InteractionManager {
      * @return List of interactions by the user.
      */
     public List<Interaction> getInteractionsByUser(Integer userId) {
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到用户"));
-        return interactionRepo.findByUser(user);
+        Optional<User> userOpt = userRepo.findById(userId);
+        if (userOpt.isEmpty()) {
+            return List.of(); // 返回空列表
+        }
+        return interactionRepo.findByUser(userOpt.get());
     }
 
     /**
@@ -125,20 +142,39 @@ public class InteractionManager {
      * 
      * @param interactionId The ID of the interaction to like.
      * @param userId The ID of the user who likes.
+     * @return true if the operation was successful, false otherwise.
      */
     @Transactional
-    public void likeInteraction(Integer interactionId, Integer userId) {
-        Interaction interaction = interactionRepo.findById(interactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到评论"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到用户"));
-            
-        // 查找或创建交互记录
-        UserInteractionRecord record = userInteractionRecordRepo.findByUserAndInteraction(user, interaction)
-            .orElseGet(() -> new UserInteractionRecord(user, interaction));
-            
-        record.like();
-        userInteractionRecordRepo.save(record);
+    public boolean likeInteraction(Integer interactionId, Integer userId) {
+        Optional<Interaction> interactionOpt = interactionRepo.findById(interactionId);
+        Optional<User> userOpt = userRepo.findById(userId);
+        
+        if (interactionOpt.isEmpty() || userOpt.isEmpty()) {
+            return false;
+        }
+        
+        Interaction interaction = interactionOpt.get();
+        User user = userOpt.get();
+        
+        // 检查用户是否已经点赞过
+        if (historyManager.hasLiked(user, interaction)) {
+            return false; // 已经点赞过，不需要重复操作
+        }
+        
+        // 检查用户是否之前点踩过，如果是则先取消点踩
+        if (historyManager.hasDisliked(user, interaction)) {
+            historyManager.removeAction(user, ActionType.DISLIKE_INTERACTION, interaction);
+            interaction.undislikes();
+        }
+        
+        // 添加点赞记录
+        historyManager.addHistory(user, ActionType.LIKE_INTERACTION, interaction);
+        
+        // 增加点赞数
+        interaction.likes();
+        interactionRepo.save(interaction);
+        
+        return true;
     }
 
     /**
@@ -146,21 +182,33 @@ public class InteractionManager {
      * 
      * @param interactionId The ID of the interaction to unlike.
      * @param userId The ID of the user who unlikes.
+     * @return true if the operation was successful, false otherwise.
      */
     @Transactional
-    public void unlikeInteraction(Integer interactionId, Integer userId) {
-        Interaction interaction = interactionRepo.findById(interactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到评论"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到用户"));
-            
-        // 查找交互记录
-        Optional<UserInteractionRecord> recordOpt = userInteractionRecordRepo.findByUserAndInteraction(user, interaction);
-        if (recordOpt.isPresent()) {
-            UserInteractionRecord record = recordOpt.get();
-            record.unlike();
-            userInteractionRecordRepo.save(record);
+    public boolean unlikeInteraction(Integer interactionId, Integer userId) {
+        Optional<Interaction> interactionOpt = interactionRepo.findById(interactionId);
+        Optional<User> userOpt = userRepo.findById(userId);
+        
+        if (interactionOpt.isEmpty() || userOpt.isEmpty()) {
+            return false;
         }
+        
+        Interaction interaction = interactionOpt.get();
+        User user = userOpt.get();
+        
+        // 检查用户是否点赞过
+        if (!historyManager.hasLiked(user, interaction)) {
+            return false; // 没有点赞过，无需取消
+        }
+        
+        // 移除点赞记录
+        historyManager.removeAction(user, ActionType.LIKE_INTERACTION, interaction);
+        
+        // 减少点赞数
+        interaction.unlikes();
+        interactionRepo.save(interaction);
+        
+        return true;
     }
 
     /**
@@ -168,20 +216,39 @@ public class InteractionManager {
      * 
      * @param interactionId The ID of the interaction to dislike.
      * @param userId The ID of the user who dislikes.
+     * @return true if the operation was successful, false otherwise.
      */
     @Transactional
-    public void dislikeInteraction(Integer interactionId, Integer userId) {
-        Interaction interaction = interactionRepo.findById(interactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到评论"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到用户"));
-            
-        // 查找或创建交互记录
-        UserInteractionRecord record = userInteractionRecordRepo.findByUserAndInteraction(user, interaction)
-            .orElseGet(() -> new UserInteractionRecord(user, interaction));
-            
-        record.dislike();
-        userInteractionRecordRepo.save(record);
+    public boolean dislikeInteraction(Integer interactionId, Integer userId) {
+        Optional<Interaction> interactionOpt = interactionRepo.findById(interactionId);
+        Optional<User> userOpt = userRepo.findById(userId);
+        
+        if (interactionOpt.isEmpty() || userOpt.isEmpty()) {
+            return false;
+        }
+        
+        Interaction interaction = interactionOpt.get();
+        User user = userOpt.get();
+        
+        // 检查用户是否已经点踩过
+        if (historyManager.hasDisliked(user, interaction)) {
+            return false; // 已经点踩过，不需要重复操作
+        }
+        
+        // 检查用户是否之前点赞过，如果是则先取消点赞
+        if (historyManager.hasLiked(user, interaction)) {
+            historyManager.removeAction(user, ActionType.LIKE_INTERACTION, interaction);
+            interaction.unlikes();
+        }
+        
+        // 添加点踩记录
+        historyManager.addHistory(user, ActionType.DISLIKE_INTERACTION, interaction);
+        
+        // 增加点踩数
+        interaction.dislikes();
+        interactionRepo.save(interaction);
+        
+        return true;
     }
 
     /**
@@ -189,37 +256,58 @@ public class InteractionManager {
      * 
      * @param interactionId The ID of the interaction to undislike.
      * @param userId The ID of the user who undislikes.
+     * @return true if the operation was successful, false otherwise.
      */
     @Transactional
-    public void undislikeInteraction(Integer interactionId, Integer userId) {
-        Interaction interaction = interactionRepo.findById(interactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到评论"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到用户"));
-            
-        // 查找交互记录
-        Optional<UserInteractionRecord> recordOpt = userInteractionRecordRepo.findByUserAndInteraction(user, interaction);
-        if (recordOpt.isPresent()) {
-            UserInteractionRecord record = recordOpt.get();
-            record.undislike();
-            userInteractionRecordRepo.save(record);
+    public boolean undislikeInteraction(Integer interactionId, Integer userId) {
+        Optional<Interaction> interactionOpt = interactionRepo.findById(interactionId);
+        Optional<User> userOpt = userRepo.findById(userId);
+        
+        if (interactionOpt.isEmpty() || userOpt.isEmpty()) {
+            return false;
         }
+        
+        Interaction interaction = interactionOpt.get();
+        User user = userOpt.get();
+        
+        // 检查用户是否点踩过
+        if (!historyManager.hasDisliked(user, interaction)) {
+            return false; // 没有点踩过，无需取消
+        }
+        
+        // 移除点踩记录
+        historyManager.removeAction(user, ActionType.DISLIKE_INTERACTION, interaction);
+        
+        // 减少点踩数
+        interaction.undislikes();
+        interactionRepo.save(interaction);
+        
+        return true;
     }
     
     /**
-     * 获取用户对评论的互动状态
+     * 检查用户是否对评论点赞或点踩
      * 
      * @param interactionId 评论ID
      * @param userId 用户ID
-     * @return 用户互动记录
+     * @return 包含点赞和点踩状态的数组，[是否点赞, 是否点踩]
      */
-    public UserInteractionRecord getUserInteractionRecord(Integer interactionId, Integer userId) {
-        Interaction interaction = interactionRepo.findById(interactionId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到评论"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new ResourceNotFoundException("未找到用户"));
-            
-        return userInteractionRecordRepo.findByUserAndInteraction(user, interaction)
-            .orElse(new UserInteractionRecord(user, interaction));
+    public boolean[] getUserInteractionStatus(Integer interactionId, Integer userId) {
+        boolean[] status = new boolean[2]; // [isLiked, isDisliked]
+        
+        Optional<Interaction> interactionOpt = interactionRepo.findById(interactionId);
+        Optional<User> userOpt = userRepo.findById(userId);
+        
+        if (interactionOpt.isEmpty() || userOpt.isEmpty()) {
+            return status;
+        }
+        
+        Interaction interaction = interactionOpt.get();
+        User user = userOpt.get();
+        
+        status[0] = historyManager.hasLiked(user, interaction);
+        status[1] = historyManager.hasDisliked(user, interaction);
+        
+        return status;
     }
 }

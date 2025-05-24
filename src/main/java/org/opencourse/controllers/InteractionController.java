@@ -97,9 +97,9 @@ public class InteractionController {
             
             // 添加当前用户是否已点赞/点踩的信息
             try {
-                var record = interactionManager.getUserInteractionRecord(interaction.getId(), userId);
-                interactionData.put("isLiked", record.isLiked());
-                interactionData.put("isDisliked", record.isDisliked());
+                boolean[] status = interactionManager.getUserInteractionStatus(interaction.getId(), userId);
+                interactionData.put("isLiked", status[0]);
+                interactionData.put("isDisliked", status[1]);
             } catch (Exception e) {
                 interactionData.put("isLiked", false);
                 interactionData.put("isDisliked", false);
@@ -123,8 +123,13 @@ public class InteractionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         
-        interactionManager.likeInteraction(interactionId, user.getId());
-        return ResponseEntity.ok(ApiResponse.success("点赞成功"));
+        boolean success = interactionManager.likeInteraction(interactionId, user.getId());
+        
+        if (success) {
+            return ResponseEntity.ok(ApiResponse.success("点赞成功"));
+        } else {
+            return ResponseEntity.badRequest().body(ApiResponse.error("点赞失败，评论不存在或已点赞"));
+        }
     }
 
     /**
@@ -139,8 +144,13 @@ public class InteractionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         
-        interactionManager.unlikeInteraction(interactionId, user.getId());
-        return ResponseEntity.ok(ApiResponse.success("取消点赞成功"));
+        boolean success = interactionManager.unlikeInteraction(interactionId, user.getId());
+        
+        if (success) {
+            return ResponseEntity.ok(ApiResponse.success("取消点赞成功"));
+        } else {
+            return ResponseEntity.badRequest().body(ApiResponse.error("取消点赞失败，评论不存在或未点赞"));
+        }
     }
 
     /**
@@ -155,8 +165,13 @@ public class InteractionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         
-        interactionManager.dislikeInteraction(interactionId, user.getId());
-        return ResponseEntity.ok(ApiResponse.success("点踩成功"));
+        boolean success = interactionManager.dislikeInteraction(interactionId, user.getId());
+        
+        if (success) {
+            return ResponseEntity.ok(ApiResponse.success("点踩成功"));
+        } else {
+            return ResponseEntity.badRequest().body(ApiResponse.error("点踩失败，评论不存在或已点踩"));
+        }
     }
 
     /**
@@ -171,7 +186,12 @@ public class InteractionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         
-        interactionManager.undislikeInteraction(interactionId, user.getId());
-        return ResponseEntity.ok(ApiResponse.success("取消点踩成功"));
+        boolean success = interactionManager.undislikeInteraction(interactionId, user.getId());
+        
+        if (success) {
+            return ResponseEntity.ok(ApiResponse.success("取消点踩成功"));
+        } else {
+            return ResponseEntity.badRequest().body(ApiResponse.error("取消点踩失败，评论不存在或未点踩"));
+        }
     }
 } 

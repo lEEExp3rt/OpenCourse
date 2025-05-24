@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * History service manager.
@@ -67,5 +68,69 @@ public class HistoryManager {
      */
     public List<History> getHistories(Integer userId) {
         return historyRepo.findAllByUserId(userId);
+    }
+    
+    /**
+     * 检查用户是否对某个对象执行过特定操作
+     * 
+     * @param user 用户
+     * @param type 操作类型
+     * @param object 操作对象
+     * @return true如果存在相应记录，否则false
+     */
+    public boolean hasPerformedAction(User user, ActionType type, ActionObject object) {
+        Optional<History> history = historyRepo.findByUserAndActionTypeAndActionObject(user, type, object);
+        return history.isPresent();
+    }
+    
+    /**
+     * 移除用户对某个对象的特定操作记录
+     * 
+     * @param user 用户
+     * @param type 操作类型
+     * @param object 操作对象
+     * @return true如果成功删除，否则false
+     */
+    @Transactional
+    public boolean removeAction(User user, ActionType type, ActionObject object) {
+        Optional<History> history = historyRepo.findByUserAndActionTypeAndActionObject(user, type, object);
+        if (history.isPresent()) {
+            historyRepo.delete(history.get());
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * 获取用户对某个对象的所有操作记录
+     * 
+     * @param user 用户
+     * @param object 操作对象
+     * @return 历史记录列表
+     */
+    public List<History> getActionsByUserAndObject(User user, ActionObject object) {
+        return historyRepo.findByUserAndActionObject(user, object);
+    }
+    
+    /**
+     * 检查用户是否对某个评论点过赞
+     * 
+     * @param user 用户
+     * @param interaction 评论对象
+     * @return true如果点过赞，否则false
+     */
+    public boolean hasLiked(User user, ActionObject interaction) {
+        return hasPerformedAction(user, ActionType.LIKE_INTERACTION, interaction);
+    }
+    
+    /**
+     * 检查用户是否对某个评论点过踩
+     * 
+     * @param user 用户
+     * @param interaction 评论对象
+     * @return true如果点过踩，否则false
+     */
+    public boolean hasDisliked(User user, ActionObject interaction) {
+        return hasPerformedAction(user, ActionType.DISLIKE_INTERACTION, interaction);
     }
 }
