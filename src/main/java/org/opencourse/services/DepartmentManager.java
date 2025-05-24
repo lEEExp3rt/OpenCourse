@@ -45,17 +45,34 @@ public class DepartmentManager {
     }
 
     /**
-     * Get a department by its name.
+     * Updates an existing department.
      * 
-     * @param name The name of the department.
-     * @return The department with the given name or null if it doesn't exist.
+     * @param id The ID of the department.
+     * @param name The new name of the department.
+     * @return The updated department or null if it doesn't exist.
      * @throws IllegalArgumentException if the name is null or empty.
      */
-    public Department getDepartment(String name) throws IllegalArgumentException {
+    @Transactional
+    public Department updateDepartment(Byte id, String name) throws IllegalArgumentException {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Department name cannot be null or empty");
         }
-        return repo.findByName(name).orElse(null);
+        Department department = repo.findById(id).orElse(null);
+        if (department != null) {
+            department.setName(name);
+            return repo.save(department);
+        }
+        return null;
+    }
+
+    /**
+     * Get a department by its ID.
+     * 
+     * @param id The ID of the department.
+     * @return The department with the given ID or null if it doesn't exist.
+     */
+    public Department getDepartment(Byte id) {
+        return repo.findById(id).orElse(null);
     }
 
     /**
