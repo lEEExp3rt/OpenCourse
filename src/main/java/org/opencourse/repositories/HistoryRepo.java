@@ -1,6 +1,5 @@
 package org.opencourse.repositories;
 
-import org.opencourse.models.ActionObject;
 import org.opencourse.models.History;
 import org.opencourse.models.User;
 import org.opencourse.utils.typeinfo.ActionType;
@@ -26,23 +25,32 @@ public interface HistoryRepo extends JpaRepository<History, Long> {
      * @return A list of histories associated with the user.
      */
     public List<History> findAllByUserId(Integer userId);
-    
+
+    /**
+     * Find all histories by user and object ID.
+     * 
+     * @param user The user associated with the histories.
+     * @return A list of histories associated with the user.
+     */
+    public List<History> findAllByUserAndObjectId(User user, Integer objectId);
+
     /**
      * 查找用户对特定对象的指定操作记录
      * 
      * @param user 用户
      * @param actionType 操作类型
-     * @param actionObject 操作对象
+     * @param objectId 操作对象 ID
      * @return 历史记录（如果存在）
      */
-    Optional<History> findByUserAndActionTypeAndActionObject(User user, ActionType actionType, ActionObject actionObject);
-    
+    Optional<History> findByUserAndActionTypeAndObjectId(User user, ActionType actionType, Integer objectId);
+
     /**
-     * 查找用户对特定对象的所有操作记录
+     * Check if a history record exists for a user with a specific action type and object ID.
      * 
-     * @param user 用户
-     * @param actionObject 操作对象
-     * @return 历史记录列表
+     * @param user       The user associated with the history record.
+     * @param actionType The action type associated with the history record.
+     * @param objectId   The object ID associated with the history record.
+     * @return true if the history record exists, false otherwise.
      */
-    List<History> findByUserAndActionObject(User user, ActionObject actionObject);
+    boolean existsByUserAndActionTypeAndObjectId(User user, ActionType actionType, Integer objectId);
 }

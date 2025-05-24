@@ -1,5 +1,6 @@
 package org.opencourse.controllers;
 
+import org.opencourse.dto.request.InteractionCreationDto;
 import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.Interaction;
 import org.opencourse.models.User;
@@ -50,7 +51,8 @@ public class InteractionController {
         
         // 添加评论
         try {
-            Interaction interaction = interactionManager.addInteraction(courseId, user.getId(), content, rating);
+            InteractionCreationDto dto = new InteractionCreationDto(courseId, user.getId(), content, rating);
+            Interaction interaction = interactionManager.addInteraction(dto);
             
             Map<String, Object> data = new HashMap<>();
             data.put("id", interaction.getId());
@@ -77,7 +79,7 @@ public class InteractionController {
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getInteractionsByCourse(
             @PathVariable Short courseId) {
         
-        List<Interaction> interactions = interactionManager.getInteractionsByCourse(courseId);
+        List<Interaction> interactions = interactionManager.getInteractions(courseId);
         
         // 获取当前登录用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -97,9 +99,8 @@ public class InteractionController {
             
             // 添加当前用户是否已点赞/点踩的信息
             try {
-                boolean[] status = interactionManager.getUserInteractionStatus(interaction.getId(), userId);
-                interactionData.put("isLiked", status[0]);
-                interactionData.put("isDisliked", status[1]);
+                boolean status = interactionManager.getUserInteractionStatus(interaction.getId(), userId);
+                interactionData.put("isLiked", status);
             } catch (Exception e) {
                 interactionData.put("isLiked", false);
                 interactionData.put("isDisliked", false);
@@ -150,48 +151,6 @@ public class InteractionController {
             return ResponseEntity.ok(ApiResponse.success("取消点赞成功"));
         } else {
             return ResponseEntity.badRequest().body(ApiResponse.error("取消点赞失败，评论不存在或未点赞"));
-        }
-    }
-
-    /**
-     * 对评论点踩
-     * 
-     * @param interactionId 评论ID
-     * @return 操作结果
-     */
-    @PostMapping("/{interactionId}/dislike")
-    public ResponseEntity<ApiResponse<Void>> dislikeInteraction(@PathVariable Integer interactionId) {
-        // 获取当前登录用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        
-        boolean success = interactionManager.dislikeInteraction(interactionId, user.getId());
-        
-        if (success) {
-            return ResponseEntity.ok(ApiResponse.success("点踩成功"));
-        } else {
-            return ResponseEntity.badRequest().body(ApiResponse.error("点踩失败，评论不存在或已点踩"));
-        }
-    }
-
-    /**
-     * 取消对评论的点踩
-     * 
-     * @param interactionId 评论ID
-     * @return 操作结果
-     */
-    @PostMapping("/{interactionId}/undislike")
-    public ResponseEntity<ApiResponse<Void>> undislikeInteraction(@PathVariable Integer interactionId) {
-        // 获取当前登录用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        
-        boolean success = interactionManager.undislikeInteraction(interactionId, user.getId());
-        
-        if (success) {
-            return ResponseEntity.ok(ApiResponse.success("取消点踩成功"));
-        } else {
-            return ResponseEntity.badRequest().body(ApiResponse.error("取消点踩失败，评论不存在或未点踩"));
         }
     }
 } 

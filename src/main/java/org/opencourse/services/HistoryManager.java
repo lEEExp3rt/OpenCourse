@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * History service manager.
@@ -51,6 +50,64 @@ public class HistoryManager {
     public List<History> getHistories(Integer userId) {
         return historyRepo.findAllByUserId(userId);
     }
+
+    /**
+     * Get the history object.
+     * 
+     * @param history The history record.
+     * @return The model object associated with the history.
+     */
+    public Model<? extends Number> getHistoryObject(History history) {
+        return historyObjectService.getHistoryObject(history);
+    }
+
+    /**
+     * Add a history record.
+     * 
+     * @param user   The user who performed the action.
+     * @param type   The action type.
+     * @param object The object on which the action was performed.
+     */
+    @Transactional
+    public void addHistory(User user, ActionType type, Model<? extends Number> object) {
+        historyRepo.save(new History(user, type, object.getId().intValue()));
+    }
+    
+    /**
+     * Add a history record.
+     * 
+     * @param userId The ID of the user who performed the action.
+     * @param type   The action type.
+     * @param object The object on which the action was performed.
+     */
+    @Transactional
+    public void addHistory(Integer userId, ActionType type, Model<? extends Number> object) {
+        User user = userRepo.findById(userId).get();
+        historyRepo.save(new History(user, type, object.getId().intValue()));
+    }
+    
+    /**
+     * Add a history record.
+     * 
+     * @param user     The user who performed the action.
+     * @param type     The action type.
+     */
+    @Transactional
+    public void addHistory(User user, ActionType type) {
+        historyRepo.save(new History(user, type));
+    }
+    
+    /**
+     * Add a history record.
+     * 
+     * @param userId   The ID of the user who performed the action.
+     * @param type     The action type.
+     */
+    @Transactional
+    public void addHistory(Integer userId, ActionType type) {
+        User user = userRepo.findById(userId).get();
+        historyRepo.save(new History(user, type));
+    }
     
     /**
      * 检查用户是否对某个对象执行过特定操作
@@ -60,9 +117,8 @@ public class HistoryManager {
      * @param object 操作对象
      * @return true如果存在相应记录，否则false
      */
-    public boolean hasPerformedAction(User user, ActionType type, ActionObject object) {
-        Optional<History> history = historyRepo.findByUserAndActionTypeAndActionObject(user, type, object);
-        return history.isPresent();
+    public boolean hasPerformedAction(User user, ActionType type, Model<? extends Number> object) {
+        return historyRepo.existsByUserAndActionTypeAndObjectId(user, type, object.getId().intValue());
     }
     
     /**
@@ -74,10 +130,12 @@ public class HistoryManager {
      * @return true如果成功删除，否则false
      */
     @Transactional
-    public boolean removeAction(User user, ActionType type, ActionObject object) {
-        Optional<History> history = historyRepo.findByUserAndActionTypeAndActionObject(user, type, object);
-        if (history.isPresent()) {
-            historyRepo.delete(history.get());
+    public boolean removeAction(User user, ActionType type, Model<? extends Number> object) {
+        History history = historyRepo
+            .findByUserAndActionTypeAndObjectId(user, type, object.getId().intValue())
+            .orElse(null);
+        if (history != null) {
+            historyRepo.delete(history);
             return true;
         }
         return false;
@@ -90,119 +148,7 @@ public class HistoryManager {
      * @param object 操作对象
      * @return 历史记录列表
      */
-    public List<History> getActionsByUserAndObject(User user, ActionObject object) {
-        return historyRepo.findByUserAndActionObject(user, object);
-    }
-    
-    /**
-     * 检查用户是否对某个评论点过赞
-     * 
-     * @param user 用户
-     * @param interaction 评论对象
-     * @return true如果点过赞，否则false
-     */
-    public boolean hasLiked(User user, ActionObject interaction) {
-        return hasPerformedAction(user, ActionType.LIKE_INTERACTION, interaction);
-    }
-    
-    /**
-     * 检查用户是否对某个评论点过踩
-     * 
-     * @param user 用户
-     * @param interaction 评论对象
-     * @return true如果点过踩，否则false
-     */
-    public boolean hasDisliked(User user, ActionObject interaction) {
-        return hasPerformedAction(user, ActionType.DISLIKE_INTERACTION, interaction);
-    }
-
-    // Course actions.
-
-    @Transactional
-    public void logCourseCreation() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logCourseUpdate() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logCourseRate() {
-        // TODO: Implement this method.
-    }
-
-    // Department actions.
-
-    @Transactional
-    public void logDepartmentCreation() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logDepartmentUpdate() {
-        // TODO: Implement this method.
-    }
-
-    // Resource actions.
-
-    @Transactional
-    public void logResourceCreation() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logResourceDelete() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logResourceLike() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logResourceUnlike() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logResourceView() {
-        // TODO: Implement this method.
-    }
-
-    // Interaction actions.
-
-    @Transactional
-    public void logInteractionCreation() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logInteractionDelete() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logInteractionLike() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logInteractionUnlike() {
-        // TODO: Implement this method.
-    }
-
-    // User actions.
-
-    @Transactional
-    public void logUserCreation() {
-        // TODO: Implement this method.
-    }
-
-    @Transactional
-    public void logUserUpdate() {
-        // TODO: Implement this method.
+    public List<History> getActionsByUserAndObject(User user, Integer objectId) {
+        return historyRepo.findAllByUserAndObjectId(user, objectId);
     }
 }
