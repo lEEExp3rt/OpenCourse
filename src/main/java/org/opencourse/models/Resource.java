@@ -25,7 +25,7 @@ import org.opencourse.utils.typeinfo.ResourceType;
  */
 @Entity
 @Table(name = "Resource")
-public class Resource extends Model {
+public class Resource extends Model<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -227,6 +227,7 @@ public class Resource extends Model {
 
     // Getters and Setters
 
+    @Override
     public Integer getId() {
         return id;
     }

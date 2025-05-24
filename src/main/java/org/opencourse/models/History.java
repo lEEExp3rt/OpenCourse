@@ -23,7 +23,7 @@ import org.opencourse.utils.typeinfo.ActionType;
  */
 @Entity
 @Table(name = "History")
-public class History extends Model {
+public class History extends Model<Long> {
 
     // The ID of the history record.
     @Id
@@ -94,6 +94,7 @@ public class History extends Model {
 
     // Getters and Setters
 
+    @Override
     public Long getId() {
         return id;
     }

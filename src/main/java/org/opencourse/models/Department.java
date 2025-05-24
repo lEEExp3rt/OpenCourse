@@ -14,7 +14,7 @@ import jakarta.persistence.Column;
  */
 @Entity
 @Table(name = "Department")
-public class Department extends Model {
+public class Department extends Model<Byte> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +40,7 @@ public class Department extends Model {
 
     // Getters and Setters
 
+    @Override
     public Byte getId() {
         return id;
     }

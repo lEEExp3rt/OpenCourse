@@ -20,7 +20,7 @@ import org.opencourse.utils.typeinfo.CourseType;
  */
 @Entity
 @Table(name = "Course")
-public class Course extends Model {
+public class Course extends Model<Short> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +68,7 @@ public class Course extends Model {
 
     // Getters and Setters
 
+    @Override
     public Short getId() {
         return id;
     }

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "User")
-public class User extends Model {
+public class User extends Model<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -92,6 +92,7 @@ public class User extends Model {
 
     // Getters and Setters
 
+    @Override
     public Integer getId() {
         return id;
     }

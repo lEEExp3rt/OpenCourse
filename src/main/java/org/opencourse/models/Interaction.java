@@ -19,7 +19,7 @@ import jakarta.persistence.Table;
  */
 @Entity
 @Table(name = "Interaction")
-public class Interaction extends Model {
+public class Interaction extends Model<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -119,6 +119,7 @@ public class Interaction extends Model {
 
     // Getters and Setters
 
+    @Override
     public Integer getId() {
         return id;
     }
