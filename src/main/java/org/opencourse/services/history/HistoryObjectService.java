@@ -49,9 +49,17 @@ public class HistoryObjectService {
      * @param history The history record.
      * @return The object from the history record.
      */
-    public Model getHistoryObject(History history) {
+    public Model<? extends Number> getHistoryObject(History history) {
+        if (history == null) {
+            return null;
+        }
+
         Integer objectId = history.getObjectId();
-        Class<? extends Model> objectClass = history.getActionType().getObjectClass();
+        if (objectId == null) {
+            return null;
+        }
+
+        Class<?> objectClass = history.getActionType().getObjectClass();
         return switch (objectClass.getSimpleName()) {
             case "Course" -> courseRepo.findById(objectId.shortValue()).orElse(null);
             case "Department" -> departmentRepo.findById(objectId.byteValue()).orElse(null);
