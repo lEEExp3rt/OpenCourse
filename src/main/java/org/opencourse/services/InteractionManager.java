@@ -19,6 +19,7 @@ import java.util.Optional;
  * Interaction service manager.
  * 
  * @author !EEExp3rt
+ * @author LJX
  */
 @Service
 public class InteractionManager {
