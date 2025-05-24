@@ -28,14 +28,14 @@ public enum ActionType implements TypeInfo {
     RATE_COURSE((byte) 34, "Rate-Course", "评分课程", Course.class),
 
     CREATE_USER((byte) 35, "Create-User", "创建用户", User.class),
-    UPDATE_USER((byte) 36, "Update-User", "更新用户", User.class),;
+    UPDATE_USER((byte) 36, "Update-User", "更新用户", User.class);
 
     private final byte id;
     private final String name;
     private final String description;
-    private final Class<? extends Model> objectClass;
+    private final Class<? extends Model<?>> objectClass;
 
-    ActionType(byte id, String name, String description, Class<? extends Model> objectClass) {
+    ActionType(byte id, String name, String description, Class<? extends Model<?>> objectClass) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -57,7 +57,7 @@ public enum ActionType implements TypeInfo {
         return description;
     }
 
-    public Class<? extends Model> getObjectClass() {
+    public Class<? extends Model<?>> getObjectClass() {
         return objectClass;
     }
 
