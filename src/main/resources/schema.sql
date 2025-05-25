@@ -93,22 +93,27 @@ create table `History` if not exists (
     `id` bigint auto_increment primary key,
     `user_id` int not null,
     `action_type` enum(
-        'CREATE_COURSE',
-        'UPDATE_COURSE',
-        'CREATE_DEPARTMENT',
-        'UPDATE_DEPARTMENT',
-        'CREATE_RESOURCE',
-        'DELETE_RESOURCE',
-        'LIKE_RESOURCE',
-        'UNLIKE_RESOURCE',
-        'VIEW_RESOURCE',
-        'CREATE_INTERACTION',
-        'DELETE_INTERACTION',
-        'LIKE_INTERACTION',
-        'UNLIKE_INTERACTION',
-        'RATE_COURSE',
-        'CREATE_USER',
-        'UPDATE_USER'
+        'CREATE_COURSE',      -- 21
+        'UPDATE_COURSE',      -- 22
+        'DELETE_COURSE',      -- 23
+        'CREATE_DEPARTMENT',  -- 24
+        'UPDATE_DEPARTMENT',  -- 25
+        'DELETE_DEPARTMENT',  -- 26
+        'CREATE_RESOURCE',    -- 27
+        'UPDATE_RESOURCE',    -- 28
+        'DELETE_RESOURCE',    -- 29
+        'LIKE_RESOURCE',      -- 30
+        'UNLIKE_RESOURCE',    -- 31
+        'VIEW_RESOURCE',      -- 32
+        'CREATE_INTERACTION', -- 33
+        'UPDATE_INTERACTION', -- 34
+        'DELETE_INTERACTION', -- 35
+        'LIKE_INTERACTION',   -- 36
+        'UNLIKE_INTERACTION', -- 37
+        'RATE_COURSE',        -- 38
+        'CREATE_USER',        -- 39
+        'UPDATE_USER',        -- 40
+        'DELETE_USER'         -- 41
     ) not null,
     `object_id` int default null,
     `timestamp` timestamp default current_timestamp,
