@@ -7,11 +7,13 @@ import jakarta.validation.constraints.Size;
 import org.opencourse.utils.typeinfo.CourseType;
 
 /**
- * DTO for course creation requests.
+ * DTO for course update requests.
  * 
  * @author !EEExp3rt
  */
-public class CourseCreationDto {
+public class CourseUpdateDto {
+
+    private Short id;
 
     @NotBlank(message = "课程名称不能为空")
     @Size(max = 31, message = "课程名称太长")
@@ -29,41 +31,52 @@ public class CourseCreationDto {
     @NotNull(message = "学分不能为空")
     private Float credits;
 
-    private Integer creatorId;
+    private Integer updatorId;
 
     /**
      * Default constructor.
      */
-    public CourseCreationDto() {
+    public CourseUpdateDto() {
     }
 
     /**
      * Constructor.
      * 
-     * @param name         The name of the course.
-     * @param code         The code of the course.
-     * @param departmentId The ID of the department.
-     * @param courseTypeId The ID of the course type.
-     * @param credits      The credits of the course.
-     * @param creatorId    The ID of the creator user.
+     * @param id           The course ID.
+     * @param name         The course name.
+     * @param code         The course code.
+     * @param departmentId The department ID.
+     * @param courseTypeId The course type ID.
+     * @param credits      The course credits.
+     * @param updatorId    The ID of the user updating the course.
      */
-    public CourseCreationDto(
+    public CourseUpdateDto(
+        Short id,
         String name,
         String code,
         Byte departmentId,
         Byte courseTypeId,
         Float credits,
-        Integer creatorId
+        Integer updatorId
     ) {
+        this.id = id;
         this.name = name;
         this.code = code;
         this.departmentId = departmentId;
         this.courseType = CourseType.getById(courseTypeId.byteValue());
         this.credits = credits;
-        this.creatorId = creatorId;
+        this.updatorId = updatorId;
     }
 
-    // Getters and Setters
+    // Getters and Setters.
+
+    public Short getId() {
+        return id;
+    }
+
+    public void setId(Short id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -109,11 +122,11 @@ public class CourseCreationDto {
         this.credits = credits;
     }
 
-    public Integer getCreatorId() {
-        return creatorId;
+    public Integer getUpdatorId() {
+        return updatorId;
     }
 
-    public void setCreatorId(Integer creatorId) {
-        this.creatorId = creatorId;
+    public void setUpdatorId(Integer updatorId) {
+        this.updatorId = updatorId;
     }
 }

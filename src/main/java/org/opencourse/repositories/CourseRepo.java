@@ -1,7 +1,6 @@
 package org.opencourse.repositories;
 
 import org.opencourse.models.Course;
-import org.opencourse.models.Department;
 import org.opencourse.utils.typeinfo.CourseType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,20 +17,12 @@ import java.util.Optional;
 public interface CourseRepo extends JpaRepository<Course, Short> {
 
     /**
-     * Find a course by its name.
-     * 
-     * @param name The course name.
-     * @return The course if found.
-     */
-    Optional<Course> findByName(String name);
-
-    /**
      * Find courses fuzzy matching the given name.
      * 
      * @param name The course name.
-     * @return List of matching courses.
+     * @return List of matching courses in name ascending order.
      */
-    List<Course> findByNameContainingIgnoreCase(String name);
+    List<Course> findByNameContainingIgnoreCaseOrderByNameAsc(String name);
 
     /**
      * Find a course by its code.
@@ -45,9 +36,9 @@ public interface CourseRepo extends JpaRepository<Course, Short> {
      * Find courses fuzzy matching the given code.
      * 
      * @param code The course code.
-     * @return List of matching courses.
+     * @return List of matching courses in name ascending order.
      */
-    List<Course> findByCodeContainingIgnoreCase(String code);
+    List<Course> findByCodeContainingIgnoreCaseOrderByNameAsc(String code);
 
     /**
      * Check if a course with the given code exists.
@@ -60,10 +51,10 @@ public interface CourseRepo extends JpaRepository<Course, Short> {
     /**
      * Find all courses belonging to a specific department.
      * 
-     * @param department The department.
+     * @param departmentId The department ID.
      * @return List of courses in the department.
      */
-    List<Course> findByDepartment(Department department);
+    List<Course> findByDepartmentId(Byte departmentId);
 
     /**
      * Find all courses of a specific course type.
@@ -72,6 +63,15 @@ public interface CourseRepo extends JpaRepository<Course, Short> {
      * @return List of courses with the specified type.
      */
     List<Course> findByCourseType(CourseType courseType);
+
+    /**
+     * Find all courses of a specific course type and in a department.
+     * 
+     * @param departmentId The department ID.
+     * @param courseType   The course type.
+     * @return List of courses matching the condition.
+     */
+    List<Course> findByDepartmentIdAndCourseType(Byte departmentId, CourseType courseType);
 
     /**
      * Find all courses ordered by name.

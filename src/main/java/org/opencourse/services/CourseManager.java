@@ -1,6 +1,7 @@
 package org.opencourse.services;
 
 import org.opencourse.dto.request.CourseCreationDto;
+import org.opencourse.dto.request.CourseUpdateDto;
 import org.opencourse.models.Course;
 import org.opencourse.models.Department;
 import org.opencourse.repositories.CourseRepo;
@@ -49,12 +50,8 @@ public class CourseManager {
     @Transactional
     public Course addCourse(CourseCreationDto dto) throws IllegalArgumentException {
         // Find the department by name.
-        Department department = departmentRepo.findByName(dto.getDepartmentName()).orElse(null);
-        if (department == null) {
-            throw new IllegalArgumentException(
-                "Department " + dto.getDepartmentName() + " not found."
-            );
-        }
+        Department department = departmentRepo.findById(dto.getDepartmentId())
+            .orElseThrow(() -> new IllegalArgumentException("Department not found."));
         // Check if the course with the same code already exists.
         if (courseRepo.existsByCode(dto.getCode())) {
             return null;
@@ -71,18 +68,48 @@ public class CourseManager {
     }
 
     /**
-     * Get a course by its name or code.
+     * Update an existing course.
      * 
-     * @param keyword The name or code of the course.
-     * @return The course if found, null otherwise.
-     * @throws IllegalArgumentException if the keyword is null or empty.
+     * @param dto The course update DTO.
+     * @return The updated course if successful or null if the course does not exist.
      */
-    public Course getCourse(String keyword) throws IllegalArgumentException {
-        if (keyword == null || keyword.isEmpty()) {
-            throw new IllegalArgumentException("Keyword cannot be null or empty.");
+    @Transactional
+    public Course updateCourse(CourseUpdateDto dto) {
+        // Find the department by name.
+        Department department = departmentRepo.findById(dto.getDepartmentId())
+            .orElseThrow(() -> new IllegalArgumentException("Department not found."));
+        // Check if the course with the same code already exists.
+        if (courseRepo.existsByCode(dto.getCode())) {
+            return null;
         }
-        return courseRepo.findByName(keyword)
-            .orElseGet(() -> courseRepo.findByCode(keyword).orElse(null));
+        // Find the course by ID.
+        Course course = courseRepo.findById(dto.getId())
+            .orElseThrow(() -> new IllegalArgumentException("Course not found."));
+        // Update the course details.
+        course.setName(dto.getName());
+        course.setCode(dto.getCode());
+        course.setDepartment(department);
+        course.setCourseType(dto.getCourseType());
+        course.setCredits(dto.getCredits());
+        // Save the updated course.
+        return courseRepo.save(course);
+    }
+
+    /**
+     * Delete an existing course.
+     * 
+     * @param courseId The course ID.
+     * @param userId   The operator ID.
+     * @return True if the course deleted successfully, false if the course not found.
+     */
+    @Transactional
+    public boolean deleteCourse(Short courseId, Integer userId) {
+        Course course = courseRepo.findById(courseId).orElse(null);
+        if (course == null) {
+            return false;
+        }
+        courseRepo.delete(course);
+        return true;
     }
 
     /**
@@ -99,34 +126,44 @@ public class CourseManager {
      * 
      * @param keyword The keyword to search for.
      * @return A list of courses that match the keyword.
-     * @apiNote The argument must be non-null and non-empty.
      */
     public List<Course> getCourses(String keyword) {
-        return Stream.concat(
-            courseRepo.findByNameContainingIgnoreCase(keyword).stream(),
-            courseRepo.findByCodeContainingIgnoreCase(keyword).stream()
-        ).distinct().collect(Collectors.toList());
+        return keyword == null || keyword.isEmpty() ?
+            getCourses() :
+            Stream.concat(
+                courseRepo.findByNameContainingIgnoreCaseOrderByNameAsc(keyword).stream(),
+                courseRepo.findByCodeContainingIgnoreCaseOrderByNameAsc(keyword).stream()
+            ).distinct().collect(Collectors.toList());
     }
 
     /**
      * Get all courses that belongs to the department.
      * 
-     * @param department The department.
+     * @param departmentId The department.
      * @return A list of courses that belong to the department.
-     * @apiNote The argument must be non-null and non-empty.
      */
-    public List<Course> getCourses(Department department) {
-        return courseRepo.findByDepartment(department);
+    public List<Course> getCoursesByDepartment(Byte departmentId) {
+        return courseRepo.findByDepartmentId(departmentId);
     }
 
     /**
      * Get all courses that belongs to the course type.
      * 
-     * @param courseType The course type.
+     * @param courseTypeId The course type ID.
      * @return A list of courses that belong to the course type.
-     * @apiNote The argument must be non-null and non-empty.
      */
-    public List<Course> getCourses(CourseType courseType) {
-        return courseRepo.findByCourseType(courseType);
+    public List<Course> getCoursesByType(byte courseTypeId) {
+        return courseRepo.findByCourseType(CourseType.getById(courseTypeId));
+    }
+
+    /**
+     * Get all courses that belongs to the department and the course type.
+     * 
+     * @param departmentId The department ID.
+     * @param courseTypeId The course type ID.
+     * @return A list of courses that belong to the department and the course type.
+     */
+    public List<Course> getCoursesByDepartmentAndType(Byte departmentId, byte courseTypeId) {
+        return courseRepo.findByDepartmentIdAndCourseType(departmentId, CourseType.getById(courseTypeId));
     }
 }
