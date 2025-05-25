@@ -49,7 +49,7 @@ public class DepartmentManager {
      * 
      * @param id The ID of the department.
      * @param name The new name of the department.
-     * @return The updated department or null if it doesn't exist.
+     * @return The updated department or null if the name already exists.
      * @throws IllegalArgumentException if the name is null or empty.
      */
     @Transactional
@@ -57,12 +57,32 @@ public class DepartmentManager {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Department name cannot be null or empty");
         }
+        // If the department name already exists, return null.
+        if (repo.existsByName(name)) {
+            return null;
+        }
         Department department = repo.findById(id).orElse(null);
         if (department != null) {
             department.setName(name);
             return repo.save(department);
         }
         return null;
+    }
+
+    /**
+     * Deletes a department.
+     * 
+     * @param id The ID of the department.
+     * @return True if the department was deleted, false otherwise.
+     */
+    @Transactional
+    public boolean deleteDepartment(Byte id) {
+        Department department = repo.findById(id).orElse(null);
+        if (department != null) {
+            repo.delete(department);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -76,6 +96,15 @@ public class DepartmentManager {
     }
 
     /**
+     * Get all departments.
+     * 
+     * @return All departments in order.
+     */
+    public List<Department> getDepartments() {
+        return repo.findAllByOrderByNameAsc();
+    }
+
+    /**
      * Get departments by the fuzzy matching name.
      * 
      * If no name is provided, all departments are returned in order.
@@ -85,7 +114,7 @@ public class DepartmentManager {
      */
     public List<Department> getDepartments(String name) {
         return name == null || name.isEmpty() ?
-            repo.findAllByOrderByNameAsc() :
+            getDepartments() :
             repo.findByNameContainingIgnoreCase(name);
     }
 }
