@@ -19,38 +19,21 @@ import java.util.Optional;
 public interface HistoryRepo extends JpaRepository<History, Long> {
 
     /**
-     * Find all histories by user ID.
+     * Find all histories of the user in descending order of creation date.
      * 
      * @param userId The ID of the user.
      * @return A list of histories associated with the user.
      */
-    public List<History> findAllByUserId(Integer userId);
+    public List<History> findAllByUserIdOrderByCreatedAtDesc(Integer userId);
 
     /**
-     * Find all histories by user and object ID.
+     * Find the latest history record for a user on a specific object in certain interaction actions range.
      * 
-     * @param user The user associated with the histories.
-     * @return A list of histories associated with the user.
+     * @param user The user who performed the action.
+     * @param objectId The ID of the object related to the action.
+     * @param actionTypes The list of action types.
+     * @return The most recent history record if found.
      */
-    public List<History> findAllByUserAndObjectId(User user, Integer objectId);
-
-    /**
-     * 查找用户对特定对象的指定操作记录
-     * 
-     * @param user 用户
-     * @param actionType 操作类型
-     * @param objectId 操作对象 ID
-     * @return 历史记录（如果存在）
-     */
-    Optional<History> findByUserAndActionTypeAndObjectId(User user, ActionType actionType, Integer objectId);
-
-    /**
-     * Check if a history record exists for a user with a specific action type and object ID.
-     * 
-     * @param user       The user associated with the history record.
-     * @param actionType The action type associated with the history record.
-     * @param objectId   The object ID associated with the history record.
-     * @return true if the history record exists, false otherwise.
-     */
-    boolean existsByUserAndActionTypeAndObjectId(User user, ActionType actionType, Integer objectId);
+    Optional<History> findFirstByUserAndObjectIdAndActionTypeInOrderByCreatedAtDesc(
+        User user, Integer objectId, List<ActionType> actionTypes);
 }

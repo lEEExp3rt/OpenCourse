@@ -7,7 +7,6 @@ import org.opencourse.models.User;
 import org.opencourse.repositories.InteractionRepo;
 import org.opencourse.repositories.CourseRepo;
 import org.opencourse.repositories.UserRepo;
-import org.opencourse.utils.typeinfo.ActionType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,7 @@ import java.util.Optional;
 @Service
 public class InteractionManager {
 
-    private final InteractionRepo interactionRepo; // Data access object.
+    private final InteractionRepo interactionRepo;
     private final CourseRepo courseRepo;
     private final UserRepo userRepo;
     private final HistoryManager historyManager;
@@ -39,8 +38,12 @@ public class InteractionManager {
      * @param historyManager The history manager.
      */
     @Autowired
-    public InteractionManager(InteractionRepo interactionRepo, CourseRepo courseRepo, UserRepo userRepo, 
-            HistoryManager historyManager) {
+    public InteractionManager(
+        InteractionRepo interactionRepo,
+        CourseRepo courseRepo,
+        UserRepo userRepo,
+        HistoryManager historyManager
+    ) {
         this.interactionRepo = interactionRepo;
         this.courseRepo = courseRepo;
         this.userRepo = userRepo;
@@ -72,14 +75,47 @@ public class InteractionManager {
         Interaction interaction = interactionRepo.save(new Interaction(course, user, content, rating));
 
         // 添加创建评论的历史记录
-        historyManager.addHistory(user, ActionType.CREATE_INTERACTION, interaction);
+        historyManager.logCreateInteraction(user, interaction);
 
         // 如果包含评分，添加评分的历史记录
         if (rating != null) {
-            historyManager.addHistory(user, ActionType.RATE_COURSE, interaction);
+            historyManager.logRateCourse(user, course);
         }
 
         return interaction;
+    }
+
+    /**
+     * Update an interaction comment.
+     * 
+     * @return
+     */
+    @Transactional
+    public Interaction updateInteraction() {
+        return null; // TODO: Implement this method.
+    }
+
+    /**
+     * Delete an interaction comment.
+     * 
+     * @param id The ID of the interaction to delete.
+     * @param userId The ID of the user who deletes the comment.
+     * @return True if the operation was successful, false otherwise.
+     */
+    @Transactional
+    public boolean deleteInteraction(Integer id, Integer userId) {
+        User user = userRepo.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        Interaction interaction = interactionRepo.findById(id).orElse(null);
+        if (interaction == null) {
+            return false;
+        }
+        interactionRepo.delete(interaction);
+        // 添加删除评论的历史记录
+        historyManager.logDeleteInteraction(user, interaction);
+        return true;
     }
 
     /**
@@ -89,7 +125,7 @@ public class InteractionManager {
      * @return List of all interactions.
      */
     public List<Interaction> getInteractions(Short courseId) {
-        return interactionRepo.findAllByCourseId(courseId);
+        return interactionRepo.findAllByCourseId(courseId); // TODO: Order.
     }
 
     /**
@@ -126,12 +162,12 @@ public class InteractionManager {
         User user = userOpt.get();
 
         // 检查用户是否已经点赞过
-        if (historyManager.hasPerformedAction(user, ActionType.LIKE_INTERACTION, interaction)) {
+        if (historyManager.getLikeStatus(user, interaction)) {
             return false; // 已经点赞过，不需要重复操作
         }
 
         // 添加点赞记录
-        historyManager.addHistory(user, ActionType.LIKE_INTERACTION, interaction);
+        historyManager.logLikeInteraction(user, interaction);
 
         // 增加点赞数
         interaction.likes();
@@ -160,12 +196,12 @@ public class InteractionManager {
         User user = userOpt.get();
 
         // 检查用户是否点赞过
-        if (!historyManager.hasPerformedAction(user, ActionType.LIKE_INTERACTION, interaction)) {
+        if (!historyManager.getLikeStatus(user, interaction)) {
             return false; // 没有点赞过，无需取消
         }
 
         // 移除点赞记录
-        historyManager.removeAction(user, ActionType.LIKE_INTERACTION, interaction);
+        historyManager.logUnlikeInteraction(user, interaction);
 
         // 减少点赞数
         interaction.unlikes();
@@ -192,6 +228,6 @@ public class InteractionManager {
         Interaction interaction = interactionOpt.get();
         User user = userOpt.get();
 
-        return historyManager.hasPerformedAction(user, ActionType.LIKE_INTERACTION, interaction);
+        return historyManager.getLikeStatus(user, interaction);
     }
 }

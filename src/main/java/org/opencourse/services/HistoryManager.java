@@ -2,7 +2,6 @@ package org.opencourse.services;
 
 import org.opencourse.models.*;
 import org.opencourse.repositories.HistoryRepo;
-import org.opencourse.repositories.UserRepo;
 import org.opencourse.services.history.HistoryObjectService;
 import org.opencourse.utils.typeinfo.ActionType;
 
@@ -10,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,38 +22,35 @@ import java.util.List;
 public class HistoryManager {
 
     private final HistoryRepo historyRepo; // Data access object.
-    private final UserRepo userRepo; // Data access object.
     private final HistoryObjectService historyObjectService;
 
     /**
      * Constructor.
      * 
      * @param historyRepo The history repository.
-     * @param userRepo The user repository.
+     * @param historyObjectService The history object service.
      */
     @Autowired
     public HistoryManager(
         HistoryRepo historyRepo,
-        UserRepo userRepo,
         HistoryObjectService historyObjectService
     ) {
         this.historyRepo = historyRepo;
-        this.userRepo = userRepo;
         this.historyObjectService = historyObjectService;
     }
 
     /**
-     * Get histories.
+     * Get all histories of the user.
      * 
      * @param userId The user ID.
-     * @return The list of histories.
+     * @return The list of histories in descending order of create timestamp.
      */
     public List<History> getHistories(Integer userId) {
-        return historyRepo.findAllByUserId(userId);
+        return historyRepo.findAllByUserIdOrderByCreatedAtDesc(userId);
     }
 
     /**
-     * Get the history object.
+     * Get the history action object.
      * 
      * @param history The history record.
      * @return The model object associated with the history.
@@ -62,93 +60,263 @@ public class HistoryManager {
     }
 
     /**
-     * Add a history record.
+     * Get the like status of a user for a specific interaction.
      * 
-     * @param user   The user who performed the action.
-     * @param type   The action type.
-     * @param object The object on which the action was performed.
+     * @param user The user.
+     * @param interaction The interaction object.
+     * @return True if the user liked the interaction, false otherwise.
      */
-    @Transactional
-    public void addHistory(User user, ActionType type, Model<? extends Number> object) {
-        historyRepo.save(new History(user, type, object.getId().intValue()));
+    public boolean getLikeStatus(User user, Interaction interaction) {
+        History history = historyRepo.findFirstByUserAndObjectIdAndActionTypeInOrderByCreatedAtDesc(
+            user,
+            interaction.getId(),
+            Arrays.asList(
+                ActionType.LIKE_INTERACTION,
+                ActionType.UNLIKE_INTERACTION
+            )
+        ).orElse(null);
+        return history != null && history.getActionType() == ActionType.LIKE_INTERACTION;
     }
-    
+
     /**
-     * Add a history record.
+     * Get the like status of a user for a specific resource.
      * 
-     * @param userId The ID of the user who performed the action.
-     * @param type   The action type.
-     * @param object The object on which the action was performed.
+     * @param user The user.
+     * @return True if the user liked the resource, false otherwise.
      */
-    @Transactional
-    public void addHistory(Integer userId, ActionType type, Model<? extends Number> object) {
-        User user = userRepo.findById(userId).get();
-        historyRepo.save(new History(user, type, object.getId().intValue()));
+    public boolean getLikeStatus(User user, Resource resource) {
+        History history = historyRepo.findFirstByUserAndObjectIdAndActionTypeInOrderByCreatedAtDesc(
+            user,
+            resource.getId(),
+            Arrays.asList(
+                ActionType.LIKE_RESOURCE,
+                ActionType.UNLIKE_RESOURCE
+            )
+        ).orElse(null);
+        return history != null && history.getActionType() == ActionType.LIKE_RESOURCE;
     }
-    
-    /**
-     * Add a history record.
-     * 
-     * @param user     The user who performed the action.
-     * @param type     The action type.
-     */
+
+    // Logging methods for different actions.
+
     @Transactional
-    public void addHistory(User user, ActionType type) {
-        historyRepo.save(new History(user, type));
-    }
-    
-    /**
-     * Add a history record.
-     * 
-     * @param userId   The ID of the user who performed the action.
-     * @param type     The action type.
-     */
-    @Transactional
-    public void addHistory(Integer userId, ActionType type) {
-        User user = userRepo.findById(userId).get();
-        historyRepo.save(new History(user, type));
-    }
-    
-    /**
-     * 检查用户是否对某个对象执行过特定操作
-     * 
-     * @param user 用户
-     * @param type 操作类型
-     * @param object 操作对象
-     * @return true如果存在相应记录，否则false
-     */
-    public boolean hasPerformedAction(User user, ActionType type, Model<? extends Number> object) {
-        return historyRepo.existsByUserAndActionTypeAndObjectId(user, type, object.getId().intValue());
-    }
-    
-    /**
-     * 移除用户对某个对象的特定操作记录
-     * 
-     * @param user 用户
-     * @param type 操作类型
-     * @param object 操作对象
-     * @return true如果成功删除，否则false
-     */
-    @Transactional
-    public boolean removeAction(User user, ActionType type, Model<? extends Number> object) {
-        History history = historyRepo
-            .findByUserAndActionTypeAndObjectId(user, type, object.getId().intValue())
-            .orElse(null);
-        if (history != null) {
-            historyRepo.delete(history);
-            return true;
+    public void logCreateCourse(User user, Course course) throws RuntimeException {
+        try {
+            historyRepo.save(
+                new History(user, ActionType.CREATE_COURSE, course.getId().intValue())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Create-Course", e);
         }
-        return false;
+        return ;
     }
-    
-    /**
-     * 获取用户对某个对象的所有操作记录
-     * 
-     * @param user 用户
-     * @param object 操作对象
-     * @return 历史记录列表
-     */
-    public List<History> getActionsByUserAndObject(User user, Integer objectId) {
-        return historyRepo.findAllByUserAndObjectId(user, objectId);
+
+    @Transactional
+    public void logUpdateCourse(User user, Course course) throws RuntimeException {
+        try {
+            historyRepo.save(
+                new History(user, ActionType.UPDATE_COURSE, course.getId().intValue())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Update-Course", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logDeleteCourse(User user, Course course) throws RuntimeException {
+        try {
+            historyRepo.save(
+                new History(user, ActionType.DELETE_COURSE, course.getId().intValue())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Delete-Course", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logCreateDepartment(User user, Department department) throws RuntimeException {
+        try {
+            historyRepo.save(
+                new History(user, ActionType.CREATE_DEPARTMENT, department.getId().intValue())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Create-Department", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logUpdateDepartment(User user, Department department) throws RuntimeException {
+        try {
+            historyRepo.save(
+                new History(user, ActionType.UPDATE_DEPARTMENT, department.getId().intValue())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Update-Department", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logDeleteDepartment(User user, Department department) throws RuntimeException {
+        try {
+            historyRepo.save(
+                new History(user, ActionType.DELETE_DEPARTMENT, department.getId().intValue())
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Delete-Department", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logCreateResource(User user, Resource resource) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.CREATE_RESOURCE, resource.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Create-Resource", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logUpdateResource(User user, Resource resource) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.UPDATE_RESOURCE, resource.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Update-Resource", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logDeleteResource(User user, Resource resource) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.DELETE_RESOURCE, resource.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Delete-Resource", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logLikeResource(User user, Resource resource) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.LIKE_RESOURCE, resource.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Like-Resource", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logUnlikeResource(User user, Resource resource) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.UNLIKE_RESOURCE, resource.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Unlike-Resource", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logViewResource(User user, Resource resource) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.VIEW_RESOURCE, resource.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log View-Resource", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logCreateInteraction(User user, Interaction interaction) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.CREATE_INTERACTION, interaction.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Create-Interaction", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logUpdateInteraction(User user, Interaction interaction) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.UPDATE_INTERACTION, interaction.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Update-Interaction", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logDeleteInteraction(User user, Interaction interaction) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.DELETE_INTERACTION, interaction.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Delete-Interaction", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logLikeInteraction(User user, Interaction interaction) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.LIKE_INTERACTION, interaction.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Like-Interaction", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logUnlikeInteraction(User user, Interaction interaction) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.UNLIKE_INTERACTION, interaction.getId()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Unlike-Interaction", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logRateCourse(User user, Course course) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.RATE_COURSE, course.getId().intValue()));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Rate-Course", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logCreateUser(User user) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.CREATE_USER));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Create-User", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logUpdateUser(User user) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.UPDATE_USER));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Update-User", e);
+        }
+        return ;
+    }
+
+    @Transactional
+    public void logDeleteUser(User user) throws RuntimeException {
+        try {
+            historyRepo.save(new History(user, ActionType.DELETE_USER));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to log Delete-User", e);
+        }
+        return ;
     }
 }
