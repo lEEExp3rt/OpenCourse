@@ -23,6 +23,7 @@ public class CourseUpdateDto {
     @Size(max = 31, message = "课程代码太长")
     private String code;
 
+    @NotNull
     private Byte departmentId;
 
     @NotNull(message = "课程类型不能为空")
@@ -31,6 +32,7 @@ public class CourseUpdateDto {
     @NotNull(message = "学分不能为空")
     private Float credits;
 
+    @NotNull
     private Integer updatorId;
 
     /**
