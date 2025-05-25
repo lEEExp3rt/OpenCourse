@@ -1,6 +1,7 @@
 package org.opencourse.services;
 
 import org.opencourse.dto.request.ResourceUploadDto;
+import org.opencourse.dto.request.ResourceUpdateDto;
 import org.opencourse.models.Course;
 import org.opencourse.models.Resource;
 import org.opencourse.models.Resource.ResourceFile;
@@ -118,10 +119,34 @@ public class ResourceManager {
         }
         // Delete the resource file.
         if (!fileStorageService.deleteFile(resource.getResourceFile().getFilePath())) {
-            // TODO: rollback.
             throw new RuntimeException("Failed to delete resource file");
         }
         return ;
+    }
+
+    /**
+     * Update a resource.
+     * 
+     * @param dto The resource metadata.
+     * @return The updated resource.
+     * @throws IllegalArgumentException If the resource is not found.
+     */
+    @Transactional
+    public Resource updateResource(ResourceUpdateDto dto) throws IllegalArgumentException {
+        return null; // TODO: Implement this method.
+    }
+
+    /**
+     * Update a resource.
+     * 
+     * @param dto  The resource metadata.
+     * @param file The file to update.
+     * @return The updated resource.
+     * @throws IllegalArgumentException If the resource is not found.
+     */
+    @Transactional
+    public Resource updateResource(ResourceUpdateDto dto, MultipartFile file) throws IllegalArgumentException {
+        return null; // TODO: Implement this method.
     }
 
     /**
@@ -199,50 +224,13 @@ public class ResourceManager {
     }
 
     /**
-     * Dislike a resource.
-     * 
-     * @param id The resource id.
-     * @param userId The user id.
-     * @throws IllegalArgumentException If the resource or user is not found.
-     */
-    @Transactional
-    public void dislikeResource(Integer id, Integer userId) throws IllegalArgumentException {
-        Resource resource = resourceRepo.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
-        resource.dislikes();
-        resourceRepo.save(resource);
-        // TODO: Add a user history record.
-        //User user = userRepo.findById(userId)
-        //    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return ;
-    }
-
-    /**
-     * Undislike a resource.
-     * 
-     * @param id The resource id.
-     * @param userId The user id.
-     * @throws IllegalArgumentException If the resource or user is not found.
-     */
-    @Transactional
-    public void undislikeResource(Integer id, Integer userId) throws IllegalArgumentException {
-        Resource resource = resourceRepo.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
-        resource.undislikes();
-        resourceRepo.save(resource);
-        // TODO: Add a user history record.
-        //User user = userRepo.findById(userId)
-        //    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return ;
-    }
-
-    /**
      * View a resource file.
      * 
      * @param id The resource id.
      * @param userId The user id.
      * @throws IllegalArgumentException If the resource or user is not found.
      */
+    @Transactional
     public InputStream viewResource(Integer id, Integer userId) throws IllegalArgumentException {
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
