@@ -31,6 +31,7 @@ public class ResourceManager {
     private final ResourceRepo resourceRepo;
     private final UserRepo userRepo;
     private final FileStorageService fileStorageService;
+    private final HistoryManager historyManager;
 
     /**
      * Constructor.
@@ -39,18 +40,21 @@ public class ResourceManager {
      * @param resourceRepo       The resource repository.
      * @param userRepo           The user repository.
      * @param fileStorageService The file storage service.
+     * @param historyManager     The history manager.
      */
     @Autowired
     public ResourceManager(
         CourseRepo courseRepo,
         ResourceRepo resourceRepo,
         UserRepo userRepo,
-        FileStorageService fileStorageService
+        FileStorageService fileStorageService,
+        HistoryManager historyManager
     ) {
         this.courseRepo = courseRepo;
         this.resourceRepo = resourceRepo;
         this.userRepo = userRepo;
         this.fileStorageService = fileStorageService;
+        this.historyManager = historyManager;
     }
 
     /**
@@ -89,7 +93,13 @@ public class ResourceManager {
                 user
             );
             // Save the resource.
-            return resourceRepo.save(resource);
+            resource = resourceRepo.save(resource);
+            // Add user activity.
+            user.addActivity(1);
+            user = userRepo.save(user);
+            // Add resource creation history record.
+            historyManager.logCreateResource(user, resource);
+            return resource;
         } catch (Exception e) {
             // Rollback the file storage.
             if (!fileStorageService.deleteFile(resourceFile.getFilePath())) {
@@ -103,16 +113,23 @@ public class ResourceManager {
      * Delete a resource.
      * 
      * @param id The resource id.
-     * @throws IllegalArgumentException If the resource is not found.
+     * @param userId The user id.
+     * @throws IllegalArgumentException If the resource or deleter is not found.
      * @throws RuntimeException         If failed to delete the resource.
      */
     @Transactional
-    public void deleteResource(Integer id) throws IllegalArgumentException, RuntimeException {
+    public void deleteResource(Integer id, Integer userId) throws IllegalArgumentException, RuntimeException {
         // Get the resource.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
+        // Get the user.
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Delete the resource.
         try {
+            user.addActivity(-1);
+            user = userRepo.save(user);
+            historyManager.logDeleteResource(user, resource);
             resourceRepo.delete(resource);
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete resource", e);
@@ -182,22 +199,29 @@ public class ResourceManager {
      * 
      * @param id The resource id.
      * @param userId The user id.
+     * @return True if the resource is liked, false if the user has already liked it.
      * @throws IllegalArgumentException If the resource or user is not found.
      */
     @Transactional
-    public void likeResource(Integer id, Integer userId) throws IllegalArgumentException {
+    public boolean likeResource(Integer id, Integer userId) throws IllegalArgumentException {
+        // Get the resource and user.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        // Check if the user has already liked the resource.
+        if (historyManager.getLikeStatus(user, resource)) {
+            return false;
+        }
         resource.likes();
-        resourceRepo.save(resource);
+        resource = resourceRepo.save(resource);
         // Add creator activity.
         User creator = resource.getUser();
         creator.addActivity(1);
         userRepo.save(creator);
-        // TODO: Add a user history record.
-        //User user = userRepo.findById(userId)
-        //    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return ;
+        // Add a like history record.
+        historyManager.logLikeResource(user, resource);
+        return true;
     }
 
     /**
@@ -208,19 +232,25 @@ public class ResourceManager {
      * @throws IllegalArgumentException If the resource or user is not found.
      */
     @Transactional
-    public void unlikeResource(Integer id, Integer userId) throws IllegalArgumentException {
+    public boolean unlikeResource(Integer id, Integer userId) throws IllegalArgumentException {
+        // Get the resource and user.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        // Check if the user has liked the resource.
+        if (!historyManager.getLikeStatus(user, resource)) {
+            return false;
+        }
         resource.unlikes();
-        resourceRepo.save(resource);
+        resource = resourceRepo.save(resource);
         // Add creator activity.
         User creator = resource.getUser();
         creator.addActivity(-1);
         userRepo.save(creator);
-        // TODO: Add a user history record.
-        //User user = userRepo.findById(userId)
-        //    .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return ;
+        // Add a unlike history record.
+        historyManager.logUnlikeResource(user, resource);
+        return true;
     }
 
     /**
@@ -232,15 +262,17 @@ public class ResourceManager {
      */
     @Transactional
     public InputStream viewResource(Integer id, Integer userId) throws IllegalArgumentException {
+        // Get the resource and user.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Add creator activity.
         User creator = resource.getUser();
         creator.addActivity(1);
         userRepo.save(creator);
-        // TODO: Add a user history record.
-        //User user = userRepo.findById(userId)
-        //    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        // Add a view history record.
+        historyManager.logViewResource(user, resource);
         return fileStorageService.getFile(resource.getResourceFile());
     }
 }
