@@ -46,7 +46,7 @@ public class HistoryManager {
      * @return The list of histories in descending order of create timestamp.
      */
     public List<History> getHistories(Integer userId) {
-        return historyRepo.findAllByUserIdOrderByCreatedAtDesc(userId);
+        return historyRepo.findAllByUserIdOrderByTimestampDesc(userId);
     }
 
     /**
@@ -67,7 +67,7 @@ public class HistoryManager {
      * @return True if the user liked the interaction, false otherwise.
      */
     public boolean getLikeStatus(User user, Interaction interaction) {
-        History history = historyRepo.findFirstByUserAndObjectIdAndActionTypeInOrderByCreatedAtDesc(
+        History history = historyRepo.findFirstByUserAndObjectIdAndActionTypeInOrderByTimestampDesc(
             user,
             interaction.getId(),
             Arrays.asList(
@@ -85,7 +85,7 @@ public class HistoryManager {
      * @return True if the user liked the resource, false otherwise.
      */
     public boolean getLikeStatus(User user, Resource resource) {
-        History history = historyRepo.findFirstByUserAndObjectIdAndActionTypeInOrderByCreatedAtDesc(
+        History history = historyRepo.findFirstByUserAndObjectIdAndActionTypeInOrderByTimestampDesc(
             user,
             resource.getId(),
             Arrays.asList(

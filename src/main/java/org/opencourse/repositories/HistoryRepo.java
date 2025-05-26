@@ -24,7 +24,7 @@ public interface HistoryRepo extends JpaRepository<History, Long> {
      * @param userId The ID of the user.
      * @return A list of histories associated with the user.
      */
-    public List<History> findAllByUserIdOrderByCreatedAtDesc(Integer userId);
+    public List<History> findAllByUserIdOrderByTimestampDesc(Integer userId);
 
     /**
      * Find the latest history record for a user on a specific object in certain interaction actions range.
@@ -34,6 +34,6 @@ public interface HistoryRepo extends JpaRepository<History, Long> {
      * @param actionTypes The list of action types.
      * @return The most recent history record if found.
      */
-    Optional<History> findFirstByUserAndObjectIdAndActionTypeInOrderByCreatedAtDesc(
+    Optional<History> findFirstByUserAndObjectIdAndActionTypeInOrderByTimestampDesc(
         User user, Integer objectId, List<ActionType> actionTypes);
 }
