@@ -21,7 +21,7 @@ import org.opencourse.utils.typeinfo.CourseType;
  * @author !EEExp3rt
  */
 @Entity
-@Table(name = "Course")
+@Table(name = "`Course`")
 public class Course extends Model<Short> {
 
     @Id

@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
  * @author !EEExp3rt
  */
 @Entity
-@Table(name = "Interaction")
+@Table(name = "`Interaction`")
 public class Interaction extends Model<Integer> {
 
     @Id
