@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * @author !EEExp3rt
  */
 @Entity
-@Table(name = "User")
+@Table(name = "`User`")
 public class User extends Model<Integer> {
 
     @Id

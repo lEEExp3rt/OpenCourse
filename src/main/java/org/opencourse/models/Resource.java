@@ -24,7 +24,7 @@ import org.opencourse.utils.typeinfo.ResourceType;
  * @author !EEExp3rt
  */
 @Entity
-@Table(name = "Resource")
+@Table(name = "`Resource`")
 public class Resource extends Model<Integer> {
 
     @Id

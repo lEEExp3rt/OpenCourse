@@ -13,7 +13,7 @@ import jakarta.persistence.Column;
  * @author !EEExp3rt
  */
 @Entity
-@Table(name = "Department")
+@Table(name = "`Department`")
 public class Department extends Model<Byte> {
 
     @Id

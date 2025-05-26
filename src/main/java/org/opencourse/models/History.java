@@ -22,7 +22,7 @@ import org.opencourse.utils.typeinfo.ActionType;
  * @author !EEExp3rt
  */
 @Entity
-@Table(name = "History")
+@Table(name = "`History`")
 public class History extends Model<Long> {
 
     // The ID of the history record.
