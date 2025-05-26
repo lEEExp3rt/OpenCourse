@@ -27,6 +27,10 @@ pom.xml.versionsBackup
 pom.xml.next
 release.properties
 
+# Application configuration files
+application.yml
+application.properties
+
 # Other
 .DS_Store
 Thumbs.db

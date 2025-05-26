@@ -1,0 +1,43 @@
+# Application configuration demo file for OpenCourse.
+# This file is a template and should be copied to application.yml for local tests.
+
+spring:
+  # Database settings.
+  datasource:
+    url: "jdbc:h2:mem:testdb"
+    driver-class-name: "org.h2.Driver"
+    username: YOUR_USERNAME_HERE
+    password: YOUR_PASSWORD_HERE
+    # Connection pool settings.
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+      pool-name: "H2Pool"
+  # JPA/Hibernate settings.
+  jpa:
+    hibernate:
+      ddl-auto: "create-drop"
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: "org.hibernate.dialect.H2Dialect"
+        format_sql: true
+        show_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+logging:
+  level:
+    # Detailed SQL logging.
+    org.hibernate.SQL: "DEBUG"
+    # Spring Data JPA logging.
+    org.springframework.data.jpa: "DEBUG"
+    # Spring test logging.
+    org.springframework.test: "DEBUG"
+    # OpenCourse project specific logging.
+    org.opencourse: "DEBUG"
