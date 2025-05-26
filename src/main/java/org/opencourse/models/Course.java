@@ -11,6 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+import java.math.BigDecimal;
+
 import org.opencourse.utils.typeinfo.CourseType;
 
 /**
@@ -41,7 +43,7 @@ public class Course extends Model<Short> {
     private CourseType courseType;
 
     @Column(name = "credits", nullable = false, precision = 3, scale = 1)
-    private Float credits;
+    private BigDecimal credits;
 
     /**
      * Default constructor.
@@ -58,7 +60,7 @@ public class Course extends Model<Short> {
      * @param courseType The type of the course.
      * @param credits    The number of credits for the course.
      */
-    public Course(String name, String code, Department department, CourseType courseType, Float credits) {
+    public Course(String name, String code, Department department, CourseType courseType, BigDecimal credits) {
         this.name = name;
         this.code = code;
         this.department = department;
@@ -105,11 +107,11 @@ public class Course extends Model<Short> {
         this.courseType = courseType;
     }
 
-    public Float getCredits() {
+    public BigDecimal getCredits() {
         return credits;
     }
 
-    public void setCredits(Float credits) {
+    public void setCredits(BigDecimal credits) {
         this.credits = credits;
     }
 

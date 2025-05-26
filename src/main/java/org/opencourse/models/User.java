@@ -85,7 +85,7 @@ public class User extends Model<Integer> {
      * 
      * @apiNote This method is called by JPA automatically.
      */
-    @PrePersist
+    @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }

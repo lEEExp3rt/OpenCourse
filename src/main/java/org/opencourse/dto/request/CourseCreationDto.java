@@ -1,8 +1,13 @@
 package org.opencourse.dto.request;
 
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.math.BigDecimal;
 
 import org.opencourse.utils.typeinfo.CourseType;
 
@@ -28,7 +33,10 @@ public class CourseCreationDto {
     private CourseType courseType;
 
     @NotNull(message = "学分不能为空")
-    private Float credits;
+    @DecimalMin(value = "0.0", message = "学分必须非负")
+    @DecimalMax(value = "99.9", message = "学分不能超过 100")
+    @Digits(integer = 2, fraction = 1, message = "学分格式错误")
+    private BigDecimal credits;
 
     @NotNull
     private Integer creatorId;
@@ -54,7 +62,7 @@ public class CourseCreationDto {
         String code,
         Byte departmentId,
         Byte courseTypeId,
-        Float credits,
+        BigDecimal credits,
         Integer creatorId
     ) {
         this.name = name;
@@ -103,11 +111,11 @@ public class CourseCreationDto {
         this.courseType = CourseType.getById(courseTypeId.byteValue());
     }
 
-    public Float getCredits() {
+    public BigDecimal getCredits() {
         return credits;
     }
 
-    public void setCredits(Float credits) {
+    public void setCredits(BigDecimal credits) {
         this.credits = credits;
     }
 
