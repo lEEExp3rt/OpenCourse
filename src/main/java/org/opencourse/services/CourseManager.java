@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @Service
 public class CourseManager {
 
-    // Data Access Object.
     private final CourseRepo courseRepo;
     private final DepartmentRepo departmentRepo;
     private final UserRepo userRepo;
