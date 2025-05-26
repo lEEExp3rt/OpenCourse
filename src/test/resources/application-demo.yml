@@ -2,6 +2,10 @@
 # This file is a template and should be copied to application.yml for local tests.
 
 spring:
+  # SQL settings.
+  sql:
+    init:
+      mode: "never"
   # Database settings.
   datasource:
     url: "jdbc:h2:mem:testdb"
