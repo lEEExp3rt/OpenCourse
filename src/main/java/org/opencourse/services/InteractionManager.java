@@ -2,6 +2,7 @@ package org.opencourse.services;
 
 import org.opencourse.models.Interaction;
 import org.opencourse.dto.request.InteractionCreationDto;
+import org.opencourse.dto.request.InteractionUpdateDto;
 import org.opencourse.models.Course;
 import org.opencourse.models.User;
 import org.opencourse.repositories.InteractionRepo;
@@ -67,8 +68,28 @@ public class InteractionManager {
         Byte rating = dto.getRating();
 
         // 检查用户是否已经对该课程进行过评论
-        if (interactionRepo.existsByCourseAndUser(course, user)) {
-            return null;
+        Optional<Interaction> existingInteraction = interactionRepo.findByCourseAndUser(course, user);
+        if (existingInteraction.isPresent()) {
+            // 如果已经存在评论，则更新评论内容和评分
+            Interaction interaction = existingInteraction.get();
+            if (content != null) {
+                interaction.setContent(content);
+            }
+            if (rating != null) {
+                interaction.setRating(rating);
+            }
+            
+            interaction = interactionRepo.save(interaction);
+            
+            // 添加更新评论的历史记录
+            historyManager.logUpdateInteraction(user, interaction);
+            
+            // 如果包含评分，添加评分的历史记录
+            if (rating != null) {
+                historyManager.logRateCourse(user, course);
+            }
+            
+            return interaction;
         }
 
         // 创建新评论
@@ -88,11 +109,42 @@ public class InteractionManager {
     /**
      * Update an interaction comment.
      * 
-     * @return
+     * @param dto 更新评论的DTO
+     * @return 更新后的评论
+     * @throws IllegalArgumentException 如果评论不存在或者用户不匹配
      */
     @Transactional
-    public Interaction updateInteraction() {
-        return null; // TODO: Implement this method.
+    public Interaction updateInteraction(InteractionUpdateDto dto) {
+        // 获取评论和用户
+        Interaction interaction = interactionRepo.findById(dto.getId())
+            .orElseThrow(() -> new IllegalArgumentException("评论不存在"));
+        User user = userRepo.findById(dto.getUserId())
+            .orElseThrow(() -> new IllegalArgumentException("用户不存在"));
+            
+        // 检查是否是评论的所有者
+        if (!interaction.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("您只能修改自己的评论");
+        }
+        
+        // 更新评论内容和评分
+        if (dto.getContent() != null) {
+            interaction.setContent(dto.getContent());
+        }
+        
+        if (dto.getRating() != null) {
+            interaction.setRating(dto.getRating());
+            
+            // 添加评分的历史记录
+            historyManager.logRateCourse(user, interaction.getCourse());
+        }
+        
+        // 保存更新后的评论
+        interaction = interactionRepo.save(interaction);
+        
+        // 添加更新评论的历史记录
+        historyManager.logUpdateInteraction(user, interaction);
+        
+        return interaction;
     }
 
     /**
@@ -112,6 +164,13 @@ public class InteractionManager {
         if (interaction == null) {
             return false;
         }
+        
+        // 检查是否是评论的所有者或管理员
+        if (!interaction.getUser().getId().equals(userId) && 
+            user.getRole() != User.UserRole.ADMIN) {
+            return false;
+        }
+        
         interactionRepo.delete(interaction);
         // 添加删除评论的历史记录
         historyManager.logDeleteInteraction(user, interaction);

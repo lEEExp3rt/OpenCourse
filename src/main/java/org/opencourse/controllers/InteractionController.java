@@ -1,6 +1,7 @@
 package org.opencourse.controllers;
 
 import org.opencourse.dto.request.InteractionCreationDto;
+import org.opencourse.dto.request.InteractionUpdateDto;
 import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.Interaction;
 import org.opencourse.models.User;
@@ -54,6 +55,10 @@ public class InteractionController {
             InteractionCreationDto dto = new InteractionCreationDto(courseId, user.getId(), content, rating);
             Interaction interaction = interactionManager.addInteraction(dto);
             
+            if (interaction == null) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("您已经对该课程发表过评论"));
+            }
+            
             Map<String, Object> data = new HashMap<>();
             data.put("id", interaction.getId());
             data.put("content", interaction.getContent());
@@ -64,6 +69,44 @@ public class InteractionController {
             data.put("createdAt", interaction.getCreatedAt());
             
             return ResponseEntity.ok(ApiResponse.success("评论添加成功", data));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 更新评论或评分
+     * 
+     * @param id 评论ID
+     * @param content 评论内容
+     * @param rating 评分（1-10）
+     * @return 更新的评论
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateInteraction(
+            @PathVariable Integer id,
+            @RequestParam(required = false) String content,
+            @RequestParam(required = false) Byte rating) {
+        
+        // 获取当前登录用户
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        
+        // 更新评论
+        try {
+            InteractionUpdateDto dto = new InteractionUpdateDto(id, user.getId(), content, rating);
+            Interaction interaction = interactionManager.updateInteraction(dto);
+            
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", interaction.getId());
+            data.put("content", interaction.getContent());
+            data.put("rating", interaction.getRating());
+            data.put("courseId", interaction.getCourse().getId());
+            data.put("userId", interaction.getUser().getId());
+            data.put("userName", interaction.getUser().getName());
+            data.put("createdAt", interaction.getCreatedAt());
+            
+            return ResponseEntity.ok(ApiResponse.success("评论更新成功", data));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
@@ -105,6 +148,9 @@ public class InteractionController {
                 interactionData.put("isLiked", false);
                 interactionData.put("isDisliked", false);
             }
+            
+            // 添加当前用户是否是评论的所有者
+            interactionData.put("isOwner", interaction.getUser().getId().equals(userId));
             
             return interactionData;
         }).collect(Collectors.toList());
@@ -151,6 +197,27 @@ public class InteractionController {
             return ResponseEntity.ok(ApiResponse.success("取消点赞成功"));
         } else {
             return ResponseEntity.badRequest().body(ApiResponse.error("取消点赞失败，评论不存在或未点赞"));
+        }
+    }
+
+    /**
+     * 删除评论
+     * 
+     * @param interactionId 评论ID
+     * @return 操作结果
+     */
+    @DeleteMapping("/{interactionId}")
+    public ResponseEntity<ApiResponse<Void>> deleteInteraction(@PathVariable Integer interactionId) {
+        // 获取当前登录用户
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        
+        boolean success = interactionManager.deleteInteraction(interactionId, user.getId());
+        
+        if (success) {
+            return ResponseEntity.ok(ApiResponse.success("评论删除成功"));
+        } else {
+            return ResponseEntity.badRequest().body(ApiResponse.error("删除评论失败，评论不存在或无权限删除"));
         }
     }
 } 
