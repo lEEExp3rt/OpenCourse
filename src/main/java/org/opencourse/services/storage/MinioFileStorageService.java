@@ -1,9 +1,10 @@
 package org.opencourse.services.storage;
 
 import io.minio.*;
+
+import org.opencourse.configs.MinioConfig;
 import org.opencourse.models.Resource.ResourceFile;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,9 +22,7 @@ import java.util.UUID;
 public class MinioFileStorageService implements FileStorageService {
 
     private final MinioClient minioClient;
-
-    @Value("${minio.bucket.name}")
-    private String bucketName;
+    private final MinioConfig minioConfig;
 
     /**
      * Constructor.
@@ -31,8 +30,9 @@ public class MinioFileStorageService implements FileStorageService {
      * @param minioClient MinIO client.
      */
     @Autowired
-    public MinioFileStorageService(MinioClient minioClient) {
+    public MinioFileStorageService(MinioClient minioClient, MinioConfig minioConfig) {
         this.minioClient = minioClient;
+        this.minioConfig = minioConfig;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class MinioFileStorageService implements FileStorageService {
             // Upload file to MinIO.
             minioClient.putObject(
                 PutObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(minioConfig.getBucketName())
                     .object(objectPath)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
@@ -66,7 +66,7 @@ public class MinioFileStorageService implements FileStorageService {
         try {
             return minioClient.getObject(
                 GetObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(minioConfig.getBucketName())
                     .object(file.getFilePath())
                     .build()
             );
@@ -80,7 +80,7 @@ public class MinioFileStorageService implements FileStorageService {
         try {
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                    .bucket(bucketName)
+                    .bucket(minioConfig.getBucketName())
                     .object(filePath)
                     .build()
             );
