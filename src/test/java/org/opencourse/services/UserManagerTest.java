@@ -76,7 +76,7 @@ public class UserManagerTest {
         // Arrange
         String email = "new@example.com";
         when(userRepo.existsByEmail(email)).thenReturn(false);
-        doNothing().when(emailService).sendVerificationCode(eq(email), anyString(), anyString());
+        when(emailService.sendVerificationCode(eq(email), anyString(), anyString())).thenReturn("123456");
 
         // Act
         boolean result = userManager.sendRegistrationVerificationCode(email);
@@ -221,7 +221,7 @@ public class UserManagerTest {
         // Arrange
         String email = "existing@example.com";
         when(userRepo.existsByEmail(email)).thenReturn(true);
-        doNothing().when(emailService).sendVerificationCode(eq(email), anyString(), anyString());
+        when(emailService.sendVerificationCode(eq(email), anyString(), anyString())).thenReturn("123456");
 
         // Act
         boolean result = userManager.sendPasswordResetVerificationCode(email);
@@ -416,6 +416,92 @@ public class UserManagerTest {
         // Assert
         assertThat(result).isFalse();
         verify(userRepo, never()).save(any(User.class));
+    }
+
+    @Test
+    void testAddUserActivity_WhenUserExists_ShouldIncreaseActivityAndReturn() {
+        // Arrange
+        Integer userId = 1;
+        User user = new User("testuser", "user@example.com", "encodedPassword", User.UserRole.USER);
+        user.setActivity(5); // 初始活跃度为5
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        Integer result = userManager.addUserActivity(userId);
+
+        // Assert
+        assertThat(result).isEqualTo(6);
+        assertThat(user.getActivity()).isEqualTo(6);
+    }
+
+    @Test
+    void testAddUserActivity_WhenUserDoesNotExist_ShouldReturnZero() {
+        // Arrange
+        Integer userId = 999;
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+        Integer result = userManager.addUserActivity(userId);
+
+        // Assert
+        assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    void testGetUserActivity_WhenUserExists_ShouldReturnActivity() {
+        // Arrange
+        Integer userId = 1;
+        User user = new User("testuser", "user@example.com", "encodedPassword", User.UserRole.USER);
+        user.setActivity(10);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        Integer result = userManager.getUserActivity(userId);
+
+        // Assert
+        assertThat(result).isEqualTo(10);
+    }
+
+    @Test
+    void testGetUserActivity_WhenUserDoesNotExist_ShouldReturnZero() {
+        // Arrange
+        Integer userId = 999;
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+        Integer result = userManager.getUserActivity(userId);
+
+        // Assert
+        assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    void testReduceUserActivity_WhenUserExists_ShouldDecreaseActivityAndReturn() {
+        // Arrange
+        Integer userId = 1;
+        User user = new User("testuser", "user@example.com", "encodedPassword", User.UserRole.USER);
+        user.setActivity(5); // 初始活跃度为5
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+
+        // Act
+        Integer result = userManager.reduceUserActivity(userId);
+
+        // Assert
+        assertThat(result).isEqualTo(4);
+        assertThat(user.getActivity()).isEqualTo(4);
+    }
+
+    @Test
+    void testReduceUserActivity_WhenUserDoesNotExist_ShouldReturnZero() {
+        // Arrange
+        Integer userId = 999;
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+
+        // Act
+        Integer result = userManager.reduceUserActivity(userId);
+
+        // Assert
+        assertThat(result).isEqualTo(0);
     }
 
     // @Test

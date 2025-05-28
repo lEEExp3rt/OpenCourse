@@ -155,25 +155,27 @@ public class JwtUtilsTest {
     }
 
     @Test
-    void testValidateToken_WithExpiredToken() throws InterruptedException {
-        // Arrange - 设置很短的过期时间
-        ReflectionTestUtils.setField(jwtUtils, "expirationTime", 1L); // 1毫秒
-        
+    void testValidateToken_WithExpiredToken() throws Exception {
+        // 创建一个带有过期日期的自定义JWT令牌（通过反射直接设置过期时间）
         UserDetails userDetails = org.springframework.security.core.userdetails.User
                 .withUsername("test@example.com")
                 .password("password")
                 .authorities(Collections.emptyList())
                 .build();
-                
+        
+        // 设置一个较长但已经过去的过期时间（-1000毫秒，即1秒前过期）
+        ReflectionTestUtils.setField(jwtUtils, "expirationTime", -1000L);
+        
+        // 生成令牌（这个令牌从创建时就已过期）
         String token = jwtUtils.generateToken(userDetails);
         
-        // 确保令牌过期
-        Thread.sleep(10);
-
-        // Act
+        // 重置令牌过期时间为默认值，避免影响其他测试
+        ReflectionTestUtils.setField(jwtUtils, "expirationTime", EXPIRATION);
+        
+        // 验证令牌 - 应该被检测为过期
         boolean isValid = jwtUtils.validateToken(token, userDetails);
-
-        // Assert
+        
+        // 验证结果
         assertThat(isValid).isFalse();
     }
     

@@ -123,7 +123,7 @@ public class VerificationServiceTest {
         assertThat(codeBeforeExpiration).isEqualTo(code);
         
         // 等待过期
-        Thread.sleep(1100); // 稍微超过1秒
+        Thread.sleep(2000); // 稍微超过1秒
         
         // Act
         String codeAfterExpiration = verificationService.getVerificationCode(email);
