@@ -418,64 +418,64 @@ public class UserManagerTest {
         verify(userRepo, never()).save(any(User.class));
     }
 
-    @Test
-    void testDisableUser_WhenUserExists_ShouldSetActivityToZeroAndReturnTrue() {
-        // Arrange
-        Integer userId = 1;
-        User user = new User("testuser", "user@example.com", "encodedPassword", User.UserRole.USER);
-        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+    // @Test
+    // void testDisableUser_WhenUserExists_ShouldSetActivityToZeroAndReturnTrue() {
+    //     // Arrange
+    //     Integer userId = 1;
+    //     User user = new User("testuser", "user@example.com", "encodedPassword", User.UserRole.USER);
+    //     when(userRepo.findById(userId)).thenReturn(Optional.of(user));
 
-        // Act
-        boolean result = userManager.disableUser(userId);
+    //     // Act
+    //     boolean result = userManager.disableUser(userId);
 
-        // Assert
-        assertThat(result).isTrue();
-        assertThat(user.getActivity()).isEqualTo(0);
-        verify(userRepo).save(user);
-    }
+    //     // Assert
+    //     assertThat(result).isTrue();
+    //     assertThat(user.getActivity()).isEqualTo(0);
+    //     verify(userRepo).save(user);
+    // }
 
-    @Test
-    void testDisableUser_WhenUserDoesNotExist_ShouldReturnFalse() {
-        // Arrange
-        Integer userId = 999;
-        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+    // @Test
+    // void testDisableUser_WhenUserDoesNotExist_ShouldReturnFalse() {
+    //     // Arrange
+    //     Integer userId = 999;
+    //     when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
-        // Act
-        boolean result = userManager.disableUser(userId);
+    //     // Act
+    //     boolean result = userManager.disableUser(userId);
 
-        // Assert
-        assertThat(result).isFalse();
-        verify(userRepo, never()).save(any(User.class));
-    }
+    //     // Assert
+    //     assertThat(result).isFalse();
+    //     verify(userRepo, never()).save(any(User.class));
+    // }
 
-    @Test
-    void testEnableUser_WhenUserExists_ShouldSetActivityToOneAndReturnTrue() {
-        // Arrange
-        Integer userId = 1;
-        User user = new User("testuser", "user@example.com", "encodedPassword", User.UserRole.USER);
-        user.setActivity(0); // 先禁用
-        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+    // @Test
+    // void testEnableUser_WhenUserExists_ShouldSetActivityToOneAndReturnTrue() {
+    //     // Arrange
+    //     Integer userId = 1;
+    //     User user = new User("testuser", "user@example.com", "encodedPassword", User.UserRole.USER);
+    //     user.setActivity(0); // 先禁用
+    //     when(userRepo.findById(userId)).thenReturn(Optional.of(user));
 
-        // Act
-        boolean result = userManager.enableUser(userId);
+    //     // Act
+    //     boolean result = userManager.enableUser(userId);
 
-        // Assert
-        assertThat(result).isTrue();
-        assertThat(user.getActivity()).isEqualTo(1);
-        verify(userRepo).save(user);
-    }
+    //     // Assert
+    //     assertThat(result).isTrue();
+    //     assertThat(user.getActivity()).isEqualTo(1);
+    //     verify(userRepo).save(user);
+    // }
 
-    @Test
-    void testEnableUser_WhenUserDoesNotExist_ShouldReturnFalse() {
-        // Arrange
-        Integer userId = 999;
-        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+    // @Test
+    // void testEnableUser_WhenUserDoesNotExist_ShouldReturnFalse() {
+    //     // Arrange
+    //     Integer userId = 999;
+    //     when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
-        // Act
-        boolean result = userManager.enableUser(userId);
+    //     // Act
+    //     boolean result = userManager.enableUser(userId);
 
-        // Assert
-        assertThat(result).isFalse();
-        verify(userRepo, never()).save(any(User.class));
-    }
+    //     // Assert
+    //     assertThat(result).isFalse();
+    //     verify(userRepo, never()).save(any(User.class));
+    // }
 } 

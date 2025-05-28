@@ -58,14 +58,6 @@
             <version>9.2.0</version>
         </dependency>
 
-        <!--  Spring Boot Starter Data Redis -->
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-            <version>3.4.5</version>
-        </dependency>
-
         <!-- MinIO -->
         <!-- https://mvnrepository.com/artifact/io.minio/minio -->
         <dependency>

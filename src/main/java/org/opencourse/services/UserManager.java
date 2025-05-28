@@ -234,39 +234,85 @@ public class UserManager {
         return true;
     }
     
-    /**
-     * 禁用用户
-     * @param userId 用户ID
-     * @return 操作结果
-     */
-    @Transactional
-    public boolean disableUser(Integer userId) {
-        Optional<User> userOptional = userRepo.findById(userId);
-        if (userOptional.isEmpty()) {
-            return false;
-        }
+    // /**
+    //  * 禁用用户
+    //  * @param userId 用户ID
+    //  * @return 操作结果
+    //  */
+    // @Transactional
+    // public boolean disableUser(Integer userId) {
+    //     Optional<User> userOptional = userRepo.findById(userId);
+    //     if (userOptional.isEmpty()) {
+    //         return false;
+    //     }
         
-        User user = userOptional.get();
-        user.setActivity(0); // 设置活跃度为0表示禁用
-        userRepo.save(user);
-        return true;
-    }
+    //     User user = userOptional.get();
+    //     user.setActivity(0); // 设置活跃度为0表示禁用
+    //     userRepo.save(user);
+    //     return true;
+    // }
     
-    /**
-     * 启用用户
+    // /**
+    //  * 启用用户
+    //  * @param userId 用户ID
+    //  * @return 操作结果
+    //  */
+    // @Transactional
+    // public boolean enableUser(Integer userId) {
+    //     Optional<User> userOptional = userRepo.findById(userId);
+    //     if (userOptional.isEmpty()) {
+    //         return false;
+    //     }
+        
+    //     User user = userOptional.get();
+    //     user.setActivity(1); // 设置活跃度为1表示启用
+    //     userRepo.save(user);
+    //     return true;
+    // }
+    /*
+     * 增加用户活跃度
      * @param userId 用户ID
-     * @return 操作结果
+     * @return 增加后的活跃度
      */
     @Transactional
-    public boolean enableUser(Integer userId) {
+    public Integer addUserActivity(Integer userId) {
         Optional<User> userOptional = userRepo.findById(userId);
         if (userOptional.isEmpty()) {
-            return false;
+            return 0;
         }
-        
+
         User user = userOptional.get();
-        user.setActivity(1); // 设置活跃度为1表示启用
-        userRepo.save(user);
-        return true;
+        user.setActivity(user.getActivity() + 1);
+        return user.getActivity();
+    }
+
+    /*
+     * 获取用户活跃度
+     * @param userId 用户ID
+     * @return 用户活跃度
+     */
+    public Integer getUserActivity(Integer userId) {
+        Optional<User> userOptional = userRepo.findById(userId);
+        if (userOptional.isEmpty()) {
+            return 0;
+        }
+        return userOptional.get().getActivity();
+    }
+
+    /*
+     * 减少用户活跃度
+     * @param userId 用户ID
+     * @return 减少后的活跃度
+     */
+    @Transactional
+    public Integer reduceUserActivity(Integer userId) {
+        Optional<User> userOptional = userRepo.findById(userId);
+        if (userOptional.isEmpty()) {
+            return 0;
+        }
+
+        User user = userOptional.get();
+        user.setActivity(user.getActivity() - 1);
+        return user.getActivity();
     }
 }

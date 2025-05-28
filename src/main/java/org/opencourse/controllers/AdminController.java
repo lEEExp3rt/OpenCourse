@@ -74,35 +74,35 @@ public class AdminController {
         }
     }
 
-    /**
-     * 禁用用户
-     * @param userId 用户ID
-     * @return 操作结果
-     */
-    @PutMapping("/users/{userId}/disable")
-    public ResponseEntity<ApiResponse<Void>> disableUser(@PathVariable Integer userId) {
-        // boolean result = userService.disableUser(userId);
-        boolean result = userManager.disableUser(userId);
-        if (result) {
-            return ResponseEntity.ok(ApiResponse.success("用户已禁用"));
-        } else {
-            return ResponseEntity.badRequest().body(ApiResponse.error("用户不存在"));
-        }
-    }
+    // /**
+    //  * 禁用用户
+    //  * @param userId 用户ID
+    //  * @return 操作结果
+    //  */
+    // @PutMapping("/users/{userId}/disable")
+    // public ResponseEntity<ApiResponse<Void>> disableUser(@PathVariable Integer userId) {
+    //     // boolean result = userService.disableUser(userId);
+    //     boolean result = userManager.disableUser(userId);
+    //     if (result) {
+    //         return ResponseEntity.ok(ApiResponse.success("用户已禁用"));
+    //     } else {
+    //         return ResponseEntity.badRequest().body(ApiResponse.error("用户不存在"));
+    //     }
+    // }
 
-    /**
-     * 启用用户
-     * @param userId 用户ID
-     * @return 操作结果
-     */
-    @PutMapping("/users/{userId}/enable")
-    public ResponseEntity<ApiResponse<Void>> enableUser(@PathVariable Integer userId) {
-        // boolean result = userService.enableUser(userId);
-        boolean result = userManager.enableUser(userId);
-        if (result) {
-            return ResponseEntity.ok(ApiResponse.success("用户已启用"));
-        } else {
-            return ResponseEntity.badRequest().body(ApiResponse.error("用户不存在"));
-        }
-    }
+    // /**
+    //  * 启用用户
+    //  * @param userId 用户ID
+    //  * @return 操作结果
+    //  */
+    // @PutMapping("/users/{userId}/enable")
+    // public ResponseEntity<ApiResponse<Void>> enableUser(@PathVariable Integer userId) {
+    //     // boolean result = userService.enableUser(userId);
+    //     boolean result = userManager.enableUser(userId);
+    //     if (result) {
+    //         return ResponseEntity.ok(ApiResponse.success("用户已启用"));
+    //     } else {
+    //         return ResponseEntity.badRequest().body(ApiResponse.error("用户不存在"));
+    //     }
+    // }
 } 

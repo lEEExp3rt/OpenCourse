@@ -2,30 +2,14 @@ package org.opencourse.services.email;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.concurrent.TimeUnit;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 /**
  * 验证码服务测试类
  */
-@ExtendWith(MockitoExtension.class)
 public class VerificationServiceTest {
-
-    @Mock
-    private RedisTemplate<String, String> redisTemplate;
-
-    @Mock
-    private ValueOperations<String, String> valueOperations;
 
     private VerificationService verificationService;
 
@@ -33,67 +17,34 @@ public class VerificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        verificationService = new VerificationService(redisTemplate);
+        verificationService = new VerificationService();
         ReflectionTestUtils.setField(verificationService, "codeExpirationSeconds", EXPIRATION_SECONDS);
-        
-        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
     }
 
     @Test
-    void testSaveVerificationCode() {
+    void testSaveAndGetVerificationCode() {
         // Arrange
         String email = "test@example.com";
         String code = "123456";
-        String expectedKey = "verification:code:" + email;
-        
-        doNothing().when(valueOperations).set(anyString(), anyString(), anyLong(), any(TimeUnit.class));
 
         // Act
         verificationService.saveVerificationCode(email, code);
+        String retrievedCode = verificationService.getVerificationCode(email);
 
         // Assert
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).set(
-            eq(expectedKey), 
-            eq(code), 
-            eq(EXPIRATION_SECONDS), 
-            eq(TimeUnit.SECONDS)
-        );
-    }
-
-    @Test
-    void testGetVerificationCode() {
-        // Arrange
-        String email = "test@example.com";
-        String expectedCode = "123456";
-        String expectedKey = "verification:code:" + email;
-        
-        when(valueOperations.get(expectedKey)).thenReturn(expectedCode);
-
-        // Act
-        String result = verificationService.getVerificationCode(email);
-
-        // Assert
-        assertThat(result).isEqualTo(expectedCode);
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).get(expectedKey);
+        assertThat(retrievedCode).isEqualTo(code);
     }
 
     @Test
     void testGetVerificationCode_WhenNotFound() {
         // Arrange
         String email = "nonexistent@example.com";
-        String expectedKey = "verification:code:" + email;
-        
-        when(valueOperations.get(expectedKey)).thenReturn(null);
 
         // Act
         String result = verificationService.getVerificationCode(email);
 
         // Assert
         assertThat(result).isNull();
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).get(expectedKey);
     }
 
     @Test
@@ -101,17 +52,14 @@ public class VerificationServiceTest {
         // Arrange
         String email = "test@example.com";
         String code = "123456";
-        String expectedKey = "verification:code:" + email;
         
-        when(valueOperations.get(expectedKey)).thenReturn(code);
+        verificationService.saveVerificationCode(email, code);
 
         // Act
         boolean result = verificationService.verifyCode(email, code);
 
         // Assert
         assertThat(result).isTrue();
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).get(expectedKey);
     }
 
     @Test
@@ -120,17 +68,14 @@ public class VerificationServiceTest {
         String email = "test@example.com";
         String storedCode = "123456";
         String wrongCode = "654321";
-        String expectedKey = "verification:code:" + email;
         
-        when(valueOperations.get(expectedKey)).thenReturn(storedCode);
+        verificationService.saveVerificationCode(email, storedCode);
 
         // Act
         boolean result = verificationService.verifyCode(email, wrongCode);
 
         // Assert
         assertThat(result).isFalse();
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).get(expectedKey);
     }
 
     @Test
@@ -138,31 +83,52 @@ public class VerificationServiceTest {
         // Arrange
         String email = "test@example.com";
         String code = "123456";
-        String expectedKey = "verification:code:" + email;
-        
-        when(valueOperations.get(expectedKey)).thenReturn(null);
 
         // Act
         boolean result = verificationService.verifyCode(email, code);
 
         // Assert
         assertThat(result).isFalse();
-        verify(redisTemplate).opsForValue();
-        verify(valueOperations).get(expectedKey);
     }
 
     @Test
     void testRemoveVerificationCode() {
         // Arrange
         String email = "test@example.com";
-        String expectedKey = "verification:code:" + email;
+        String code = "123456";
         
-        when(redisTemplate.delete(expectedKey)).thenReturn(true);
-
+        verificationService.saveVerificationCode(email, code);
+        
         // Act
         verificationService.removeVerificationCode(email);
+        String retrievedCode = verificationService.getVerificationCode(email);
 
         // Assert
-        verify(redisTemplate).delete(expectedKey);
+        assertThat(retrievedCode).isNull();
+    }
+    
+    @Test
+    void testCodeExpiration() throws InterruptedException {
+        // Arrange
+        String email = "test@example.com";
+        String code = "123456";
+        
+        // 设置一个非常短的过期时间用于测试
+        ReflectionTestUtils.setField(verificationService, "codeExpirationSeconds", 1); // 1秒
+        
+        verificationService.saveVerificationCode(email, code);
+        
+        // 确保代码在获取之前是存在的
+        String codeBeforeExpiration = verificationService.getVerificationCode(email);
+        assertThat(codeBeforeExpiration).isEqualTo(code);
+        
+        // 等待过期
+        Thread.sleep(1100); // 稍微超过1秒
+        
+        // Act
+        String codeAfterExpiration = verificationService.getVerificationCode(email);
+        
+        // Assert
+        assertThat(codeAfterExpiration).isNull();
     }
 } 
