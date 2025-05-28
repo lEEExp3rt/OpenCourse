@@ -78,6 +78,12 @@ public class MinioFileStorageService implements FileStorageService {
     @Override
     public boolean deleteFile(String filePath) {
         try {
+            minioClient.statObject(
+                StatObjectArgs.builder()
+                    .bucket(minioConfig.getBucketName())
+                    .object(filePath)
+                    .build()
+            );
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
                     .bucket(minioConfig.getBucketName())
