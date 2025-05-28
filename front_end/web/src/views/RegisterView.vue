@@ -9,20 +9,19 @@ const router = useRouter()
 const userModule = useUserModule()
 
 const loading = ref(false)
-const userLoginDTO = reactive({
+const userRegisterDTO = reactive({
   email: '',
   password: ''
 })
 
-async function handleLogin() {
+async function handleRegister() {
   try {
     loading.value = true
-    const res = await userModule.login(userLoginDTO)
+    const res = await userModule.register(userRegisterDTO)
     if (String(res.code) === '1') {
-      message.success('登录成功')
       router.push('/')
     } else {
-      message.error(res.msg || '登录失败')
+      message.error(res.msg || '注册失败')
       loading.value = false
     }
   } catch (error) {
@@ -31,8 +30,8 @@ async function handleLogin() {
   }
 }
 
-function goRegister() {
-  router.push('/register');
+function goLogin() {
+  router.push('/login');
 }
 
 watch(
@@ -45,25 +44,25 @@ watch(
 <template>
   <el-container class="base-container">
     <el-image src="/images/open_course.png" style="width: 100px; height: 100px; margin-right: 10px; filter: invert(100%)"/>
-    <el-text style="color: var(--el-color-white); font-size: 24px"> 登录 OpenCourse </el-text>
+    <el-text style="color: var(--el-color-white); font-size: 24px"> 注册 OpenCourse </el-text>
 
     <el-card class="primary-card" style="margin-top: 25px">
-      <el-form :model="userLoginDTO" label-position="top">
+      <el-form :model="userRegisterDTO" label-position="top">
         <el-form-item label="账号">
-          <el-input class="primary-input" v-model="userLoginDTO.email" placeholder="请输入邮箱" />
+          <el-input class="primary-input" v-model="userRegisterDTO.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="密码">
-          <el-input class="primary-input" v-model="userLoginDTO.password" type="password" placeholder="请输入密码" show-password />
+          <el-input class="primary-input" v-model="userRegisterDTO.password" type="password" placeholder="请输入密码" show-password />
         </el-form-item>
         <el-form-item style="margin-top: 10px">
-          <el-button class="primary-button" type="primary" @click="handleLogin"> 登录 </el-button>
+          <el-button class="primary-button" type="primary" @click="handleRegister"> 注册 </el-button>
         </el-form-item>
       </el-form>
     </el-card>
 
     <el-card class="secondary-card" style="margin-top: 16px">
-      <el-text class="secondary-text"> 还没有账号？ </el-text>
-      <el-link class="secondary-link" type="primary" @click="goRegister"> 点此注册 </el-link>
+      <el-text class="secondary-text"> 已有账号？ </el-text>
+      <el-link class="secondary-link" type="primary" @click="goLogin"> 点此登录 </el-link>
     </el-card>
   </el-container>
 </template>
