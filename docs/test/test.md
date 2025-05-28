@@ -30,7 +30,10 @@
 
 - 仓库层
 - 服务层
-  - [课程服务测试文档](./services/CourseManagerTest.md)
-  - [院系服务测试文档](./services/DepartmentManagerTest.md)
-  - [历史记录测试文档](./services/HistoryManagerTest.md)
+  - [CourseManager     测试文档](./services/CourseManagerTest.md)
+  - [DepartmentManager 测试文档](./services/DepartmentManagerTest.md)
+  - [HistoryManager    测试文档](./services/HistoryManagerTest.md)
+  - Resourcemanager   测试文档
+    - [MinioFileStorageService 单元测试文档](./services/storage/MinioFileStorageServiceTest.md)
+    - [MinioFileStorageService 集成测试文档](./services/storage/MinioFileStorageServiceIntegrationTest.md)
 - 控制层
