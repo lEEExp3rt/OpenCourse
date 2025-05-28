@@ -155,7 +155,7 @@ public class CourseManager {
      * @return A list of courses that match the keyword.
      */
     public List<Course> getCourses(String keyword) {
-        return keyword == null || keyword.isEmpty() ?
+        return keyword == null || keyword.isBlank() ?
             getCourses() :
             Stream.concat(
                 courseRepo.findByNameContainingIgnoreCaseOrderByNameAsc(keyword).stream(),
