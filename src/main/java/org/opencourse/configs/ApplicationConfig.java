@@ -1,6 +1,7 @@
 package org.opencourse.configs;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
@@ -15,7 +16,8 @@ import jakarta.validation.constraints.NotNull;
 @Component
 @ConfigurationProperties(prefix = "app")
 @Validated
-public class ApplicationConfigs {
+@EnableConfigurationProperties(ApplicationConfig.class)
+public class ApplicationConfig {
 
     @Valid
     @NotNull
