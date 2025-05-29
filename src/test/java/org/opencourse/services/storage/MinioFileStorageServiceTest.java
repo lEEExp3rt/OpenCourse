@@ -34,6 +34,9 @@ class MinioFileStorageServiceTest {
     private MinioConfig minioConfig;
 
     @Mock
+    private MinioConfig.MinioConfigProperties minioConfigProperties;
+
+    @Mock
     private MultipartFile multipartFile;
 
     private MinioFileStorageService minioFileStorageService;
@@ -44,7 +47,8 @@ class MinioFileStorageServiceTest {
     @BeforeEach
     void setUp() {
         minioFileStorageService = new MinioFileStorageService(minioClient, minioConfig);
-        lenient().when(minioConfig.getBucketName()).thenReturn(BUCKET_NAME);
+        lenient().when(minioConfig.getMinioConfigProperties()).thenReturn(minioConfigProperties);
+        lenient().when(minioConfigProperties.getBucketName()).thenReturn(BUCKET_NAME);
     }
 
     @Test

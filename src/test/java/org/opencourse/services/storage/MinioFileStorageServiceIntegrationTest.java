@@ -11,10 +11,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.opencourse.configs.MinioConfig;
-import org.opencourse.configs.TestConfigs;
 import org.opencourse.models.Resource.ResourceFile;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,36 +29,33 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 
  * @author !EEExp3rt
  */
-@SpringBootTest(classes = {TestConfigs.class})
-@EnableConfigurationProperties(TestConfigs.TestMinioConfigs.class)
+@SpringBootTest(classes = {
+    MinioConfig.class,
+    MinioFileStorageService.class
+})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MinioFileStorageServiceIntegrationTest {
 
-    // Service and client to be tested.
-    private MinioFileStorageService minioFileStorageService;
+    // MinIO configuration.
+    @Autowired
+    private MinioConfig minioConfig;
+
+    // MinIO client.
+    @Autowired
     private MinioClient minioClient;
+
+    // MinIO file storage service to be tested.
+    @Autowired
+    private MinioFileStorageService minioFileStorageService;
 
     // Test files to be cleaned up after each test.
     private List<String> filesToCleanup;
-
-    // Test configuration properties.
-    @Autowired
-    TestConfigs.TestMinioConfigs testConfigs;
 
     // Test data.
     private static final Short COURSE_ID = 123;
 
     @BeforeAll
     void setUpOnce() throws Exception {
-        // Build MinIO client.
-        minioClient = MinioClient.builder()
-            .endpoint(testConfigs.getMinioEndpoint())
-            .credentials(
-                testConfigs.getMinioAccessKey(),
-                testConfigs.getMinioSecretKey()
-            )
-            .build();
-
         // Test MinIO connection.
         try {
             minioClient.listBuckets();
@@ -72,29 +67,18 @@ class MinioFileStorageServiceIntegrationTest {
         try {
             if (!minioClient.bucketExists(
                 BucketExistsArgs.builder()
-                .bucket(testConfigs.getMinioBucketName())
+                .bucket(minioConfig.getMinioConfigProperties().getBucketName())
                 .build())
             ) {
                 minioClient.makeBucket(
                     MakeBucketArgs.builder()
-                    .bucket(testConfigs.getMinioBucketName())
+                    .bucket(minioConfig.getMinioConfigProperties().getBucketName())
                     .build()
                 );
             }
         } catch (Exception e) {
             throw new RuntimeException("Test bucket setup failed", e);
         }
-
-        // Build MinioConfig for testing.
-        MinioConfig minioConfig = new MinioConfig() {
-            @Override
-            public String getBucketName() {
-                return testConfigs.getMinioBucketName();
-            }
-        };
-
-        // Build MinioFileStorageService.
-        minioFileStorageService = new MinioFileStorageService(minioClient, minioConfig);
     }
 
     @BeforeEach
