@@ -28,9 +28,13 @@ public class MinioFileStorageService implements FileStorageService {
      * Constructor.
      * 
      * @param minioClient MinIO client.
+     * @param minioConfig MinIO configuration.
      */
     @Autowired
-    public MinioFileStorageService(MinioClient minioClient, MinioConfig minioConfig) {
+    public MinioFileStorageService(
+        MinioClient minioClient,
+        MinioConfig minioConfig
+    ) {
         this.minioClient = minioClient;
         this.minioConfig = minioConfig;
     }
@@ -46,7 +50,7 @@ public class MinioFileStorageService implements FileStorageService {
             // Upload file to MinIO.
             minioClient.putObject(
                 PutObjectArgs.builder()
-                    .bucket(minioConfig.getBucketName())
+                    .bucket(minioConfig.getMinioConfigProperties().getBucketName())
                     .object(objectPath)
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .contentType(file.getContentType())
@@ -66,7 +70,7 @@ public class MinioFileStorageService implements FileStorageService {
         try {
             return minioClient.getObject(
                 GetObjectArgs.builder()
-                    .bucket(minioConfig.getBucketName())
+                    .bucket(minioConfig.getMinioConfigProperties().getBucketName())
                     .object(file.getFilePath())
                     .build()
             );
@@ -80,13 +84,13 @@ public class MinioFileStorageService implements FileStorageService {
         try {
             minioClient.statObject(
                 StatObjectArgs.builder()
-                    .bucket(minioConfig.getBucketName())
+                    .bucket(minioConfig.getMinioConfigProperties().getBucketName())
                     .object(filePath)
                     .build()
             );
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
-                    .bucket(minioConfig.getBucketName())
+                    .bucket(minioConfig.getMinioConfigProperties().getBucketName())
                     .object(filePath)
                     .build()
             );
