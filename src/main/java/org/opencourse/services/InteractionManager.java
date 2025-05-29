@@ -156,18 +156,14 @@ public class InteractionManager {
      */
     @Transactional
     public boolean deleteInteraction(Integer id, Integer userId) {
-        User user = userRepo.findById(userId).orElse(null);
-        if (user == null) {
-            return false;
-        }
         Interaction interaction = interactionRepo.findById(id).orElse(null);
         if (interaction == null) {
             return false;
         }
+        User user = interaction.getUser();
         
         // 检查是否是评论的所有者或管理员
-        if (!interaction.getUser().getId().equals(userId) && 
-            user.getRole() != User.UserRole.ADMIN) {
+        if (!user.getId().equals(userId) && user.getRole() != User.UserRole.ADMIN) {
             return false;
         }
         
