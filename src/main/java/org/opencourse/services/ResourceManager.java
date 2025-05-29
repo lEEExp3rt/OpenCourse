@@ -119,17 +119,22 @@ public class ResourceManager {
      * 
      * @param id The resource id.
      * @param userId The user id.
-     * @throws IllegalArgumentException If the resource or deleter is not found.
+     * @return True if the resource is deleted successfully,
+     *     false if the operator is not the creator or the resource is not found.
      * @throws RuntimeException         If failed to delete the resource.
      */
     @Transactional
-    public void deleteResource(Integer id, Integer userId) throws IllegalArgumentException, RuntimeException {
+    public boolean deleteResource(Integer id, Integer userId) throws RuntimeException {
         // Get the resource.
-        Resource resource = resourceRepo.findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
-        // Get the user.
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        Resource resource = resourceRepo.findById(id).orElse(null);
+        if (resource == null) {
+            return false;
+        }
+        User user = resource.getUser();
+        // Check if the user is the creator of the resource.
+        if (!user.getId().equals(userId)) {
+            return false;
+        }
         // Delete the resource.
         try {
             user.addActivity(applicationConfig.getActivity().getResource().getDelete());
@@ -143,7 +148,7 @@ public class ResourceManager {
         if (!fileStorageService.deleteFile(resource.getResourceFile().getFilePath())) {
             throw new RuntimeException("Failed to delete resource file");
         }
-        return ;
+        return true;
     }
 
     /**

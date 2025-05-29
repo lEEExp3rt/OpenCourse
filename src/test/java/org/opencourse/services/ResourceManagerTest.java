@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.opencourse.configs.ApplicationConfig;
 import org.opencourse.dto.request.ResourceUploadDto;
 import org.opencourse.dto.request.ResourceUpdateDto;
 import org.opencourse.models.Course;
@@ -63,6 +64,15 @@ class ResourceManagerTest {
 
     @Mock
     private InputStream mockInputStream;
+
+    @Mock
+    private ApplicationConfig applicationConfig;
+
+    @Mock
+    private ApplicationConfig.Activity activityConfig;
+
+    @Mock
+    private ApplicationConfig.Activity.Resource activityResourceConfig;
 
     @InjectMocks
     private ResourceManager resourceManager;
@@ -154,6 +164,15 @@ class ResourceManagerTest {
             (short) 1,
             2
         );
+
+        // Mock configuration.
+        lenient().when(applicationConfig.getActivity()).thenReturn(activityConfig);
+        lenient().when(activityConfig.getResource()).thenReturn(activityResourceConfig);
+        lenient().when(activityResourceConfig.getAdd()).thenReturn(10);
+        lenient().when(activityResourceConfig.getDelete()).thenReturn(-5);
+        lenient().when(activityResourceConfig.getLike()).thenReturn(1);
+        lenient().when(activityResourceConfig.getUnlike()).thenReturn(-1);
+        lenient().when(activityResourceConfig.getView()).thenReturn(5);
     }
 
     // Resource Add Tests.
@@ -175,6 +194,11 @@ class ResourceManagerTest {
         // Then.
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(testResource);
+
+        verify(applicationConfig).getActivity();
+        verify(activityConfig).getResource();
+        verify(activityResourceConfig).getAdd();
+        verify(testCreator).addActivity(10);
 
         verify(courseRepo).findById((short) 1);
         verify(userRepo).findById(2);
@@ -280,56 +304,79 @@ class ResourceManagerTest {
     // Resource Delete Tests.
 
     @Test
-    @DisplayName("Should successfully delete resource")
-    void deleteResource_WithValidData_ShouldDeleteSuccessfully() {
+    @DisplayName("Should successfully delete resource when data is valid")
+    void deleteResource_WithValidData_ShouldReturnTrueAndDeleteSuccessfully() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
-        when(userRepo.save(eq(testUser))).thenReturn(testUser);
+        when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(true);
 
         // When.
-        resourceManager.deleteResource(1, 1);
+        boolean result = resourceManager.deleteResource(1, 2);
 
         // Then.
+        assertThat(result).isTrue();
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(1);
-        verify(userRepo).save(eq(testUser));
-        verify(historyManager).logDeleteResource(eq(testUser), eq(testResource));
+
+        verify(applicationConfig).getActivity();
+        verify(activityConfig).getResource();
+        verify(activityResourceConfig).getDelete();
+        verify(testCreator).addActivity(-5);
+
+        verify(userRepo).save(eq(testCreator));
+        verify(historyManager).logDeleteResource(eq(testCreator), eq(testResource));
         verify(resourceRepo).delete(eq(testResource));
         verify(fileStorageService).deleteFile(testResourceFile.getFilePath());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when deleting non-existent resource")
-    void deleteResource_WithInvalidResourceId_ShouldThrowException() {
+    @DisplayName("Should return false when deleting non-existent resource")
+    void deleteResource_WithInvalidResourceId_ShouldReturnFalse() {
         // Given.
         when(resourceRepo.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then.
-        assertThatThrownBy(() -> resourceManager.deleteResource(999, 1))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Resource not found");
+        // When.
+        boolean result = resourceManager.deleteResource(999, 1);
+
+        // Then.
+        assertThat(result).isFalse();
 
         verify(resourceRepo).findById(999);
-        verifyNoInteractions(userRepo, historyManager, fileStorageService);
+        verifyNoInteractions(
+            userRepo,
+            historyManager,
+            fileStorageService,
+            applicationConfig
+        );
+
+        verify(userRepo, never()).save(any());
+        verify(resourceRepo, never()).delete(any());
+        verify(fileStorageService, never()).deleteFile(anyString());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when deleting with invalid user")
-    void deleteResource_WithInvalidUserId_ShouldThrowException() {
+    @DisplayName("Should return false when deleting with invalid user")
+    void deleteResource_WithInvalidUserId_ShouldReturnFalse() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(999)).thenReturn(Optional.empty());
 
-        // When & Then.
-        assertThatThrownBy(() -> resourceManager.deleteResource(1, 999))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found");
+        // When.
+        boolean result = resourceManager.deleteResource(1, 999);
+
+        // Then.
+        assertThat(result).isFalse();
 
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(999);
-        verifyNoInteractions(historyManager, fileStorageService);
+        verifyNoInteractions(
+            userRepo,
+            historyManager,
+            fileStorageService,
+            applicationConfig
+        );
+
+        verify(userRepo, never()).save(any());
+        verify(resourceRepo, never()).delete(any());
+        verify(fileStorageService, never()).deleteFile(anyString());
     }
 
     @Test
@@ -337,12 +384,11 @@ class ResourceManagerTest {
     void deleteResource_WithResourceDeleteFailure_ShouldThrowException() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
-        when(userRepo.save(eq(testUser))).thenReturn(testUser);
+        when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         doThrow(new RuntimeException("Database error")).when(resourceRepo).delete(eq(testResource));
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.deleteResource(1, 1))
+        assertThatThrownBy(() -> resourceManager.deleteResource(1, 2))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Failed to delete resource");
 
@@ -355,12 +401,11 @@ class ResourceManagerTest {
     void deleteResource_WithFileDeleteFailure_ShouldThrowException() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
-        when(userRepo.save(eq(testUser))).thenReturn(testUser);
+        when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(false);
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.deleteResource(1, 1))
+        assertThatThrownBy(() -> resourceManager.deleteResource(1, 2))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Failed to delete resource file");
 
@@ -528,8 +573,15 @@ class ResourceManagerTest {
 
         // Then.
         assertThat(result).isTrue();
+
         verify(resourceRepo).findById(1);
         verify(userRepo).findById(1);
+
+        verify(applicationConfig).getActivity();
+        verify(activityConfig).getResource();
+        verify(activityResourceConfig).getLike();
+        verify(testCreator).addActivity(1);
+
         verify(historyManager).getLikeStatus(testUser, testResource);
         verify(resourceRepo).save(eq(testResource));
         verify(userRepo).save(eq(testCreator));
@@ -604,8 +656,15 @@ class ResourceManagerTest {
 
         // Then.
         assertThat(result).isTrue();
+
         verify(resourceRepo).findById(1);
         verify(userRepo).findById(1);
+
+        verify(applicationConfig).getActivity();
+        verify(activityConfig).getResource();
+        verify(activityResourceConfig).getUnlike();
+        verify(testCreator).addActivity(-1);
+
         verify(historyManager).getLikeStatus(testUser, testResource);
         verify(resourceRepo).save(eq(testResource));
         verify(userRepo).save(eq(testCreator));
@@ -679,8 +738,15 @@ class ResourceManagerTest {
 
         // Then.
         assertThat(result).isEqualTo(mockInputStream);
+
         verify(resourceRepo).findById(1);
         verify(userRepo).findById(1);
+
+        verify(applicationConfig).getActivity();
+        verify(activityConfig).getResource();
+        verify(activityResourceConfig).getView();
+        verify(testCreator).addActivity(5);
+
         verify(userRepo).save(eq(testCreator));
         verify(historyManager).logViewResource(testUser, testResource);
         verify(fileStorageService).getFile(testResourceFile);

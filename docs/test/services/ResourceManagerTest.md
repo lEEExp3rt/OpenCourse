@@ -15,10 +15,10 @@
    6. 文件回滚失败抛出 `RuntimeException`
 2. 删除资源 (`deleteResource`)
    1. 正常删除成功
-   2. 资源不存在抛出 `IllegalArgumentException`
-   3.  用户不存在抛出 `IllegalArgumentException`
-   4.  资源删除失败抛出 `RuntimeException`
-   5.  文件删除失败抛出 `RuntimeException`
+   2. 资源不存在返回 `false`
+   3. 用户不是创作者返回 `false`
+   4. 资源删除失败抛出 `RuntimeException`
+   5. 文件删除失败抛出 `RuntimeException`
 3. 更新资源 (`updateResource`) ( **未实现** )
    1. 仅更新元数据 - 当前返回 `null`
    2. 更新资源并上传新文件 - 当前返回 `null`
