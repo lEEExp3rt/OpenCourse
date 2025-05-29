@@ -1,5 +1,6 @@
 package org.opencourse.services;
 
+import org.opencourse.configs.ApplicationConfig;
 import org.opencourse.dto.request.ResourceUploadDto;
 import org.opencourse.dto.request.ResourceUpdateDto;
 import org.opencourse.models.Course;
@@ -30,6 +31,7 @@ public class ResourceManager {
     private final CourseRepo courseRepo;
     private final ResourceRepo resourceRepo;
     private final UserRepo userRepo;
+    private final ApplicationConfig applicationConfig;
     private final FileStorageService fileStorageService;
     private final HistoryManager historyManager;
 
@@ -39,6 +41,7 @@ public class ResourceManager {
      * @param courseRepo         The course repository.
      * @param resourceRepo       The resource repository.
      * @param userRepo           The user repository.
+     * @param applicationConfig  The application configuration.
      * @param fileStorageService The file storage service.
      * @param historyManager     The history manager.
      */
@@ -47,12 +50,14 @@ public class ResourceManager {
         CourseRepo courseRepo,
         ResourceRepo resourceRepo,
         UserRepo userRepo,
+        ApplicationConfig applicationConfig,
         FileStorageService fileStorageService,
         HistoryManager historyManager
     ) {
         this.courseRepo = courseRepo;
         this.resourceRepo = resourceRepo;
         this.userRepo = userRepo;
+        this.applicationConfig = applicationConfig;
         this.fileStorageService = fileStorageService;
         this.historyManager = historyManager;
     }
@@ -95,7 +100,7 @@ public class ResourceManager {
             // Save the resource.
             resource = resourceRepo.save(resource);
             // Add user activity.
-            user.addActivity(1);
+            user.addActivity(applicationConfig.getActivity().getResource().getAdd());
             user = userRepo.save(user);
             // Add resource creation history record.
             historyManager.logCreateResource(user, resource);
@@ -127,7 +132,7 @@ public class ResourceManager {
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Delete the resource.
         try {
-            user.addActivity(-1);
+            user.addActivity(applicationConfig.getActivity().getResource().getDelete());
             user = userRepo.save(user);
             historyManager.logDeleteResource(user, resource);
             resourceRepo.delete(resource);
@@ -217,7 +222,7 @@ public class ResourceManager {
         resource = resourceRepo.save(resource);
         // Add creator activity.
         User creator = resource.getUser();
-        creator.addActivity(1);
+        creator.addActivity(applicationConfig.getActivity().getResource().getLike());
         userRepo.save(creator);
         // Add a like history record.
         historyManager.logLikeResource(user, resource);
@@ -246,7 +251,7 @@ public class ResourceManager {
         resource = resourceRepo.save(resource);
         // Add creator activity.
         User creator = resource.getUser();
-        creator.addActivity(-1);
+        creator.addActivity(applicationConfig.getActivity().getResource().getUnlike());
         userRepo.save(creator);
         // Add a unlike history record.
         historyManager.logUnlikeResource(user, resource);
@@ -269,7 +274,7 @@ public class ResourceManager {
             .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Add creator activity.
         User creator = resource.getUser();
-        creator.addActivity(1);
+        creator.addActivity(applicationConfig.getActivity().getResource().getView());
         userRepo.save(creator);
         // Add a view history record.
         historyManager.logViewResource(user, resource);
