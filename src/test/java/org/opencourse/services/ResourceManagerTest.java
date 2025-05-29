@@ -82,6 +82,7 @@ class ResourceManagerTest {
     private Department testDepartment;
     private User testUser;
     private User testCreator;
+    private User testAdmin;
     private Resource testResource;
     private ResourceFile testResourceFile;
     private ResourceUploadDto testUploadDto;
@@ -108,9 +109,9 @@ class ResourceManagerTest {
         // Test user.
         testUser = new User(
             "testUser",
-            "test@example.com",
+            "testuser@example.com",
             "hashedPassword",
-            User.UserRole.ADMIN
+            User.UserRole.USER
         );
         testUser = spy(testUser);
         lenient().when(testUser.getId()).thenReturn(1);
@@ -118,12 +119,22 @@ class ResourceManagerTest {
         // Test creator.
         testCreator = new User(
             "testCreator",
-            "test@example.com",
+            "testcreator@example.com",
             "hashedPassword",
             User.UserRole.USER
         );
         testCreator = spy(testCreator);
         lenient().when(testCreator.getId()).thenReturn(2);
+
+        // Test administrator.
+        testAdmin = new User(
+            "testAdmin",
+            "testAdmin@example.com",
+            "hashedAdminPassword",
+            User.UserRole.ADMIN
+        );
+        testAdmin = spy(testAdmin);
+        lenient().when(testAdmin.getId()).thenReturn(3);
 
         // Test resource file.
         testResourceFile = new ResourceFile(
@@ -308,6 +319,7 @@ class ResourceManagerTest {
     void deleteResource_WithValidData_ShouldReturnTrueAndDeleteSuccessfully() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
+        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(true);
 
@@ -325,6 +337,33 @@ class ResourceManagerTest {
 
         verify(userRepo).save(eq(testCreator));
         verify(historyManager).logDeleteResource(eq(testCreator), eq(testResource));
+        verify(resourceRepo).delete(eq(testResource));
+        verify(fileStorageService).deleteFile(testResourceFile.getFilePath());
+    }
+
+    @Test
+    @DisplayName("Should successfully delete resource when operator is admin")
+    void deleteResource_WithAdminUser_ShouldReturnTrueAndDeleteSuccessfully() {
+        // Given.
+        when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
+        when(userRepo.findById(3)).thenReturn(Optional.of(testAdmin));
+        when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
+        when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(true);
+
+        // When.
+        boolean result = resourceManager.deleteResource(1, 3); // Admin user ID
+
+        // Then.
+        assertThat(result).isTrue();
+        verify(resourceRepo).findById(1);
+
+        verify(applicationConfig).getActivity();
+        verify(activityConfig).getResource();
+        verify(activityResourceConfig).getDelete();
+        verify(testCreator).addActivity(-5);
+
+        verify(userRepo).save(eq(testCreator));
+        verify(historyManager).logDeleteResource(eq(testAdmin), eq(testResource));
         verify(resourceRepo).delete(eq(testResource));
         verify(fileStorageService).deleteFile(testResourceFile.getFilePath());
     }
@@ -368,7 +407,6 @@ class ResourceManagerTest {
 
         verify(resourceRepo).findById(1);
         verifyNoInteractions(
-            userRepo,
             historyManager,
             fileStorageService,
             applicationConfig
@@ -384,6 +422,7 @@ class ResourceManagerTest {
     void deleteResource_WithResourceDeleteFailure_ShouldThrowException() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
+        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         doThrow(new RuntimeException("Database error")).when(resourceRepo).delete(eq(testResource));
 
@@ -401,6 +440,7 @@ class ResourceManagerTest {
     void deleteResource_WithFileDeleteFailure_ShouldThrowException() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
+        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(false);
 

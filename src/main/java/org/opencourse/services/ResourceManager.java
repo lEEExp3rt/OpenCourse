@@ -119,9 +119,8 @@ public class ResourceManager {
      * 
      * @param id The resource id.
      * @param userId The user id.
-     * @return True if the resource is deleted successfully,
-     *     false if the operator is not the creator or the resource is not found.
-     * @throws RuntimeException         If failed to delete the resource.
+     * @return True if the resource is deleted successfully, false otherwise.
+     * @throws RuntimeException If failed to delete the resource.
      */
     @Transactional
     public boolean deleteResource(Integer id, Integer userId) throws RuntimeException {
@@ -130,15 +129,19 @@ public class ResourceManager {
         if (resource == null) {
             return false;
         }
-        User user = resource.getUser();
-        // Check if the user is the creator of the resource.
-        if (!user.getId().equals(userId)) {
+        User user = userRepo.findById(userId).orElse(null);
+        if (user == null) {
+            return false;
+        }
+        User creator = resource.getUser();
+        // Check if the user is the creator of the resource or administrator.
+        if (!user.getId().equals(creator.getId()) && !user.getRole().equals(User.UserRole.ADMIN)) {
             return false;
         }
         // Delete the resource.
         try {
-            user.addActivity(applicationConfig.getActivity().getResource().getDelete());
-            user = userRepo.save(user);
+            creator.addActivity(applicationConfig.getActivity().getResource().getDelete());
+            creator = userRepo.save(creator);
             historyManager.logDeleteResource(user, resource);
             resourceRepo.delete(resource);
         } catch (Exception e) {
