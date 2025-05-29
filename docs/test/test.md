@@ -33,7 +33,7 @@
   - [CourseManager     测试文档](./services/CourseManagerTest.md)
   - [DepartmentManager 测试文档](./services/DepartmentManagerTest.md)
   - [HistoryManager    测试文档](./services/HistoryManagerTest.md)
-  - Resourcemanager   测试文档
+  - [Resourcemanager   测试文档](./services/ResourceManagerTest.md)
     - [MinioFileStorageService 单元测试文档](./services/storage/MinioFileStorageServiceTest.md)
     - [MinioFileStorageService 集成测试文档](./services/storage/MinioFileStorageServiceIntegrationTest.md)
 - 控制层
