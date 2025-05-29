@@ -102,23 +102,18 @@ jwt:
   refresh-expiration: 604800000
 
 # Application-specific settings.
-opencourse:
-  # Upload settings
-  file:
-    upload-path: "/home/opencourse/uploads"
-    max-size: "10MB"
-    allowed-types: "pdf,doc,docx,ppt,pptx,txt,md,jpg,jpeg,png,gif"
-  # Email settings
-  email:
-    from: YOUR_SENDING_EMAIL@NOREPLY.COM # Change to your sending email address
-    verification:
-      subject: "OpenCourse - 邮箱验证"
-      template: "verification-email"
-    reset-password:
-      subject: "OpenCourse - 密码重置"
-      template: "reset-password-email"
-  # Verification code settings
-  verification:
-    code-length: 6
-    expiration: 300
-    max-attempts: 5
+app:
+  # User activity settings.
+  activity:
+    resource:
+      add: 1
+      delete: -1
+      like: 1
+      unlike: -1
+      view: 1
+    interaction:
+      add: 1
+      delete: 1
+      like: 1
+      unlike: -1
+

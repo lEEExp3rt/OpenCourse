@@ -22,10 +22,6 @@ spring:
         format_sql: true
         show_sql: true
         use_sql_comments: true
-        jdbc:
-          batch_size: 20
-        order_inserts: true
-        order_updates: true
 
 minio:
   endpoint: "http://localhost:9000"
@@ -35,6 +31,8 @@ minio:
 
 logging:
   level:
+    # Root logging level.
+    root: "INFO"
     # Detailed SQL logging.
     org.hibernate.SQL: "WARN"
     # Spring Data JPA logging.
@@ -44,3 +42,18 @@ logging:
     org.springframework.test.context: "WARN"
     # OpenCourse project specific logging.
     org.opencourse: "WARN"
+
+app:
+  # User activity settings.
+  activity:
+    resource:
+      add: 1
+      delete: -1
+      like: 1
+      unlike: -1
+      view: 1
+    interaction:
+      add: 1
+      delete: 1
+      like: 1
+      unlike: -1
