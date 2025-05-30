@@ -12,7 +12,7 @@ spring:
       mode: "never"
   # Database settings.
   datasource:
-    url: "jdbc:mysql://mysql:3306/opencourse?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8mb4&useUnicode=true&connectionCollation=utf8mb4_unicode_ci"
+    url: "jdbc:mysql://mysql:3306/opencourse_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai&characterEncoding=utf8&useUnicode=true"
     username: YOUR_USERNAME_HERE      # Change to your MySQL username
     password: YOUR_PASSWORD_HERE      # Change to your MySQL password
     driver-class-name: "com.mysql.cj.jdbc.Driver"
@@ -33,7 +33,7 @@ spring:
         use_sql_comments: false
         # Character encoding settings.
         connection:
-          characterEncoding: "utf8mb4"
+          characterEncoding: "utf8"
           useUnicode: true
     open-in-view: false
   # Redis settings.
@@ -55,6 +55,14 @@ spring:
     port: 587                         # Change to your SMTP server port
     username: YOUR_EMAIL@EXAMPLE.COM  # Change to your email address
     password: YOUR_EMAIL_PASSWORD     # Change to your email authorization password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            enable: true
   # File upload settings.
   servlet:
     multipart:

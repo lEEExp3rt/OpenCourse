@@ -18,7 +18,7 @@ public class VerificationService {
     // 使用ConcurrentHashMap存储验证码和过期时间
     private final Map<String, VerificationCodeRecord> codeMap = new ConcurrentHashMap<>();
 
-    @Value("${app.verification.code.expiration}")
+    @Value("${app.verification-code.expiration}")
     private long codeExpirationSeconds;
 
     /**
