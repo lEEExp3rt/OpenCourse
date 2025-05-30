@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.opencourse.utils.VerificationCodeGenerator;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +23,9 @@ import static org.mockito.Mockito.*;
  */
 @ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
+
+    @Mock
+    private MailProperties mailProperties;
 
     @Mock
     private JavaMailSender mailSender;
@@ -36,7 +40,8 @@ public class EmailServiceTest {
 
     @BeforeEach
     void setUp() {
-        emailService = new EmailService(mailSender, verificationService);
+        when(mailProperties.getUsername()).thenReturn("testSender@example.com");
+        emailService = new EmailService(mailProperties, mailSender, verificationService);
     }
 
     @Test

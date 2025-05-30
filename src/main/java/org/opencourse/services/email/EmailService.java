@@ -5,6 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 
 import org.opencourse.utils.VerificationCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.mail.MailProperties;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -17,17 +18,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
+    private final MailProperties mailProperties;
     private final JavaMailSender mailSender;
     private final VerificationService verificationService;
 
     /**
      * Constructor.
      * 
+     * @param mailProperties      The mail properties.
      * @param mailSender          The mail sender.
      * @param verificationService The verification service.
      */
     @Autowired
-    public EmailService(JavaMailSender mailSender, VerificationService verificationService) {
+    public EmailService(
+        MailProperties mailProperties,
+        JavaMailSender mailSender,
+        VerificationService verificationService
+    ) {
+        this.mailProperties = mailProperties;
         this.mailSender = mailSender;
         this.verificationService = verificationService;
     }
@@ -48,6 +56,7 @@ public class EmailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         helper.setTo(to);
+        helper.setFrom(mailProperties.getUsername());
         helper.setSubject(subject);
 
         String htmlContent = createVerificationEmailTemplate(verificationCode, purpose);
