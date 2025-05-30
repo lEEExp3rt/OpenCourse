@@ -45,10 +45,12 @@ class MinioFileStorageServiceTest {
     private static final Short COURSE_ID = 123;
 
     @BeforeEach
-    void setUp() {
-        minioFileStorageService = new MinioFileStorageService(minioClient, minioConfig);
+    void setUp() throws Exception {
         lenient().when(minioConfig.getMinioConfigProperties()).thenReturn(minioConfigProperties);
         lenient().when(minioConfigProperties.getBucketName()).thenReturn(BUCKET_NAME);
+        lenient().when(minioClient.bucketExists(any(BucketExistsArgs.class))).thenReturn(false);
+        minioFileStorageService = new MinioFileStorageService(minioClient, minioConfig);
+        verify(minioClient).makeBucket(any(MakeBucketArgs.class));
     }
 
     @Test

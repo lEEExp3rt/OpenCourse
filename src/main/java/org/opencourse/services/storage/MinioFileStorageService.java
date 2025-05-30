@@ -37,6 +37,7 @@ public class MinioFileStorageService implements FileStorageService {
     ) {
         this.minioClient = minioClient;
         this.minioConfig = minioConfig;
+        init();
     }
 
     @Override
@@ -105,5 +106,16 @@ public class MinioFileStorageService implements FileStorageService {
         // Transform bytes to MB, keep two decimal places.
         return new BigDecimal(fileSize)
             .divide(new BigDecimal(1024 * 1024), 2, RoundingMode.HALF_UP);
+    }
+
+    private void init() throws RuntimeException {
+        String bucket = minioConfig.getMinioConfigProperties().getBucketName();
+        try {
+            if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize MinIO service", e);
+        }
     }
 }
