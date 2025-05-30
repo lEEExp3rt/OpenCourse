@@ -4,12 +4,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import org.opencourse.models.User;
+import org.opencourse.repositories.UserRepo;
 import org.opencourse.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,51 +17,66 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /**
- * JWT授权过滤器，用于处理JWT令牌的验证和授权
+ * JWT Authorization Filter to validate JWT tokens and set the user authentication.
+ * 
+ * @author LJX
+ * @author !EEExp3rt
+ * @apiNote This filter checks the authorization before a request is processed in controller layer.
  */
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtils jwtUtils;
-    private final UserDetailsService userDetailsService;
+    private final UserRepo userRepo;
 
     @Autowired
-    public JwtAuthorizationFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
+    public JwtAuthorizationFilter(JwtUtils jwtUtils, UserRepo userRepo) {
         this.jwtUtils = jwtUtils;
-        this.userDetailsService = userDetailsService;
+        this.userRepo = userRepo;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        
+    protected void doFilterInternal(
+        HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+    ) throws ServletException, IOException {
+        // Get the Authorization header from the request.
         final String authorizationHeader = request.getHeader("Authorization");
 
-        String username = null;
         String jwt = null;
 
-        // 检查Authorization头
+        // Check if the Authorization header is present and starts with "Bearer ".
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
+            // Load user details and set authentication in the security context.
             try {
-                username = jwtUtils.getUsernameFromToken(jwt);
-            } catch (Exception e) {
-                logger.error("Cannot set user authentication: {}", e);
-            }
-        }
-
-        // 验证JWT令牌并设置认证上下文
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-            if (jwtUtils.validateToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                User user = validateToken(jwt);
+                UserAuthentication authentication = new UserAuthentication(
+                    user, new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (Exception e) {
+                throw e;
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Validates the JWT token and return the user.
+     * 
+     * @param jwt The JWT token to validate.
+     * @return The user if the token is valid, otherwise null.
+     * @throws RuntimeException If the token is invalid or expired or the user is not found.
+     */
+    private User validateToken(String jwt) throws RuntimeException{
+        if (jwt == null || jwt.isEmpty()) {
+            throw new RuntimeException("Invalid JWT token");
+        }
+        if (jwtUtils.isTokenExpired(jwt)) {
+            throw new RuntimeException("JWT token is expired");
+        }
+        User user = userRepo.findByEmail(jwtUtils.getUsernameFromToken(jwt))
+            .orElseThrow(() -> new RuntimeException("User not found in JWT authorization"));
+        return user;
     }
 }

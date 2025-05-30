@@ -3,11 +3,10 @@ package org.opencourse.controllers;
 import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.User;
 import org.opencourse.services.UserManager;
+import org.opencourse.utils.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -37,14 +36,7 @@ public class UserController {
      */
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        
-        User user = userManager.getUserByEmail(email);
-        if (user == null) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("用户不存在"));
-        }
-        
+        User user = SecurityUtils.getCurrentUser();
         Map<String, Object> userData = new HashMap<>();
         userData.put("id", user.getId());
         userData.put("name", user.getName());

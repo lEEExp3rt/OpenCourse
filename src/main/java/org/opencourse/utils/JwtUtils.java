@@ -6,7 +6,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.opencourse.models.User;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -75,22 +74,9 @@ public class JwtUtils {
      * @param token JWT令牌
      * @return 是否过期
      */
-    private Boolean isTokenExpired(String token) {
+    public Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
-    }
-
-    /**
-     * 为用户生成令牌
-     * @param userDetails 用户信息
-     * @return JWT令牌
-     */
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        if (userDetails instanceof org.springframework.security.core.userdetails.User) {
-            claims.put("roles", userDetails.getAuthorities());
-        }
-        return doGenerateToken(claims, userDetails.getUsername());
     }
 
     /**
@@ -119,21 +105,6 @@ public class JwtUtils {
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
                 .compact();
-    }
-
-    /**
-     * 验证令牌
-     * @param token JWT令牌
-     * @param userDetails 用户信息
-     * @return 是否有效
-     */
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        try {
-            final String username = getUsernameFromToken(token);
-            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     /**
