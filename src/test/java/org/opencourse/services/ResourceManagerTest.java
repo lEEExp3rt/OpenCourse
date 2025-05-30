@@ -161,8 +161,8 @@ class ResourceManagerTest {
             "Test Description",
             ResourceType.EXAM,
             ResourceFile.FileType.PDF,
-            (short) 1,
-            2
+            (short) 1
+            // 移除了 userId: 2
         );
 
         // Test update DTO.
@@ -172,8 +172,8 @@ class ResourceManagerTest {
             "Updated Description",
             ResourceType.NOTE,
             ResourceFile.FileType.TEXT,
-            (short) 1,
-            2
+            (short) 1
+            // 移除了 userId: 2
         );
 
         // Mock configuration.
@@ -193,14 +193,13 @@ class ResourceManagerTest {
     void addResource_WithValidData_ShouldReturnResource() {
         // Given.
         when(courseRepo.findById((short) 1)).thenReturn(Optional.of(testCourse));
-        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(fileStorageService.storeFile(eq(mockFile), eq(ResourceFile.FileType.PDF), eq((short) 1)))
             .thenReturn(testResourceFile);
         when(resourceRepo.save(any(Resource.class))).thenReturn(testResource);
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
 
         // When.
-        Resource result = resourceManager.addResource(testUploadDto, mockFile);
+        Resource result = resourceManager.addResource(testUploadDto, mockFile, testCreator);
 
         // Then.
         assertThat(result).isNotNull();
@@ -212,7 +211,6 @@ class ResourceManagerTest {
         verify(testCreator).addActivity(10);
 
         verify(courseRepo).findById((short) 1);
-        verify(userRepo).findById(2);
         verify(fileStorageService).storeFile(eq(mockFile), eq(ResourceFile.FileType.PDF), eq((short) 1));
         verify(resourceRepo).save(any(Resource.class));
         verify(userRepo).save(eq(testCreator));
@@ -226,28 +224,11 @@ class ResourceManagerTest {
         when(courseRepo.findById((short) 1)).thenReturn(Optional.empty());
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile))
+        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile, testCreator))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Course not found");
 
         verify(courseRepo).findById((short) 1);
-        verifyNoInteractions(userRepo, fileStorageService, resourceRepo, historyManager);
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when user not found")
-    void addResource_WithInvalidUserId_ShouldThrowException() {
-        // Given.
-        when(courseRepo.findById((short) 1)).thenReturn(Optional.of(testCourse));
-        when(userRepo.findById(2)).thenReturn(Optional.empty());
-
-        // When & Then.
-        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found");
-
-        verify(courseRepo).findById((short) 1);
-        verify(userRepo).findById(2);
         verifyNoInteractions(fileStorageService, resourceRepo, historyManager);
     }
 
@@ -256,18 +237,16 @@ class ResourceManagerTest {
     void addResource_WithFileStorageFailure_ShouldThrowException() {
         // Given.
         when(courseRepo.findById((short) 1)).thenReturn(Optional.of(testCourse));
-        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(fileStorageService.storeFile(eq(mockFile), eq(ResourceFile.FileType.PDF), eq((short) 1)))
             .thenReturn(null);
         when(mockFile.getOriginalFilename()).thenReturn("test.pdf");
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile))
+        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile, testCreator))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Failed to store file test.pdf");
 
         verify(courseRepo).findById((short) 1);
-        verify(userRepo).findById(2);
         verify(fileStorageService).storeFile(eq(mockFile), eq(ResourceFile.FileType.PDF), eq((short) 1));
         verifyNoInteractions(resourceRepo, historyManager);
     }
@@ -277,14 +256,13 @@ class ResourceManagerTest {
     void addResource_WithResourceSaveFailure_ShouldRollbackFileStorage() {
         // Given.
         when(courseRepo.findById((short) 1)).thenReturn(Optional.of(testCourse));
-        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(fileStorageService.storeFile(eq(mockFile), eq(ResourceFile.FileType.PDF), eq((short) 1)))
             .thenReturn(testResourceFile);
         when(resourceRepo.save(any(Resource.class))).thenThrow(new RuntimeException("Database error"));
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(true);
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile))
+        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile, testCreator))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Database error");
 
@@ -296,7 +274,6 @@ class ResourceManagerTest {
     void addResource_WithFileRollbackFailure_ShouldThrowRollbackException() {
         // Given.
         when(courseRepo.findById((short) 1)).thenReturn(Optional.of(testCourse));
-        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(fileStorageService.storeFile(eq(mockFile), eq(ResourceFile.FileType.PDF), eq((short) 1)))
             .thenReturn(testResourceFile);
         RuntimeException originalException = new RuntimeException("Database error");
@@ -304,7 +281,7 @@ class ResourceManagerTest {
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(false);
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile))
+        assertThatThrownBy(() -> resourceManager.addResource(testUploadDto, mockFile, testCreator))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Failed to delete file while rollbacking ")
             .hasCause(originalException);
@@ -319,12 +296,11 @@ class ResourceManagerTest {
     void deleteResource_WithValidData_ShouldReturnTrueAndDeleteSuccessfully() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(true);
 
         // When.
-        boolean result = resourceManager.deleteResource(1, 2);
+        boolean result = resourceManager.deleteResource(1, testCreator);
 
         // Then.
         assertThat(result).isTrue();
@@ -346,12 +322,11 @@ class ResourceManagerTest {
     void deleteResource_WithAdminUser_ShouldReturnTrueAndDeleteSuccessfully() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(3)).thenReturn(Optional.of(testAdmin));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(true);
 
         // When.
-        boolean result = resourceManager.deleteResource(1, 3); // Admin user ID
+        boolean result = resourceManager.deleteResource(1, testAdmin); // Admin user
 
         // Then.
         assertThat(result).isTrue();
@@ -375,7 +350,7 @@ class ResourceManagerTest {
         when(resourceRepo.findById(999)).thenReturn(Optional.empty());
 
         // When.
-        boolean result = resourceManager.deleteResource(999, 1);
+        boolean result = resourceManager.deleteResource(999, testUser);
 
         // Then.
         assertThat(result).isFalse();
@@ -394,19 +369,20 @@ class ResourceManagerTest {
     }
 
     @Test
-    @DisplayName("Should return false when deleting with invalid user")
-    void deleteResource_WithInvalidUserId_ShouldReturnFalse() {
+    @DisplayName("Should return false when user is not creator or admin")
+    void deleteResource_WithUnauthorizedUser_ShouldReturnFalse() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
 
         // When.
-        boolean result = resourceManager.deleteResource(1, 999);
+        boolean result = resourceManager.deleteResource(1, testUser); // testUser is not creator or admin
 
         // Then.
         assertThat(result).isFalse();
 
         verify(resourceRepo).findById(1);
         verifyNoInteractions(
+            userRepo,
             historyManager,
             fileStorageService,
             applicationConfig
@@ -422,12 +398,11 @@ class ResourceManagerTest {
     void deleteResource_WithResourceDeleteFailure_ShouldThrowException() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         doThrow(new RuntimeException("Database error")).when(resourceRepo).delete(eq(testResource));
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.deleteResource(1, 2))
+        assertThatThrownBy(() -> resourceManager.deleteResource(1, testCreator))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Failed to delete resource");
 
@@ -440,12 +415,11 @@ class ResourceManagerTest {
     void deleteResource_WithFileDeleteFailure_ShouldThrowException() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(2)).thenReturn(Optional.of(testCreator));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.deleteFile(testResourceFile.getFilePath())).thenReturn(false);
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.deleteResource(1, 2))
+        assertThatThrownBy(() -> resourceManager.deleteResource(1, testCreator))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Failed to delete resource file");
 
@@ -461,7 +435,7 @@ class ResourceManagerTest {
         // TODO: This method is not implemented yet.
 
         // When.
-        Resource result = resourceManager.updateResource(testUpdateDto);
+        Resource result = resourceManager.updateResource(testUpdateDto, testCreator);
 
         // Then.
         assertThat(result).isNull();
@@ -477,7 +451,7 @@ class ResourceManagerTest {
         // TODO: This method is not implemented yet.
 
         // When.
-        Resource result = resourceManager.updateResource(testUpdateDto, mockFile);
+        Resource result = resourceManager.updateResource(testUpdateDto, mockFile, testCreator);
 
         // Then.
         assertThat(result).isNull();
@@ -494,16 +468,16 @@ class ResourceManagerTest {
         // Given.
         ResourceUpdateDto invalidDto = new ResourceUpdateDto(
             999, "Updated", "Description", ResourceType.NOTE, 
-            ResourceFile.FileType.TEXT, (short) 1, 2
+            ResourceFile.FileType.TEXT, (short) 1
         );
 
         // When.
-        Resource result = resourceManager.updateResource(invalidDto);
+        Resource result = resourceManager.updateResource(invalidDto, testCreator);
 
         // Then.
         // TODO: This method is not implemented yet.
         assertThat(result).isNull();
-        // assertThatThrownBy(() -> resourceManager.updateResource(invalidDto))
+        // assertThatThrownBy(() -> resourceManager.updateResource(invalidDto, testCreator))
         //     .isInstanceOf(IllegalArgumentException.class)
         //     .hasMessage("Resource not found");
     }
@@ -603,19 +577,17 @@ class ResourceManagerTest {
     void likeResource_WithUserNotLiked_ShouldReturnTrue() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
         when(historyManager.getLikeStatus(testUser, testResource)).thenReturn(false);
         when(resourceRepo.save(eq(testResource))).thenReturn(testResource);
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
 
         // When.
-        boolean result = resourceManager.likeResource(1, 1);
+        boolean result = resourceManager.likeResource(1, testUser);
 
         // Then.
         assertThat(result).isTrue();
 
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(1);
 
         verify(applicationConfig).getActivity();
         verify(activityConfig).getResource();
@@ -633,16 +605,14 @@ class ResourceManagerTest {
     void likeResource_WithUserAlreadyLiked_ShouldReturnFalse() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
         when(historyManager.getLikeStatus(testUser, testResource)).thenReturn(true);
 
         // When.
-        boolean result = resourceManager.likeResource(1, 1);
+        boolean result = resourceManager.likeResource(1, testUser);
 
         // Then.
         assertThat(result).isFalse();
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(1);
         verify(historyManager).getLikeStatus(testUser, testResource);
         verifyNoMoreInteractions(resourceRepo, userRepo, historyManager);
     }
@@ -654,29 +624,12 @@ class ResourceManagerTest {
         when(resourceRepo.findById(999)).thenReturn(Optional.empty());
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.likeResource(999, 1))
+        assertThatThrownBy(() -> resourceManager.likeResource(999, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Resource not found");
 
         verify(resourceRepo).findById(999);
         verifyNoInteractions(userRepo, historyManager);
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when liking with invalid user")
-    void likeResource_WithInvalidUserId_ShouldThrowException() {
-        // Given.
-        when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(999)).thenReturn(Optional.empty());
-
-        // When & Then.
-        assertThatThrownBy(() -> resourceManager.likeResource(1, 999))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found");
-
-        verify(resourceRepo).findById(1);
-        verify(userRepo).findById(999);
-        verifyNoMoreInteractions(historyManager);
     }
 
     // Resource Unlike Tests.
@@ -686,19 +639,17 @@ class ResourceManagerTest {
     void unlikeResource_WithUserHasLiked_ShouldReturnTrue() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
         when(historyManager.getLikeStatus(testUser, testResource)).thenReturn(true);
         when(resourceRepo.save(eq(testResource))).thenReturn(testResource);
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
 
         // When.
-        boolean result = resourceManager.unlikeResource(1, 1);
+        boolean result = resourceManager.unlikeResource(1, testUser);
 
         // Then.
         assertThat(result).isTrue();
 
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(1);
 
         verify(applicationConfig).getActivity();
         verify(activityConfig).getResource();
@@ -716,16 +667,14 @@ class ResourceManagerTest {
     void unlikeResource_WithUserNotLiked_ShouldReturnFalse() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
         when(historyManager.getLikeStatus(testUser, testResource)).thenReturn(false);
 
         // When.
-        boolean result = resourceManager.unlikeResource(1, 1);
+        boolean result = resourceManager.unlikeResource(1, testUser);
 
         // Then.
         assertThat(result).isFalse();
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(1);
         verify(historyManager).getLikeStatus(testUser, testResource);
         verifyNoMoreInteractions(resourceRepo, userRepo, historyManager);
     }
@@ -737,29 +686,12 @@ class ResourceManagerTest {
         when(resourceRepo.findById(999)).thenReturn(Optional.empty());
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.unlikeResource(999, 1))
+        assertThatThrownBy(() -> resourceManager.unlikeResource(999, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Resource not found");
 
         verify(resourceRepo).findById(999);
         verifyNoInteractions(userRepo, historyManager);
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when unliking with invalid user")
-    void unlikeResource_WithInvalidUserId_ShouldThrowException() {
-        // Given.
-        when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(999)).thenReturn(Optional.empty());
-
-        // When & Then.
-        assertThatThrownBy(() -> resourceManager.unlikeResource(1, 999))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found");
-
-        verify(resourceRepo).findById(1);
-        verify(userRepo).findById(999);
-        verifyNoMoreInteractions(historyManager);
     }
 
     // Resource View Tests.
@@ -769,18 +701,16 @@ class ResourceManagerTest {
     void viewResource_WithValidData_ShouldReturnInputStream() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.getFile(testResourceFile)).thenReturn(mockInputStream);
 
         // When.
-        InputStream result = resourceManager.viewResource(1, 1);
+        InputStream result = resourceManager.viewResource(1, testUser);
 
         // Then.
         assertThat(result).isEqualTo(mockInputStream);
 
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(1);
 
         verify(applicationConfig).getActivity();
         verify(activityConfig).getResource();
@@ -799,7 +729,7 @@ class ResourceManagerTest {
         when(resourceRepo.findById(999)).thenReturn(Optional.empty());
 
         // When & Then.
-        assertThatThrownBy(() -> resourceManager.viewResource(999, 1))
+        assertThatThrownBy(() -> resourceManager.viewResource(999, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Resource not found");
 
@@ -808,38 +738,19 @@ class ResourceManagerTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when viewing with invalid user")
-    void viewResource_WithInvalidUserId_ShouldThrowException() {
-        // Given.
-        when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(999)).thenReturn(Optional.empty());
-
-        // When & Then.
-        assertThatThrownBy(() -> resourceManager.viewResource(1, 999))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found");
-
-        verify(resourceRepo).findById(1);
-        verify(userRepo).findById(999);
-        verifyNoInteractions(historyManager, fileStorageService);
-    }
-
-    @Test
     @DisplayName("Should return null when file service returns null")
     void viewResource_WithFileServiceReturnsNull_ShouldReturnNull() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
-        when(userRepo.findById(1)).thenReturn(Optional.of(testUser));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
         when(fileStorageService.getFile(testResourceFile)).thenReturn(null);
 
         // When.
-        InputStream result = resourceManager.viewResource(1, 1);
+        InputStream result = resourceManager.viewResource(1, testUser);
 
         // Then.
         assertThat(result).isNull();
         verify(resourceRepo).findById(1);
-        verify(userRepo).findById(1);
         verify(userRepo).save(eq(testCreator));
         verify(historyManager).logViewResource(testUser, testResource);
         verify(fileStorageService).getFile(testResourceFile);

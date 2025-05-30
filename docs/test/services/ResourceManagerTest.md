@@ -9,10 +9,9 @@
 1. 添加资源 (`addResource`)
    1. 正常添加成功
    2. 课程不存在抛出 `IllegalArgumentException`
-   3. 用户不存在抛出 `IllegalArgumentException`
-   4. 文件存储失败抛出 `RuntimeException`
-   5. 资源保存失败时文件存储回滚成功
-   6. 文件回滚失败抛出 `RuntimeException`
+   3. 文件存储失败抛出 `RuntimeException`
+   4. 资源保存失败时文件存储回滚成功
+   5. 文件回滚失败抛出 `RuntimeException`
 2. 删除资源 (`deleteResource`)
    1. 正常删除成功
    2. 管理员删除资源成功
@@ -37,17 +36,14 @@
    1. 用户未点赞时点赞成功返回 `true`
    2. 用户已点赞时返回 `false`
    3. 资源不存在抛出 `IllegalArgumentException`
-   4. 用户不存在抛出 `IllegalArgumentException`
 8. 取消点赞资源 (`unlikeResource`)
    1. 用户已点赞时取消点赞成功返回 `true`
    2. 用户未点赞时返回 `false`
    3. 资源不存在抛出 `IllegalArgumentException`
-   4. 用户不存在抛出 `IllegalArgumentException`
 9. 查看资源 (`viewResource`)
    1. 正常查看资源返回文件流
    2. 资源不存在抛出 `IllegalArgumentException`
-   3. 用户不存在抛出 `IllegalArgumentException`
-   4. 文件服务返回 `null` 时返回 `null`
+   3. 文件服务返回 `null` 时返回 `null`
 
 ## 测试覆盖
 

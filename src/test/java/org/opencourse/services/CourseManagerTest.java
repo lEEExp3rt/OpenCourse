@@ -82,7 +82,7 @@ class CourseManagerTest {
         testCourse = spy(testCourse);
         lenient().when(testCourse.getId()).thenReturn((short) 1);
 
-        // Create test DTOs (移除了 userId 参数).
+        // Create test DTOs.
         testCreationDto = new CourseCreationDto(
             "Data Structures",
             "CS101",

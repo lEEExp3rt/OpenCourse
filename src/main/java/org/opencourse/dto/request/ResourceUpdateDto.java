@@ -34,9 +34,6 @@ public class ResourceUpdateDto {
     @NotNull
     private Short courseId;
 
-    @NotNull
-    private Integer userId;
-
     /**
      * Default constructor.
      */
@@ -52,7 +49,6 @@ public class ResourceUpdateDto {
      * @param resourceTypeId Resource type id.
      * @param fileTypeName   File type name.
      * @param courseId       Course id.
-     * @param userId         User id.
      */
     public ResourceUpdateDto(
         Integer id,
@@ -60,8 +56,7 @@ public class ResourceUpdateDto {
         String description,
         Byte resourceTypeId,
         String fileTypeName,
-        Short courseId,
-        Integer userId
+        Short courseId
     ) {
         this.id = id;
         this.name = name;
@@ -69,7 +64,6 @@ public class ResourceUpdateDto {
         this.resourceType = ResourceType.getById(resourceTypeId.byteValue());
         this.fileType = FileType.from(fileTypeName);
         this.courseId = courseId;
-        this.userId = userId;
     }
 
     /**
@@ -81,7 +75,6 @@ public class ResourceUpdateDto {
      * @param resourceType Resource type.
      * @param fileType     File type.
      * @param courseId     Course id.
-     * @param userId       User id.
      */
     public ResourceUpdateDto(
         Integer id,
@@ -89,8 +82,7 @@ public class ResourceUpdateDto {
         String description,
         ResourceType resourceType,
         FileType fileType,
-        Short courseId,
-        Integer userId
+        Short courseId
     ) {
         this.id = id;
         this.name = name;
@@ -98,7 +90,6 @@ public class ResourceUpdateDto {
         this.resourceType = resourceType;
         this.fileType = fileType;
         this.courseId = courseId;
-        this.userId = userId;
     }
 
     // Getters and Setters
@@ -157,13 +148,5 @@ public class ResourceUpdateDto {
 
     public void setCourseId(Short courseId) {
         this.courseId = courseId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
     }
 }

@@ -31,9 +31,6 @@ public class ResourceUploadDto {
     @NotNull
     private Short courseId;
 
-    @NotNull
-    private Integer userId;
-
     /**
      * Default constructor.
      */
@@ -48,22 +45,19 @@ public class ResourceUploadDto {
      * @param resourceTypeId Resource type id.
      * @param fileTypeName   File type name.
      * @param courseId       Course id.
-     * @param userId         User id.
      */
     public ResourceUploadDto(
         String name,
         String description,
         Byte resourceTypeId,
         String fileTypeName,
-        Short courseId,
-        Integer userId
+        Short courseId
     ) {
         this.name = name;
         this.description = description;
         this.resourceType = ResourceType.getById(resourceTypeId.byteValue());
         this.fileType = FileType.from(fileTypeName);
         this.courseId = courseId;
-        this.userId = userId;
     }
 
     /**
@@ -74,22 +68,19 @@ public class ResourceUploadDto {
      * @param resourceType Resource type.
      * @param fileType     File type.
      * @param courseId     Course id.
-     * @param userId       User id.
      */
     public ResourceUploadDto(
         String name,
         String description,
         ResourceType resourceType,
         FileType fileType,
-        Short courseId,
-        Integer userId
+        Short courseId
     ) {
         this.name = name;
         this.description = description;
         this.resourceType = resourceType;
         this.fileType = fileType;
         this.courseId = courseId;
-        this.userId = userId;
     }
 
     // Getters and Setters
@@ -140,13 +131,5 @@ public class ResourceUploadDto {
 
     public void setCourseId(Short courseId) {
         this.courseId = courseId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
     }
 }

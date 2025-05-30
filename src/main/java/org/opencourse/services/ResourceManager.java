@@ -67,17 +67,16 @@ public class ResourceManager {
      * 
      * @param dto  The resource metadata.
      * @param file The file to add.
+     * @param user The uploader.
      * @return The added resource.
-     * @throws IllegalArgumentException If the course or user is not found.
+     * @throws IllegalArgumentException If the course is not found.
      * @throws RuntimeException         If the file storage fails or other error happens.
      */
     @Transactional
-    public Resource addResource(ResourceUploadDto dto, MultipartFile file) throws IllegalArgumentException, RuntimeException {
-        // Get course and user infomation.
+    public Resource addResource(ResourceUploadDto dto, MultipartFile file, User user) throws IllegalArgumentException, RuntimeException {
+        // Get course infomation.
         Course course = courseRepo.findById(dto.getCourseId())
             .orElseThrow(() -> new IllegalArgumentException("Course not found"));
-        User user = userRepo.findById(dto.getUserId())
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Store the file.
         ResourceFile resourceFile = fileStorageService.storeFile(
             file,
@@ -118,19 +117,15 @@ public class ResourceManager {
      * Delete a resource.
      * 
      * @param id The resource id.
-     * @param userId The user id.
+     * @param user The deleter.
      * @return True if the resource is deleted successfully, false otherwise.
      * @throws RuntimeException If failed to delete the resource.
      */
     @Transactional
-    public boolean deleteResource(Integer id, Integer userId) throws RuntimeException {
+    public boolean deleteResource(Integer id, User user) throws RuntimeException {
         // Get the resource.
         Resource resource = resourceRepo.findById(id).orElse(null);
         if (resource == null) {
-            return false;
-        }
-        User user = userRepo.findById(userId).orElse(null);
-        if (user == null) {
             return false;
         }
         User creator = resource.getUser();
@@ -158,11 +153,12 @@ public class ResourceManager {
      * Update a resource.
      * 
      * @param dto The resource metadata.
+     * @param user The updater.
      * @return The updated resource.
      * @throws IllegalArgumentException If the resource is not found.
      */
     @Transactional
-    public Resource updateResource(ResourceUpdateDto dto) throws IllegalArgumentException {
+    public Resource updateResource(ResourceUpdateDto dto, User user) throws IllegalArgumentException {
         return null; // TODO: Implement this method.
     }
 
@@ -171,11 +167,12 @@ public class ResourceManager {
      * 
      * @param dto  The resource metadata.
      * @param file The file to update.
+     * @param user The updater.
      * @return The updated resource.
      * @throws IllegalArgumentException If the resource is not found.
      */
     @Transactional
-    public Resource updateResource(ResourceUpdateDto dto, MultipartFile file) throws IllegalArgumentException {
+    public Resource updateResource(ResourceUpdateDto dto, MultipartFile file, User user) throws IllegalArgumentException {
         return null; // TODO: Implement this method.
     }
 
@@ -211,17 +208,15 @@ public class ResourceManager {
      * Like a resource.
      * 
      * @param id The resource id.
-     * @param userId The user id.
+     * @param user The user.
      * @return True if the resource is liked, false if the user has already liked it.
-     * @throws IllegalArgumentException If the resource or user is not found.
+     * @throws IllegalArgumentException If the resource is not found.
      */
     @Transactional
-    public boolean likeResource(Integer id, Integer userId) throws IllegalArgumentException {
-        // Get the resource and user.
+    public boolean likeResource(Integer id, User user) throws IllegalArgumentException {
+        // Get the resource.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Check if the user has already liked the resource.
         if (historyManager.getLikeStatus(user, resource)) {
             return false;
@@ -241,16 +236,14 @@ public class ResourceManager {
      * Unlike a resource.
      * 
      * @param id The resource id.
-     * @param userId The user id.
-     * @throws IllegalArgumentException If the resource or user is not found.
+     * @param user The user.
+     * @throws IllegalArgumentException If the resource is not found.
      */
     @Transactional
-    public boolean unlikeResource(Integer id, Integer userId) throws IllegalArgumentException {
-        // Get the resource and user.
+    public boolean unlikeResource(Integer id, User user) throws IllegalArgumentException {
+        // Get the resource.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Check if the user has liked the resource.
         if (!historyManager.getLikeStatus(user, resource)) {
             return false;
@@ -270,16 +263,14 @@ public class ResourceManager {
      * View a resource file.
      * 
      * @param id The resource id.
-     * @param userId The user id.
-     * @throws IllegalArgumentException If the resource or user is not found.
+     * @param user The user.
+     * @throws IllegalArgumentException If the resource is not found.
      */
     @Transactional
-    public InputStream viewResource(Integer id, Integer userId) throws IllegalArgumentException {
-        // Get the resource and user.
+    public InputStream viewResource(Integer id, User user) throws IllegalArgumentException {
+        // Get the resource.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // Add creator activity.
         User creator = resource.getUser();
         creator.addActivity(applicationConfig.getActivity().getResource().getView());
