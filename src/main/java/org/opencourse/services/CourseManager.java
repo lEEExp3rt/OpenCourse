@@ -51,6 +51,7 @@ public class CourseManager {
      * Add a new course.
      * 
      * @param dto The course creation DTO.
+     * @param user The operator.
      * @return The created course if successful or null if the course already exists.
      * @throws IllegalArgumentException If the department is not found.
      */
@@ -81,6 +82,7 @@ public class CourseManager {
      * Update an existing course.
      * 
      * @param dto The course update DTO.
+     * @param user The operator.
      * @return The updated course if successful or null if the course does not exist.
      * @throws IllegalArgumentException If the department or course is not found.
      */
