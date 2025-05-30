@@ -14,9 +14,6 @@ public class InteractionCreationDto {
     @NotNull(message = "课程不能为空")
     private Short courseId;
 
-    @NotNull(message = "用户不能为空")
-    private Integer userId;
-
     private String content;
 
     @Range(min = 1, max = 10, message = "评分必须在 1 到 10 之间")
@@ -32,13 +29,11 @@ public class InteractionCreationDto {
      * Constructor.
      * 
      * @param courseId The ID of the course.
-     * @param userId   The ID of the user.
      * @param content  The content of the interaction.
      * @param rating   The rating of the interaction.
      */
-    public InteractionCreationDto(Short courseId, Integer userId, String content, Byte rating) {
+    public InteractionCreationDto(Short courseId, String content, Byte rating) {
         this.courseId = courseId;
-        this.userId = userId;
         this.content = content;
         this.rating = rating;
     }
@@ -47,12 +42,10 @@ public class InteractionCreationDto {
      * Constructor.
      * 
      * @param courseId The ID of the course.
-     * @param userId   The ID of the user.
      * @param content  The content of the interaction.
      */
-    public InteractionCreationDto(Short courseId, Integer userId, String content) {
+    public InteractionCreationDto(Short courseId, String content) {
         this.courseId = courseId;
-        this.userId = userId;
         this.content = content;
     }
 
@@ -64,14 +57,6 @@ public class InteractionCreationDto {
 
     public void setCourseId(Short courseId) {
         this.courseId = courseId;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
     }
 
     public String getContent() {

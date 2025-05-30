@@ -26,20 +26,20 @@ public interface InteractionRepo extends JpaRepository<Interaction, Integer> {
     List<Interaction> findAllByCourse(Course course);
     
     /**
-     * 查找指定课程的所有评论
+     * 查找指定课程的所有评论，按点赞数降序和创建时间降序排序
      * 
      * @param courseId 课程 ID
      * @return 评论列表
      */
-    List<Interaction> findAllByCourseId(Short courseId);
+    List<Interaction> findByCourseIdOrderByLikesDescCreatedAtDesc(Short courseId);
     
     /**
      * 查找指定用户的所有评论
      * 
-     * @param user 用户
+     * @param userId 用户 ID
      * @return 评论列表
      */
-    List<Interaction> findByUser(User user);
+    List<Interaction> findByUserId(Integer userId);
     
     /**
      * 查找指定课程和用户的评论
