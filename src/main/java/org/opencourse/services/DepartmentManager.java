@@ -3,7 +3,6 @@ package org.opencourse.services;
 import org.opencourse.models.Department;
 import org.opencourse.models.User;
 import org.opencourse.repositories.DepartmentRepo;
-import org.opencourse.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,42 +18,36 @@ import jakarta.transaction.Transactional;
 public class DepartmentManager {
 
     private final DepartmentRepo departmentRepo;
-    private final UserRepo userRepo;
     private final HistoryManager historyManager;
 
     /**
      * Constructor.
      * 
      * @param departmentRepo The department repository.
-     * @param userRepo The user repository.
      * @param historyManager The history manager.
      */
     @Autowired
     public DepartmentManager(
         DepartmentRepo departmentRepo,
-        UserRepo userRepo,
         HistoryManager historyManager
     ) {
         this.departmentRepo = departmentRepo;
-        this.userRepo = userRepo;
         this.historyManager = historyManager;
     }
 
     /**
      * Adds a new department.
      * 
-     * @param name The name of the department.
-     * @param userId The ID of the user who is adding the department.
+     * @param name The department name.
+     * @param user The adder.
      * @return The created department or null if it already exists.
-     * @throws IllegalArgumentException If the name is null or empty, or the user does not exist.
+     * @throws IllegalArgumentException If the name is null or empty.
      */
     @Transactional
-    public Department addDepartment(String name, Integer userId) throws IllegalArgumentException {
+    public Department addDepartment(String name, User user) throws IllegalArgumentException {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Department name cannot be null or empty");
         }
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (departmentRepo.existsByName(name)) {
             return null; // Department with this name already exists.
         }
@@ -69,17 +62,15 @@ public class DepartmentManager {
      * 
      * @param id The ID of the department.
      * @param name The new name of the department.
-     * @param userId The ID of the user who is updating the department.
+     * @param user The updater.
      * @return The updated department or null if the name already exists.
-     * @throws IllegalArgumentException If the name is null or empty, or the user does not exist.
+     * @throws IllegalArgumentException If the name is null or empty.
      */
     @Transactional
-    public Department updateDepartment(Byte id, String name, Integer userId) throws IllegalArgumentException {
+    public Department updateDepartment(Byte id, String name, User user) throws IllegalArgumentException {
         if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Department name cannot be null or empty");
         }
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
         // If the department name already exists, return null.
         if (departmentRepo.existsByName(name)) {
             return null;
@@ -98,14 +89,13 @@ public class DepartmentManager {
      * Deletes a department.
      * 
      * @param id The ID of the department.
-     * @param userId The ID of the user who is deleting the department.
+     * @param userId The user who is deleting the department.
      * @return True if the department was deleted, false otherwise.
      */
     @Transactional
-    public boolean deleteDepartment(Byte id, Integer userId) {
+    public boolean deleteDepartment(Byte id, User user) {
         Department department = departmentRepo.findById(id).orElse(null);
-        User user = userRepo.findById(userId).orElse(null);
-        if (department != null && user != null) {
+        if (department != null) {
             historyManager.logDeleteDepartment(user, department);
             departmentRepo.delete(department);
             return true;

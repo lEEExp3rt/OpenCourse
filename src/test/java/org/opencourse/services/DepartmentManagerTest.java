@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opencourse.models.Department;
 import org.opencourse.models.User;
 import org.opencourse.repositories.DepartmentRepo;
-import org.opencourse.repositories.UserRepo;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,9 +30,6 @@ class DepartmentManagerTest {
 
     @Mock
     private DepartmentRepo departmentRepo;
-
-    @Mock
-    private UserRepo userRepo;
 
     @Mock
     private HistoryManager historyManager;
@@ -68,14 +64,12 @@ class DepartmentManagerTest {
     void addDepartment_WithValidNameAndUser_ShouldReturnCreatedDepartment() {
         // Given.
         String departmentName = "Mathematics";
-        Integer userId = 1;
 
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
         when(departmentRepo.existsByName(departmentName)).thenReturn(false);
         when(departmentRepo.save(any(Department.class))).thenReturn(testDepartment);
 
         // When.
-        Department result = departmentManager.addDepartment(departmentName, userId);
+        Department result = departmentManager.addDepartment(departmentName, testUser);
 
         // Then.
         assertThat(result).isNotNull();
@@ -91,13 +85,11 @@ class DepartmentManagerTest {
     void addDepartment_WithExistingName_ShouldReturnNull() {
         // Given.
         String existingName = "Computer Science";
-        Integer userId = 1;
 
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
         when(departmentRepo.existsByName(existingName)).thenReturn(true);
 
         // When.
-        Department result = departmentManager.addDepartment(existingName, userId);
+        Department result = departmentManager.addDepartment(existingName, testUser);
 
         // Then.
         assertThat(result).isNull();
@@ -112,14 +104,12 @@ class DepartmentManagerTest {
     void addDepartment_WithNullName_ShouldThrowException() {
         // Given.
         String nullName = null;
-        Integer userId = 1;
 
         // When & Then.
-        assertThatThrownBy(() -> departmentManager.addDepartment(nullName, userId))
+        assertThatThrownBy(() -> departmentManager.addDepartment(nullName, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Department name cannot be null or empty");
 
-        verify(userRepo, never()).findById(any());
         verify(departmentRepo, never()).existsByName(any());
     }
 
@@ -128,32 +118,12 @@ class DepartmentManagerTest {
     void addDepartment_WithEmptyName_ShouldThrowException() {
         // Given.
         String emptyName = "";
-        Integer userId = 1;
 
         // When & Then.
-        assertThatThrownBy(() -> departmentManager.addDepartment(emptyName, userId))
+        assertThatThrownBy(() -> departmentManager.addDepartment(emptyName, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Department name cannot be null or empty");
 
-        verify(userRepo, never()).findById(any());
-        verify(departmentRepo, never()).existsByName(any());
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when user does not exist")
-    void addDepartment_WithNonExistentUser_ShouldThrowException() {
-        // Given.
-        String departmentName = "Physics";
-        Integer nonExistentUserId = 999;
-
-        when(userRepo.findById(nonExistentUserId)).thenReturn(Optional.empty());
-
-        // When & Then.
-        assertThatThrownBy(() -> departmentManager.addDepartment(departmentName, nonExistentUserId))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found");
-
-        verify(userRepo).findById(nonExistentUserId);
         verify(departmentRepo, never()).existsByName(any());
     }
 
@@ -163,15 +133,13 @@ class DepartmentManagerTest {
         // Given.
         Byte departmentId = (byte) 1;
         String newName = "Computer Engineering";
-        Integer userId = 1;
 
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
         when(departmentRepo.existsByName(newName)).thenReturn(false);
         when(departmentRepo.findById(departmentId)).thenReturn(Optional.of(testDepartment));
         when(departmentRepo.save(testDepartment)).thenReturn(testDepartment);
 
         // When.
-        Department result = departmentManager.updateDepartment(departmentId, newName, userId);
+        Department result = departmentManager.updateDepartment(departmentId, newName, testUser);
 
         // Then.
         assertThat(result).isNotNull();
@@ -188,13 +156,11 @@ class DepartmentManagerTest {
         // Given.
         Byte departmentId = (byte) 1;
         String existingName = "Mathematics";
-        Integer userId = 1;
 
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
         when(departmentRepo.existsByName(existingName)).thenReturn(true);
 
         // When.
-        Department result = departmentManager.updateDepartment(departmentId, existingName, userId);
+        Department result = departmentManager.updateDepartment(departmentId, existingName, testUser);
 
         // Then.
         assertThat(result).isNull();
@@ -210,14 +176,12 @@ class DepartmentManagerTest {
         // Given.
         Byte nonExistentId = (byte) 99;
         String newName = "New Department";
-        Integer userId = 1;
 
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
         when(departmentRepo.existsByName(newName)).thenReturn(false);
         when(departmentRepo.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // When.
-        Department result = departmentManager.updateDepartment(nonExistentId, newName, userId);
+        Department result = departmentManager.updateDepartment(nonExistentId, newName, testUser);
 
         // Then.
         assertThat(result).isNull();
@@ -233,10 +197,9 @@ class DepartmentManagerTest {
         // Given.
         Byte departmentId = (byte) 1;
         String nullName = null;
-        Integer userId = 1;
 
         // When & Then.
-        assertThatThrownBy(() -> departmentManager.updateDepartment(departmentId, nullName, userId))
+        assertThatThrownBy(() -> departmentManager.updateDepartment(departmentId, nullName, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Department name cannot be null or empty");
     }
@@ -246,13 +209,11 @@ class DepartmentManagerTest {
     void deleteDepartment_WithExistingDepartment_ShouldReturnTrue() {
         // Given.
         Byte departmentId = (byte) 1;
-        Integer userId = 1;
 
         when(departmentRepo.findById(departmentId)).thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
 
         // When.
-        boolean result = departmentManager.deleteDepartment(departmentId, userId);
+        boolean result = departmentManager.deleteDepartment(departmentId, testUser);
 
         // Then.
         assertThat(result).isTrue();
@@ -266,33 +227,11 @@ class DepartmentManagerTest {
     void deleteDepartment_WithNonExistentDepartment_ShouldReturnFalse() {
         // Given.
         Byte nonExistentId = (byte) 99;
-        Integer userId = 1;
 
         when(departmentRepo.findById(nonExistentId)).thenReturn(Optional.empty());
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
 
         // When.
-        boolean result = departmentManager.deleteDepartment(nonExistentId, userId);
-
-        // Then.
-        assertThat(result).isFalse();
-
-        verify(departmentRepo, never()).delete(any());
-        verify(historyManager, never()).logDeleteDepartment(any(), any());
-    }
-
-    @Test
-    @DisplayName("Should return false when user does not exist for deletion")
-    void deleteDepartment_WithNonExistentUser_ShouldReturnFalse() {
-        // Given.
-        Byte departmentId = (byte) 1;
-        Integer nonExistentUserId = 999;
-
-        when(departmentRepo.findById(departmentId)).thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(nonExistentUserId)).thenReturn(Optional.empty());
-
-        // When.
-        boolean result = departmentManager.deleteDepartment(departmentId, nonExistentUserId);
+        boolean result = departmentManager.deleteDepartment(nonExistentId, testUser);
 
         // Then.
         assertThat(result).isFalse();
