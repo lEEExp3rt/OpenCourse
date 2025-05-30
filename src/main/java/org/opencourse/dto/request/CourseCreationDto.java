@@ -38,9 +38,6 @@ public class CourseCreationDto {
     @Digits(integer = 2, fraction = 1, message = "学分格式错误")
     private BigDecimal credits;
 
-    @NotNull
-    private Integer creatorId;
-
     /**
      * Default constructor.
      */
@@ -55,22 +52,19 @@ public class CourseCreationDto {
      * @param departmentId The ID of the department.
      * @param courseTypeId The ID of the course type.
      * @param credits      The credits of the course.
-     * @param creatorId    The ID of the creator user.
      */
     public CourseCreationDto(
         String name,
         String code,
         Byte departmentId,
         Byte courseTypeId,
-        BigDecimal credits,
-        Integer creatorId
+        BigDecimal credits
     ) {
         this.name = name;
         this.code = code;
         this.departmentId = departmentId;
         this.courseType = CourseType.getById(courseTypeId.byteValue());
         this.credits = credits;
-        this.creatorId = creatorId;
     }
 
     // Getters and Setters
@@ -117,13 +111,5 @@ public class CourseCreationDto {
 
     public void setCredits(BigDecimal credits) {
         this.credits = credits;
-    }
-
-    public Integer getCreatorId() {
-        return creatorId;
-    }
-
-    public void setCreatorId(Integer creatorId) {
-        this.creatorId = creatorId;
     }
 }

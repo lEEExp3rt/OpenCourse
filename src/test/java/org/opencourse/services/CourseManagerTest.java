@@ -14,11 +14,11 @@ import org.opencourse.models.Department;
 import org.opencourse.models.User;
 import org.opencourse.repositories.CourseRepo;
 import org.opencourse.repositories.DepartmentRepo;
-import org.opencourse.repositories.UserRepo;
 import org.opencourse.utils.typeinfo.CourseType;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,9 +40,6 @@ class CourseManagerTest {
 
     @Mock
     private DepartmentRepo departmentRepo;
-
-    @Mock
-    private UserRepo userRepo;
 
     @Mock
     private HistoryManager historyManager;
@@ -85,14 +82,13 @@ class CourseManagerTest {
         testCourse = spy(testCourse);
         lenient().when(testCourse.getId()).thenReturn((short) 1);
 
-        // Create test DTOs.
+        // Create test DTOs (移除了 userId 参数).
         testCreationDto = new CourseCreationDto(
             "Data Structures",
             "CS101",
             (byte) 1,
             (byte) 13, // CourseType.MAJOR_REQUIRED.
-            new BigDecimal("3.0"),
-            1
+            new BigDecimal("3.0")
         );
 
         testUpdateDto = new CourseUpdateDto(
@@ -101,8 +97,7 @@ class CourseManagerTest {
             "CS102",
             (byte) 1,
             (byte) 13, // CourseType.MAJOR_REQUIRED.
-            new BigDecimal("4.0"),
-            1
+            new BigDecimal("4.0")
         );
     }
 
@@ -114,21 +109,18 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testCreationDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testCreationDto.getCreatorId()))
-            .thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testCreationDto.getCode()))
             .thenReturn(false);
         when(courseRepo.save(any(Course.class))).thenReturn(testCourse);
 
         // When.
-        Course result = courseManager.addCourse(testCreationDto);
+        Course result = courseManager.addCourse(testCreationDto, testUser);
 
         // Then.
         assertThat(result).isNotNull();
         assertThat(result).isEqualTo(testCourse);
 
         verify(departmentRepo).findById(testCreationDto.getDepartmentId());
-        verify(userRepo).findById(testCreationDto.getCreatorId());
         verify(courseRepo).existsByCode(testCreationDto.getCode());
         verify(courseRepo).save(any(Course.class));
         verify(historyManager).logCreateCourse(testUser, testCourse);
@@ -140,13 +132,11 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testCreationDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testCreationDto.getCreatorId()))
-            .thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testCreationDto.getCode()))
             .thenReturn(true);
 
         // When.
-        Course result = courseManager.addCourse(testCreationDto);
+        Course result = courseManager.addCourse(testCreationDto, testUser);
 
         // Then.
         assertThat(result).isNull();
@@ -164,32 +154,11 @@ class CourseManagerTest {
             .thenReturn(Optional.empty());
 
         // When & Then.
-        assertThatThrownBy(() -> courseManager.addCourse(testCreationDto))
+        assertThatThrownBy(() -> courseManager.addCourse(testCreationDto, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Department not found.");
 
         verify(departmentRepo).findById(testCreationDto.getDepartmentId());
-        verify(userRepo, never()).findById(any());
-        verify(courseRepo, never()).save(any());
-        verify(historyManager, never()).logCreateCourse(any(), any());
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when user not found")
-    void addCourse_WithNonExistentUser_ShouldThrowException() {
-        // Given.
-        when(departmentRepo.findById(testCreationDto.getDepartmentId()))
-            .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testCreationDto.getCreatorId()))
-            .thenReturn(Optional.empty());
-
-        // When & Then.
-        assertThatThrownBy(() -> courseManager.addCourse(testCreationDto))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found.");
-
-        verify(departmentRepo).findById(testCreationDto.getDepartmentId());
-        verify(userRepo).findById(testCreationDto.getCreatorId());
         verify(courseRepo, never()).save(any());
         verify(historyManager, never()).logCreateCourse(any(), any());
     }
@@ -200,15 +169,13 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testCreationDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testCreationDto.getCreatorId()))
-            .thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testCreationDto.getCode()))
             .thenReturn(false);
         when(courseRepo.save(any(Course.class)))
             .thenAnswer(invocation -> invocation.getArgument(0));
 
         // When.
-        courseManager.addCourse(testCreationDto);
+        courseManager.addCourse(testCreationDto, testUser);
 
         // Then.
         verify(courseRepo).save(argThat(course ->
@@ -228,8 +195,6 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testUpdateDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testUpdateDto.getUpdatorId()))
-            .thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testUpdateDto.getCode()))
             .thenReturn(false);
         when(courseRepo.findById(testUpdateDto.getId()))
@@ -237,7 +202,7 @@ class CourseManagerTest {
         when(courseRepo.save(testCourse)).thenReturn(testCourse);
 
         // When.
-        Course result = courseManager.updateCourse(testUpdateDto);
+        Course result = courseManager.updateCourse(testUpdateDto, testUser);
 
         // Then.
         assertThat(result).isNotNull();
@@ -253,13 +218,11 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testUpdateDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testUpdateDto.getUpdatorId()))
-            .thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testUpdateDto.getCode()))
             .thenReturn(true);
 
         // When.
-        Course result = courseManager.updateCourse(testUpdateDto);
+        Course result = courseManager.updateCourse(testUpdateDto, testUser);
 
         // Then.
         assertThat(result).isNull();
@@ -277,30 +240,11 @@ class CourseManagerTest {
             .thenReturn(Optional.empty());
 
         // When & Then.
-        assertThatThrownBy(() -> courseManager.updateCourse(testUpdateDto))
+        assertThatThrownBy(() -> courseManager.updateCourse(testUpdateDto, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Department not found.");
 
         verify(departmentRepo).findById(testUpdateDto.getDepartmentId());
-        verify(userRepo, never()).findById(any());
-        verify(courseRepo, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("Should throw IllegalArgumentException when user not found for update")
-    void updateCourse_WithNonExistentUser_ShouldThrowException() {
-        // Given.
-        when(departmentRepo.findById(testUpdateDto.getDepartmentId()))
-            .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testUpdateDto.getUpdatorId())).thenReturn(Optional.empty());
-
-        // When & Then.
-        assertThatThrownBy(() -> courseManager.updateCourse(testUpdateDto))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("User not found.");
-
-        verify(departmentRepo).findById(testUpdateDto.getDepartmentId());
-        verify(userRepo).findById(testUpdateDto.getUpdatorId());
         verify(courseRepo, never()).save(any());
     }
 
@@ -310,12 +254,11 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testUpdateDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testUpdateDto.getUpdatorId())).thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testUpdateDto.getCode())).thenReturn(false);
         when(courseRepo.findById(testUpdateDto.getId())).thenReturn(Optional.empty());
 
         // When & Then.
-        assertThatThrownBy(() -> courseManager.updateCourse(testUpdateDto))
+        assertThatThrownBy(() -> courseManager.updateCourse(testUpdateDto, testUser))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Course not found.");
 
@@ -329,13 +272,12 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testUpdateDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testUpdateDto.getUpdatorId())).thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testUpdateDto.getCode())).thenReturn(false);
         when(courseRepo.findById(testUpdateDto.getId())).thenReturn(Optional.of(testCourse));
         when(courseRepo.save(testCourse)).thenReturn(testCourse);
 
         // When.
-        courseManager.updateCourse(testUpdateDto);
+        courseManager.updateCourse(testUpdateDto, testUser);
 
         // Then.
         verify(testCourse).setName(testUpdateDto.getName());
@@ -352,13 +294,11 @@ class CourseManagerTest {
     void deleteCourse_WithValidData_ShouldReturnTrue() {
         // Given.
         Short courseId = (short) 1;
-        Integer userId = 1;
 
         when(courseRepo.findById(courseId)).thenReturn(Optional.of(testCourse));
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
 
         // When.
-        boolean result = courseManager.deleteCourse(courseId, userId);
+        boolean result = courseManager.deleteCourse(courseId, testUser);
 
         // Then.
         assertThat(result).isTrue();
@@ -372,33 +312,11 @@ class CourseManagerTest {
     void deleteCourse_WithNonExistentCourse_ShouldReturnFalse() {
         // Given.
         Short courseId = (short) 999;
-        Integer userId = 1;
 
         when(courseRepo.findById(courseId)).thenReturn(Optional.empty());
-        when(userRepo.findById(userId)).thenReturn(Optional.of(testUser));
 
         // When.
-        boolean result = courseManager.deleteCourse(courseId, userId);
-
-        // Then.
-        assertThat(result).isFalse();
-
-        verify(courseRepo, never()).delete(any());
-        verify(historyManager, never()).logDeleteCourse(any(), any());
-    }
-
-    @Test
-    @DisplayName("Should return false when user not found for deletion")
-    void deleteCourse_WithNonExistentUser_ShouldReturnFalse() {
-        // Given.
-        Short courseId = (short) 1;
-        Integer userId = 999;
-
-        when(courseRepo.findById(courseId)).thenReturn(Optional.of(testCourse));
-        when(userRepo.findById(userId)).thenReturn(Optional.empty());
-
-        // When.
-        boolean result = courseManager.deleteCourse(courseId, userId);
+        boolean result = courseManager.deleteCourse(courseId, testUser);
 
         // Then.
         assertThat(result).isFalse();
@@ -471,7 +389,7 @@ class CourseManagerTest {
         );
 
         List<Course> coursesByName = Arrays.asList(course1, course2);
-        List<Course> coursesByCode = Arrays.asList();
+        List<Course> coursesByCode = Collections.emptyList();
 
         when(courseRepo.findByNameContainingIgnoreCaseOrderByNameAsc(keyword))
             .thenReturn(coursesByName);
@@ -664,7 +582,7 @@ class CourseManagerTest {
     void getCoursesByDepartment_WithNonExistentDepartment_ShouldReturnEmptyList() {
         // Given.
         Byte departmentId = (byte) 999;
-        List<Course> emptyCourses = Arrays.asList();
+        List<Course> emptyCourses = Collections.emptyList();
 
         when(courseRepo.findByDepartmentId(departmentId)).thenReturn(emptyCourses);
 
@@ -684,7 +602,7 @@ class CourseManagerTest {
         // Given.
         byte courseTypeId = 11; // CourseType.GENERAL_REQUIRED.getId()
         CourseType courseType = CourseType.getById(courseTypeId);
-        List<Course> emptyCourses = Arrays.asList();
+        List<Course> emptyCourses = Collections.emptyList();
 
         when(courseRepo.findByCourseType(courseType)).thenReturn(emptyCourses);
 
@@ -710,7 +628,7 @@ class CourseManagerTest {
 
         // Then.
         assertThat(courseType).isNull();
-        assertThat(result).isEmpty();;
+        assertThat(result).isEmpty();
     }
 
     // Edge cases and additional tests
@@ -721,15 +639,13 @@ class CourseManagerTest {
         // Given.
         when(departmentRepo.findById(testCreationDto.getDepartmentId()))
             .thenReturn(Optional.of(testDepartment));
-        when(userRepo.findById(testCreationDto.getCreatorId()))
-            .thenReturn(Optional.of(testUser));
         when(courseRepo.existsByCode(testCreationDto.getCode()))
             .thenReturn(false);
         when(courseRepo.save(any(Course.class)))
             .thenThrow(new RuntimeException("Database error"));
 
         // When & Then.
-        assertThatThrownBy(() -> courseManager.addCourse(testCreationDto))
+        assertThatThrownBy(() -> courseManager.addCourse(testCreationDto, testUser))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("Database error");
 

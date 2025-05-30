@@ -7,7 +7,6 @@ import org.opencourse.models.Department;
 import org.opencourse.models.User;
 import org.opencourse.repositories.CourseRepo;
 import org.opencourse.repositories.DepartmentRepo;
-import org.opencourse.repositories.UserRepo;
 import org.opencourse.utils.typeinfo.CourseType;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,6 @@ public class CourseManager {
 
     private final CourseRepo courseRepo;
     private final DepartmentRepo departmentRepo;
-    private final UserRepo userRepo;
     private final HistoryManager historyManager;
 
     /**
@@ -36,19 +34,16 @@ public class CourseManager {
      * 
      * @param courseRepo     The course repository.
      * @param departmentRepo The department repository.
-     * @param userRepo       The user repository.
      * @param historyManager The history manager.
      */
     @Autowired
     public CourseManager(
         CourseRepo courseRepo,
         DepartmentRepo departmentRepo,
-        UserRepo userRepo,
         HistoryManager historyManager
     ) {
         this.courseRepo = courseRepo;
         this.departmentRepo = departmentRepo;
-        this.userRepo = userRepo;
         this.historyManager = historyManager;
     }
 
@@ -57,16 +52,13 @@ public class CourseManager {
      * 
      * @param dto The course creation DTO.
      * @return The created course if successful or null if the course already exists.
-     * @throws IllegalArgumentException If the department or creator is not found.
+     * @throws IllegalArgumentException If the department is not found.
      */
     @Transactional
-    public Course addCourse(CourseCreationDto dto) throws IllegalArgumentException {
+    public Course addCourse(CourseCreationDto dto, User user) throws IllegalArgumentException {
         // Find the department by name.
         Department department = departmentRepo.findById(dto.getDepartmentId())
             .orElseThrow(() -> new IllegalArgumentException("Department not found."));
-        // Find the user by ID.
-        User user = userRepo.findById(dto.getCreatorId())
-            .orElseThrow(() -> new IllegalArgumentException("User not found."));
         // Check if the course with the same code already exists.
         if (courseRepo.existsByCode(dto.getCode())) {
             return null;
@@ -90,16 +82,13 @@ public class CourseManager {
      * 
      * @param dto The course update DTO.
      * @return The updated course if successful or null if the course does not exist.
-     * @throws IllegalArgumentException If the department, user, or course is not found.
+     * @throws IllegalArgumentException If the department or course is not found.
      */
     @Transactional
-    public Course updateCourse(CourseUpdateDto dto) throws IllegalArgumentException {
+    public Course updateCourse(CourseUpdateDto dto, User user) throws IllegalArgumentException {
         // Find the department by name.
         Department department = departmentRepo.findById(dto.getDepartmentId())
             .orElseThrow(() -> new IllegalArgumentException("Department not found."));
-        // Find the user by ID.
-        User user = userRepo.findById(dto.getUpdatorId())
-            .orElseThrow(() -> new IllegalArgumentException("User not found."));
         // Check if the course with the same code already exists.
         if (courseRepo.existsByCode(dto.getCode())) {
             return null;
@@ -124,14 +113,13 @@ public class CourseManager {
      * Delete an existing course.
      * 
      * @param courseId The course ID.
-     * @param userId   The operator ID.
-     * @return True if the course deleted successfully, false if the course or deleter not found.
+     * @param user     The operator.
+     * @return True if the course deleted successfully, false if the course is not found.
      */
     @Transactional
-    public boolean deleteCourse(Short courseId, Integer userId) {
+    public boolean deleteCourse(Short courseId, User user) {
         Course course = courseRepo.findById(courseId).orElse(null);
-        User user = userRepo.findById(userId).orElse(null);
-        if (course == null || user == null) {
+        if (course == null) {
             return false;
         }
         historyManager.logDeleteCourse(user, course);

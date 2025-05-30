@@ -40,9 +40,6 @@ public class CourseUpdateDto {
     @Digits(integer = 2, fraction = 1, message = "学分格式错误")
     private BigDecimal credits;
 
-    @NotNull
-    private Integer updatorId;
-
     /**
      * Default constructor.
      */
@@ -58,7 +55,6 @@ public class CourseUpdateDto {
      * @param departmentId The department ID.
      * @param courseTypeId The course type ID.
      * @param credits      The course credits.
-     * @param updatorId    The ID of the user updating the course.
      */
     public CourseUpdateDto(
         Short id,
@@ -66,8 +62,7 @@ public class CourseUpdateDto {
         String code,
         Byte departmentId,
         Byte courseTypeId,
-        BigDecimal credits,
-        Integer updatorId
+        BigDecimal credits
     ) {
         this.id = id;
         this.name = name;
@@ -75,7 +70,6 @@ public class CourseUpdateDto {
         this.departmentId = departmentId;
         this.courseType = CourseType.getById(courseTypeId.byteValue());
         this.credits = credits;
-        this.updatorId = updatorId;
     }
 
     // Getters and Setters.
@@ -130,13 +124,5 @@ public class CourseUpdateDto {
 
     public void setCredits(BigDecimal credits) {
         this.credits = credits;
-    }
-
-    public Integer getUpdatorId() {
-        return updatorId;
-    }
-
-    public void setUpdatorId(Integer updatorId) {
-        this.updatorId = updatorId;
     }
 }
