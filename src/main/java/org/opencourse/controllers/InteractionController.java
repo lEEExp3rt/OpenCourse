@@ -134,7 +134,7 @@ public class InteractionController {
         data.put("userName", interaction.getUser().getName());
         data.put("createdAt", interaction.getCreatedAt());
         
-        return ResponseEntity.ok(ApiResponse.success("获取评论成功", data));
+        return ResponseEntity.ok(ApiResponse.success("获取指定id评论成功", data));
     }
 
 

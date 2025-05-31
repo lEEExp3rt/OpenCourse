@@ -294,6 +294,9 @@ public class InteractionManager {
 
         return historyManager.getLikeStatus(user, interaction);
     }
+
+    public Interaction getInteractionById(Integer id) {
+        return interactionRepo.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("评论不存在"));
+    }
 }
-
-
