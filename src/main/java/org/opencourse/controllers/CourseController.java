@@ -19,8 +19,9 @@ import java.util.stream.Collectors;
 
 /**
  * 课程管理控制器
- * 
- * @author GitHub Copilot
+ * 完成课程的增删改查功能
+ * 包括课程的创建、更新、删除、查询等操作
+ * @author ljx
  */
 @RestController
 @RequestMapping("/course")
