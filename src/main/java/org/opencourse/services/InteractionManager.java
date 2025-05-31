@@ -295,3 +295,5 @@ public class InteractionManager {
         return historyManager.getLikeStatus(user, interaction);
     }
 }
+
+

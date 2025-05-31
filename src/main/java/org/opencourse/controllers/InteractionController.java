@@ -80,9 +80,11 @@ public class InteractionController {
      * @param rating 评分（1-10）
      * @return 更新的评论
      */
-    @PutMapping("/{id}")
+    // @PutMapping("/{id}")
+    @PutMapping()
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateInteraction(
-            @PathVariable Integer id,
+            // @PathVariable Integer id,
+            @RequestParam Integer id,
             @RequestParam(required = false) String content,
             @RequestParam(required = false) Byte rating) {
         
@@ -108,6 +110,33 @@ public class InteractionController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    /**
+     * 获取指定的评论
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getInteractionById(@PathVariable Integer id) {
+        Interaction interaction = interactionManager.getInteractionById(id);
+        
+        if (interaction == null) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", interaction.getId());
+        data.put("content", interaction.getContent());
+        data.put("rating", interaction.getRating());
+        data.put("likes", interaction.getLikes());
+        data.put("dislikes", interaction.getDislikes());
+        data.put("userId", interaction.getUser().getId());
+        data.put("userName", interaction.getUser().getName());
+        data.put("createdAt", interaction.getCreatedAt());
+        
+        return ResponseEntity.ok(ApiResponse.success("获取评论成功", data));
+    }
+
 
     /**
      * 获取课程的所有评论
@@ -159,7 +188,7 @@ public class InteractionController {
      * @param interactionId 评论ID
      * @return 操作结果
      */
-    @PostMapping("/{interactionId}/like")
+    @PostMapping("/interaction/like/{id}")
     public ResponseEntity<ApiResponse<Void>> likeInteraction(@PathVariable Integer interactionId) {
         // 获取当前登录用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
