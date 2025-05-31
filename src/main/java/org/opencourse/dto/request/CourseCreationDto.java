@@ -54,12 +54,11 @@ public class CourseCreationDto {
      * @param credits      The credits of the course.
      */
     public CourseCreationDto(
-        String name,
-        String code,
-        Byte departmentId,
-        Byte courseTypeId,
-        BigDecimal credits
-    ) {
+            String name,
+            String code,
+            Byte departmentId,
+            Byte courseTypeId,
+            BigDecimal credits) {
         this.name = name;
         this.code = code;
         this.departmentId = departmentId;
@@ -99,10 +98,6 @@ public class CourseCreationDto {
 
     public void setCourseType(CourseType courseType) {
         this.courseType = courseType;
-    }
-
-    public void setCourseType(Byte courseTypeId) {
-        this.courseType = CourseType.getById(courseTypeId.byteValue());
     }
 
     public BigDecimal getCredits() {

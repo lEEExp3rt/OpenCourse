@@ -57,13 +57,12 @@ public class CourseUpdateDto {
      * @param credits      The course credits.
      */
     public CourseUpdateDto(
-        Short id,
-        String name,
-        String code,
-        Byte departmentId,
-        Byte courseTypeId,
-        BigDecimal credits
-    ) {
+            Short id,
+            String name,
+            String code,
+            Byte departmentId,
+            Byte courseTypeId,
+            BigDecimal credits) {
         this.id = id;
         this.name = name;
         this.code = code;
@@ -112,10 +111,6 @@ public class CourseUpdateDto {
 
     public void setCourseType(CourseType courseType) {
         this.courseType = courseType;
-    }
-
-    public void setCourseType(Byte courseTypeId) {
-        this.courseType = CourseType.getById(courseTypeId.byteValue());
     }
 
     public BigDecimal getCredits() {
