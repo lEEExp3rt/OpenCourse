@@ -38,10 +38,9 @@ public class CourseManager {
      */
     @Autowired
     public CourseManager(
-        CourseRepo courseRepo,
-        DepartmentRepo departmentRepo,
-        HistoryManager historyManager
-    ) {
+            CourseRepo courseRepo,
+            DepartmentRepo departmentRepo,
+            HistoryManager historyManager) {
         this.courseRepo = courseRepo;
         this.departmentRepo = departmentRepo;
         this.historyManager = historyManager;
@@ -50,28 +49,28 @@ public class CourseManager {
     /**
      * Add a new course.
      * 
-     * @param dto The course creation DTO.
+     * @param dto  The course creation DTO.
      * @param user The operator.
-     * @return The created course if successful or null if the course already exists.
+     * @return The created course if successful or null if the course already
+     *         exists.
      * @throws IllegalArgumentException If the department is not found.
      */
     @Transactional
     public Course addCourse(CourseCreationDto dto, User user) throws IllegalArgumentException {
         // Find the department by name.
         Department department = departmentRepo.findById(dto.getDepartmentId())
-            .orElseThrow(() -> new IllegalArgumentException("Department not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Department not found."));
         // Check if the course with the same code already exists.
         if (courseRepo.existsByCode(dto.getCode())) {
             return null;
         }
         // Create a new course and save.
         Course course = new Course(
-            dto.getName(),
-            dto.getCode(),
-            department,
-            dto.getCourseType(),
-            dto.getCredits()
-        );
+                dto.getName(),
+                dto.getCode(),
+                department,
+                dto.getCourseType(),
+                dto.getCredits());
         course = courseRepo.save(course);
         // Add the course creation history record.
         historyManager.logCreateCourse(user, course);
@@ -81,23 +80,24 @@ public class CourseManager {
     /**
      * Update an existing course.
      * 
-     * @param dto The course update DTO.
+     * @param dto  The course update DTO.
      * @param user The operator.
-     * @return The updated course if successful or null if the course does not exist.
+     * @return The updated course if successful or null if the course does not
+     *         exist.
      * @throws IllegalArgumentException If the department or course is not found.
      */
     @Transactional
     public Course updateCourse(CourseUpdateDto dto, User user) throws IllegalArgumentException {
         // Find the department by name.
         Department department = departmentRepo.findById(dto.getDepartmentId())
-            .orElseThrow(() -> new IllegalArgumentException("Department not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Department not found."));
         // Check if the course with the same code already exists.
         if (courseRepo.existsByCode(dto.getCode())) {
             return null;
         }
         // Find the course by ID.
         Course course = courseRepo.findById(dto.getId())
-            .orElseThrow(() -> new IllegalArgumentException("Course not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Course not found."));
         // Update the course details.
         course.setName(dto.getName());
         course.setCode(dto.getCode());
@@ -116,7 +116,8 @@ public class CourseManager {
      * 
      * @param courseId The course ID.
      * @param user     The operator.
-     * @return True if the course deleted successfully, false if the course is not found.
+     * @return True if the course deleted successfully, false if the course is not
+     *         found.
      */
     @Transactional
     public boolean deleteCourse(Short courseId, User user) {
@@ -145,12 +146,11 @@ public class CourseManager {
      * @return A list of courses that match the keyword.
      */
     public List<Course> getCourses(String keyword) {
-        return keyword == null || keyword.isBlank() ?
-            getCourses() :
-            Stream.concat(
-                courseRepo.findByNameContainingIgnoreCaseOrderByNameAsc(keyword).stream(),
-                courseRepo.findByCodeContainingIgnoreCaseOrderByNameAsc(keyword).stream()
-            ).distinct().collect(Collectors.toList());
+        return keyword == null || keyword.isBlank() ? getCourses()
+                : Stream.concat(
+                        courseRepo.findByNameContainingIgnoreCaseOrderByNameAsc(keyword).stream(),
+                        courseRepo.findByCodeContainingIgnoreCaseOrderByNameAsc(keyword).stream()).distinct()
+                        .collect(Collectors.toList());
     }
 
     /**
@@ -182,5 +182,15 @@ public class CourseManager {
      */
     public List<Course> getCoursesByDepartmentAndType(Byte departmentId, byte courseTypeId) {
         return courseRepo.findByDepartmentIdAndCourseType(departmentId, CourseType.getById(courseTypeId));
+    }
+
+    /**
+     * Get a course by its ID.
+     * 
+     * @param courseId The course ID.
+     * @return The course if found, null otherwise.
+     */
+    public Course getCourseById(Short courseId) {
+        return courseRepo.findById(courseId).orElse(null);
     }
 }
