@@ -64,7 +64,7 @@ public class DepartmentController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         } catch (RuntimeException e) {
-            return ResponseEntity.internalServerError().body(ApiResponse.error("创建部门失败"));
+            return ResponseEntity.internalServerError().body(ApiResponse.error("服务器内部错误"));
         }
     }
 
@@ -112,7 +112,7 @@ public class DepartmentController {
             if (success) {
                 return ResponseEntity.ok(ApiResponse.success("部门删除成功"));
             } else {
-                return ResponseEntity.badRequest().body(ApiResponse.error("部门不存在或删除失败"));
+                return ResponseEntity.badRequest().body(ApiResponse.error("部门不存在"));
             }
         } catch (RuntimeException e) {
             return ResponseEntity.internalServerError().body(ApiResponse.error("删除部门失败"));
@@ -131,7 +131,7 @@ public class DepartmentController {
             Department department = departmentManager.getDepartment(id);
 
             if (department == null) {
-                return ResponseEntity.notFound().build();
+                return ResponseEntity.status(404).body(ApiResponse.error("部门不存在"));
             }
 
             Map<String, Object> data = new HashMap<>();
@@ -177,7 +177,12 @@ public class DepartmentController {
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> searchDepartments(
             @RequestParam(required = false) String name) {
         try {
-            List<Department> departments = departmentManager.getDepartments(name);
+            List<Department> departments;
+            if (name == null || name.trim().isEmpty()) {
+                departments = departmentManager.getDepartments();
+            } else {
+                departments = departmentManager.getDepartments(name);
+            }
 
             List<Map<String, Object>> data = departments.stream().map(department -> {
                 Map<String, Object> departmentData = new HashMap<>();

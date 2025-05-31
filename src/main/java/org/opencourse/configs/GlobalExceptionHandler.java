@@ -18,27 +18,37 @@ import java.util.Map;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     /**
      * 处理参数验证异常
+     * 
      * @param ex 参数验证异常
      * @return 错误响应
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
+        String firstErrorMessage = "输入参数验证失败";
+
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
+
+        // 获取第一个错误信息作为主要错误信息
+        if (!errors.isEmpty()) {
+            firstErrorMessage = errors.values().iterator().next();
+        }
+
         return ResponseEntity
                 .badRequest()
-                .body(ApiResponse.error("输入参数验证失败", errors));
+                .body(ApiResponse.error(firstErrorMessage, errors));
     }
 
     /**
      * 处理认证异常
+     * 
      * @param ex 认证异常
      * @return 错误响应
      */
@@ -51,6 +61,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 处理访问拒绝异常
+     * 
      * @param ex 访问拒绝异常
      * @return 错误响应
      */
@@ -63,6 +74,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 处理其他异常
+     * 
      * @param ex 异常
      * @return 错误响应
      */
