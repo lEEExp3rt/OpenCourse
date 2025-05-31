@@ -6,7 +6,7 @@ import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.Interaction;
 import org.opencourse.models.User;
 import org.opencourse.services.InteractionManager;
-
+import org.opencourse.utils.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  * 交互控制器，处理评论相关请求
  */
 @RestController
-@RequestMapping("/api/interactions")
+@RequestMapping("/interaction")
 public class InteractionController {
 
     private final InteractionManager interactionManager;
@@ -46,14 +46,12 @@ public class InteractionController {
             @RequestParam(required = false) String content,
             @RequestParam(required = false) Byte rating) {
         
-        // 获取当前登录用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        User user = SecurityUtils.getCurrentUser();
         
         // 添加评论
         try {
-            InteractionCreationDto dto = new InteractionCreationDto(courseId, user.getId(), content, rating);
-            Interaction interaction = interactionManager.addInteraction(dto);
+            InteractionCreationDto dto = new InteractionCreationDto(courseId, content, rating);
+            Interaction interaction = interactionManager.addInteraction(dto, user);
             
             if (interaction == null) {
                 return ResponseEntity.badRequest().body(ApiResponse.error("您已经对该课程发表过评论"));
@@ -89,13 +87,12 @@ public class InteractionController {
             @RequestParam(required = false) Byte rating) {
         
         // 获取当前登录用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
-        
+        User user = SecurityUtils.getCurrentUser();
+
         // 更新评论
         try {
-            InteractionUpdateDto dto = new InteractionUpdateDto(id, user.getId(), content, rating);
-            Interaction interaction = interactionManager.updateInteraction(dto);
+            InteractionUpdateDto dto = new InteractionUpdateDto(id, content, rating);
+            Interaction interaction = interactionManager.updateInteraction(dto, user);
             
             Map<String, Object> data = new HashMap<>();
             data.put("id", interaction.getId());
@@ -125,8 +122,7 @@ public class InteractionController {
         List<Interaction> interactions = interactionManager.getInteractions(courseId);
         
         // 获取当前登录用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        User user = SecurityUtils.getCurrentUser();
         Integer userId = user.getId();
         
         List<Map<String, Object>> data = interactions.stream().map(interaction -> {
@@ -142,11 +138,10 @@ public class InteractionController {
             
             // 添加当前用户是否已点赞/点踩的信息
             try {
-                boolean status = interactionManager.getUserInteractionStatus(interaction.getId(), userId);
+                boolean status = interactionManager.getUserInteractionStatus(interaction.getId(), user);
                 interactionData.put("isLiked", status);
             } catch (Exception e) {
                 interactionData.put("isLiked", false);
-                interactionData.put("isDisliked", false);
             }
             
             // 添加当前用户是否是评论的所有者
@@ -170,7 +165,7 @@ public class InteractionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         
-        boolean success = interactionManager.likeInteraction(interactionId, user.getId());
+        boolean success = interactionManager.likeInteraction(interactionId, user);
         
         if (success) {
             return ResponseEntity.ok(ApiResponse.success("点赞成功"));
@@ -188,10 +183,9 @@ public class InteractionController {
     @PostMapping("/{interactionId}/unlike")
     public ResponseEntity<ApiResponse<Void>> unlikeInteraction(@PathVariable Integer interactionId) {
         // 获取当前登录用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        User user = SecurityUtils.getCurrentUser();
         
-        boolean success = interactionManager.unlikeInteraction(interactionId, user.getId());
+        boolean success = interactionManager.unlikeInteraction(interactionId, user);
         
         if (success) {
             return ResponseEntity.ok(ApiResponse.success("取消点赞成功"));
@@ -209,10 +203,9 @@ public class InteractionController {
     @DeleteMapping("/{interactionId}")
     public ResponseEntity<ApiResponse<Void>> deleteInteraction(@PathVariable Integer interactionId) {
         // 获取当前登录用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) authentication.getPrincipal();
+        User user = SecurityUtils.getCurrentUser();
         
-        boolean success = interactionManager.deleteInteraction(interactionId, user.getId());
+        boolean success = interactionManager.deleteInteraction(interactionId, user);
         
         if (success) {
             return ResponseEntity.ok(ApiResponse.success("评论删除成功"));

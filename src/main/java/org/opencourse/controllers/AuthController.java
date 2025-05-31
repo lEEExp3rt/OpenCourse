@@ -21,7 +21,7 @@ import java.util.Map;
  * 用户认证控制器
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/user")
 public class AuthController {
 
     // private final UserService userService;
@@ -105,6 +105,15 @@ public class AuthController {
         ));
 
         return ResponseEntity.ok(ApiResponse.success("登录成功", result));
+    }
+
+    /**
+     * 用户登出
+     * @return 操作结果
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        return ResponseEntity.ok(ApiResponse.success("登出成功", null));        
     }
 
     /**
