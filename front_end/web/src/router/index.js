@@ -5,33 +5,44 @@ const index=createRouter({
     {
       path: '/',
       redirect: '/dashboard',
+      meta: {requiresAuth: true},
     },
     {
-      name: '登录',
+      path: '/404',
+      component: () => import('@/views/404View.vue'),
+      meta: {requiresAuth: false},
+    },
+    {
+      path: '/register',
+      component: () => import('@/views/RegisterView.vue'),
+      meta: {requiresAuth: false},
+    },
+    {
       path: '/login',
-      component: () => import('../views/LoginView.vue'),
+      component: () => import('@/views/LoginView.vue'),
+      meta: {requiresAuth: false},
     },
     {
-      name: '主页',
       path: '/dashboard',
-      component: () => import('../views/DashboardView.vue'),
+      redirect: '/dashboard/course',
+      component: () => import('@/views/DashboardView.vue'),
+      meta: {requiresAuth: true},
       children:[
         {
-          path: '',
-          redirect: '/course',
+          path: 'course',
+          component: () => import('@/views/dashboard/CourseView.vue'),
         },
         {
-          name: '课程中心',
-          path: '/course',
-          component: () => import('../views/dashboard/CourseView.vue'),
-        },
-        {
-          name: '个人中心',
-          path: '/user',
-          component: () => import('../views/dashboard/UserView.vue'),
+          path: 'user',
+          component: () => import('@/views/dashboard/UserView.vue'),
         },
       ]
     },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404',
+      meta: {requiresAuth: false},
+    }
   ],
   history: createWebHistory()
 })
