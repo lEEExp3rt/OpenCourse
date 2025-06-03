@@ -29,8 +29,15 @@ service.interceptors.response.use(
     }
   },
   (error) => {
-    console.error('请求异常:', error)
-    alert('网络错误，请检查连接')
+    // 如果服务端有返回信息（如400、500等带响应体）
+    if (error.response && error.response.data) {
+      const msg = error.response.data.msg || '服务器错误'
+      console.error('返回的错误信息:', msg)
+      alert(`网络错误，请检查连接\n错误信息：${msg}`)
+    } else {
+      // 服务器无响应或断网等
+      alert('网络错误，请检查连接')
+    }
     return Promise.reject(error)
   }
 )

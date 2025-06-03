@@ -17,6 +17,10 @@ RUN echo "deb http://mirrors.aliyun.com/ubuntu/ jammy main restricted universe m
     echo "deb http://mirrors.aliyun.com/ubuntu/ jammy-backports main restricted universe multiverse" >> /etc/apt/sources.list && \
     echo "deb http://mirrors.aliyun.com/ubuntu/ jammy-security main restricted universe multiverse" >> /etc/apt/sources.list
 
+RUN echo 'Acquire::http::Proxy "http://10.162.148.163:7890";' > /etc/apt/apt.conf.d/01proxy && \
+    echo 'Acquire::https::Proxy "http://10.162.148.163:7890";' >> /etc/apt/apt.conf.d/01proxy
+
+
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \

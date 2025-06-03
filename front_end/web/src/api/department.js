@@ -1,17 +1,11 @@
 import request from '@/utils/request'
 
-const CourseApi = {
-  get_all_courses(){
-    return request.get('/course')
-  },
+const DepartmentApi = {
   query(id) {
     return request.get(`/course/`, id);
   },
   get_resource(id) {
     return request.post(`/resource/course/`, id);
-  },
-  delete(id){
-    return request.delete('/course/')
   }
 };
 
