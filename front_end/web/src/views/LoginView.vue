@@ -20,7 +20,7 @@ async function handleLogin() {
     const res = await userModule.login(userLoginDTO)
     if (res.success === true) {
       message.success('登录成功')
-      localStorage.setItem('token', res.data.token)
+      console.log("登录成功，",res.token)
       router.push('/')
     } else {
       message.error(res.msg || '登录失败')
