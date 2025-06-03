@@ -29,6 +29,8 @@ RUN apt-get update && \
     wget \
     git \
     vim \
+    zip \
+    unzip \
     && \
     rm -rf /var/lib/apt/lists/* && \
     chsh -s /usr/bin/fish opencourse
