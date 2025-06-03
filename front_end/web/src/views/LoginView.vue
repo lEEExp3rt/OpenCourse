@@ -8,26 +8,26 @@ const route = useRoute()
 const router = useRouter()
 const userModule = useUserModule()
 
-const loading = ref(false)
+const loginLoading = ref(false)
 const userLoginDTO = reactive({
   email: '',
-  password: ''
+  password: '',
 })
 
 async function handleLogin() {
   try {
-    loading.value = true
+    loginLoading.value = true
     const res = await userModule.login(userLoginDTO)
     if (String(res.code) === '1') {
       message.success('登录成功')
       router.push('/')
     } else {
       message.error(res.msg || '登录失败')
-      loading.value = false
+      loginLoading.value = false
     }
   } catch (error) {
     message.error(error.message || '网络异常，请稍后再试')
-    loading.value = false
+    loginLoading.value = false
   }
 }
 
@@ -56,7 +56,7 @@ watch(
           <el-input class="primary-input" v-model="userLoginDTO.password" type="password" placeholder="请输入密码" show-password />
         </el-form-item>
         <el-form-item style="margin-top: 10px">
-          <el-button class="primary-button" type="primary" @click="handleLogin"> 登录 </el-button>
+          <el-button class="primary-button" type="primary" :loading="loginLoading" @click="handleLogin"> 登录 </el-button>
         </el-form-item>
       </el-form>
     </el-card>
