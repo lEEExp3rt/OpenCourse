@@ -35,6 +35,10 @@ export const useUserModule = defineStore('user', {
     },
     setToken(tokenVO) {
       this.token = tokenVO.token
+      this.token = this.token.replace(/"/g, '');
+
+      // 去掉所有单引号
+      this.token = this.token.replace(/'/g, '');
       setItem('token', this.token)
     },
     resetToken() {
