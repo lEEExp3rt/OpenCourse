@@ -73,7 +73,7 @@ export const useUserModule = defineStore('user', {
       email = email.trim()
       try {
         const response = await UserApi.login({ email: email, password: password })
-        if (response.code === '1') {
+        if (response.success === true) {
           this.setInfo(response.data)
           this.setToken(response.data)
         }
