@@ -18,7 +18,7 @@ async function handleLogin() {
   try {
     loginLoading.value = true
     const res = await userModule.login(userLoginDTO)
-    if (String(res.code) === '1') {
+    if (res.success === true) {
       message.success('登录成功')
       router.push('/')
     } else {

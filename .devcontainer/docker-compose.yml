@@ -1,5 +1,4 @@
 services:
-  # app-frontend:
   app:
     build:
       context: ..
@@ -18,6 +17,8 @@ services:
         condition: service_healthy
     ports:
       - 8080:8080
+      - 5173:5173
+      - 5174:5174
     networks:
       - opencourse-network
 
