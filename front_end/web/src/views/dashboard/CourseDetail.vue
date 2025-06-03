@@ -10,6 +10,7 @@ const courseData = ref(null)
 
 const fetchCourseDetail = async () => {
   // 假设你有一个封装好的 request
+  console.log("enter child page")
   const res = await request.get(`/course/${courseId}`)
   courseData.value = res.data
 }
@@ -29,4 +30,5 @@ onMounted(() => {
     </div>
   </div>
   <div v-else>加载中...</div>
+  <el-button>hello</el-button>
 </template>

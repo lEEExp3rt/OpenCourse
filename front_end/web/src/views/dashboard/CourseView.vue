@@ -4,8 +4,10 @@ import { useCourseStore } from '@/stores/course'
 import { onMounted } from 'vue'
 const courseStore = useCourseStore()
 
-const handleCardClick = (course_name) => {
-  window.open("http://localhost:5173/course/" + course_name) // 新标签页打开
+const handleCardClick = (course_id) => {
+  const currentUrl = window.location.href
+  // 这里简单拼接 course_id，假设是直接追加在末尾
+  window.open(currentUrl + '/' +course_id)
 }
 
 onMounted(() => {
@@ -37,7 +39,6 @@ const handleDelete = (id, event) => {
   courseStore.DeleteCourse(id)
 }
 
-
 </script>
 
 
@@ -48,7 +49,7 @@ const handleDelete = (id, event) => {
       :key="course.id"
       class="course-card"
       shadow="hover"
-      @click="handleCardClick(course.link)"
+      @click="handleCardClick(course.id)"
     >
     <el-row align="middle" class="course-row" style="margin-bottom: 16px">
     <el-col :span="20">
@@ -64,6 +65,8 @@ const handleDelete = (id, event) => {
 
     </el-card>
   </div>
+
+<router-view />
 </template>
 
   <style scoped>

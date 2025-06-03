@@ -33,7 +33,7 @@ const index=createRouter({
           component: () => import('@/views/dashboard/CourseView.vue'),
           children:[
             {
-              path: '/dashboard/course/:id',
+              path: ':id',
               component: () => import('@/views/dashboard/CourseDetail.vue')
             }
           ]
@@ -44,11 +44,11 @@ const index=createRouter({
         },
       ]
     },
-    {
-      path: '/:pathMatch(.*)*',
-      redirect: '/404',
-      meta: {requiresAuth: false},
-    }
+    // {
+    //   path: '/:pathMatch(.*)*',
+    //   redirect: '/404',
+    //   meta: {requiresAuth: false},
+    // }
   ],
   history: createWebHistory()
 })
