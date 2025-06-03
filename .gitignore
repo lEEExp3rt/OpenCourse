@@ -20,12 +20,17 @@
 
 # Maven
 log/
+logs/
 target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
+
+# Application configuration files
+application.yml
+application.properties
 
 # Other
 .DS_Store

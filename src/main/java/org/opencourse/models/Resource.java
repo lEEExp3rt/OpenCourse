@@ -24,8 +24,8 @@ import org.opencourse.utils.typeinfo.ResourceType;
  * @author !EEExp3rt
  */
 @Entity
-@Table(name = "Resource")
-public class Resource extends ActionObject {
+@Table(name = "`Resource`")
+public class Resource extends Model<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +52,24 @@ public class Resource extends ActionObject {
          * Resource file type.
          */
         public enum FileType {
-            PDF, TEXT, OTHER;
+
+            PDF,
+            TEXT,
+            OTHER;
+
+            /**
+             * Get the file type from a string.
+             * 
+             * @param fileTypeName The name of the file type.
+             * @return The corresponding FileType enum value if matched or OTHER if not.
+             */
+            public static FileType from(String fileTypeName) {
+                try {
+                    return FileType.valueOf(fileTypeName.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return OTHER;
+                }
+            }
         }
     
         @Enumerated(EnumType.STRING)
@@ -112,11 +129,8 @@ public class Resource extends ActionObject {
     @Embedded
     private ResourceFile resourceFile;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 
     // The course to which the resource belongs.
     @ManyToOne
@@ -128,13 +142,13 @@ public class Resource extends ActionObject {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer views;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer likes;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false, columnDefinition = "INT DEFAULT 0")
     private Integer dislikes;
 
     /**
@@ -164,7 +178,6 @@ public class Resource extends ActionObject {
         this.resourceType = resourceType;
         this.resourceFile = resourceFile;
         this.createdAt = null;
-        this.updatedAt = null;
         this.course = course;
         this.user = user;
         this.views = 0;
@@ -195,7 +208,6 @@ public class Resource extends ActionObject {
         this.resourceType = resourceType;
         this.resourceFile = resourceFile;
         this.createdAt = null;
-        this.updatedAt = null;
         this.course = course;
         this.user = user;
         this.views = 0;
@@ -211,16 +223,6 @@ public class Resource extends ActionObject {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-    }
-
-    /**
-     * Set update timestamp on update.
-     * 
-     * @apiNote This method is called by JPA automatically.
-     */
-    @PrePersist
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
     }
 
     // Getters and Setters
@@ -254,12 +256,16 @@ public class Resource extends ActionObject {
         this.resourceType = resourceType;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public ResourceFile getResourceFile() {
+        return resourceFile;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public void setResourceFile(ResourceFile resourceFile) {
+        this.resourceFile = resourceFile;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public Course getCourse() {
@@ -310,4 +316,20 @@ public class Resource extends ActionObject {
         this.dislikes--;
     }
 
+    @Override
+    public String toString() {
+        return "Resource{" +
+            "id=" + id +
+            ", name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", resourceType=" + resourceType +
+            ", resourceFile=" + resourceFile +
+            ", createdAt=" + createdAt +
+            ", course=" + course +
+            ", user=" + user +
+            ", views=" + views +
+            ", likes=" + likes +
+            ", dislikes=" + dislikes +
+            '}';
+    }
 }
