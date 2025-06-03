@@ -17,7 +17,7 @@
 ```Shell
 .
 ├── build.sh  # 开发容器构建脚本
-├── docs/     # 项目文档，dev/下文档为开发文档
+├── docs/     # 项目文档
 ├── pom.xml   # 后端依赖及配置
 ├── README.md # 项目自述文件
 ├── src/      # 源代码
@@ -30,8 +30,3 @@
 
 1. [环境配置](./env.md)
 2. [数据库表设计](./database.md)
-3. 后端接口
-   1. [实体模型定义](./backend/models.md)
-   2. [数据访问层接口](./backend/repositories.md)
-   3. [服务层接口](./backend/services.md)
-   4. [控制层接口](./backend/controllers.md)
