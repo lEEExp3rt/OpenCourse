@@ -15,7 +15,7 @@ export const useUserModule = defineStore('user', {
   }),
 
   actions: {
-    set(userVO) {
+    setInfo(userVO) {
       this.id = userVO.id
       this.name = userVO.name
       this.email = userVO.email
@@ -23,10 +23,8 @@ export const useUserModule = defineStore('user', {
       this.activity = userVO.activity
       this.createdAt = userVO.createdAt
       this.updatedAt = userVO.updatedAt
-      this.token = userVO.token
-      setItem('token', this.token)
     },
-    reset() {
+    resetInfo() {
       this.id = ''
       this.name = ''
       this.email = ''
@@ -34,6 +32,12 @@ export const useUserModule = defineStore('user', {
       this.activity = ''
       this.createdAt = ''
       this.updatedAt = ''
+    },
+    setToken(tokenVO) {
+      this.token = tokenVO.token
+      setItem('token', this.token)
+    },
+    resetToken() {
       this.token = ''
       removeItem('token')
     },
@@ -45,7 +49,7 @@ export const useUserModule = defineStore('user', {
       try {
         const response = await UserApi.info(this.id)
         if (response.code === '1') {
-          this.set(response.data)
+          this.setInfo(response.data)
         }
         return response
       } catch (error) {
@@ -68,9 +72,10 @@ export const useUserModule = defineStore('user', {
       let { email, password } = userLoginDTO
       email = email.trim()
       try {
-        const response = await UserApi.login({ email, password })
+        const response = await UserApi.login({ email: email, password: password })
         if (response.code === '1') {
-          this.set(response.data)
+          this.setInfo(response.data)
+          this.setToken(response.data)
         }
         return response
       } catch (error) {
@@ -82,7 +87,8 @@ export const useUserModule = defineStore('user', {
       try {
         const response = await UserApi.logout()
         if (response.code === '1') {
-          this.reset()
+          this.resetInfo()
+          this.resetToken()
         }
         return response
       } catch (error) {

@@ -1,4 +1,7 @@
 <script setup>
+import { useUserModule } from "@/stores/user";
+
+const userModule = useUserModule()
 </script>
 
 <template>
@@ -10,7 +13,7 @@
       </div>
 
       <div style="display: flex; padding-right: 20px; align-items: center; justify-content: space-between;">
-        <el-text style="margin-right: 20px; font-size: large"> 张三 </el-text>
+        <el-text style="margin-right: 20px; font-size: large"> {{ userModule.id }} </el-text>
         <el-avatar>
           <el-icon size="30"> <User /> </el-icon>
         </el-avatar>
