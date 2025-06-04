@@ -18,7 +18,7 @@ const dialogVisible = ref(false)
 const newCourseForm = ref({
   name: '',
   departmentId: 0,
-  typeId: 0,
+  courseType: 0,
   credits: 0,
 })
 
@@ -27,14 +27,14 @@ console.log("enter course page")
 coursesStore.fetchAllCourses(departmentId)
 })
 
-const get_typename_by_id = (typeId) => {
+const get_typename_by_id = (courseType) => {
   const map = {
     11: '通识必修',
     12: '通识选修',
     13: '专业必修',
     14: '专业选修'
   }
-  return map[typeId] || `未知类型（ID: ${typeId})`
+  return map[courseType] || `未知类型（ID: ${courseType})`
 }
 
 const new_course = () => {
@@ -53,9 +53,10 @@ const handleSubmitNewCourse = () => {
   dialogVisible.value = false
   // 清空表单
   newCourseForm.value = {
+    code: '',
     name: '',
     departmentId: departmentId,
-    typeId: 0,
+    courseType: 0,
     credits: 0,
   }
 }
@@ -75,7 +76,7 @@ const handleSubmitNewCourse = () => {
       <el-col :span="20">
         <div>课程名称：{{ course.name }}</div>
         <div>课程代码：{{ course.code }}</div>
-        <div>课程类型：{{ get_typename_by_id(course.typeId) }}</div>
+        <div>课程类型：{{ get_typename_by_id(course.courseType) }}</div>
         <div> 评分：{{   course.credits }}</div>
       </el-col>
       <el-col :span="4" style="text-align: right">
@@ -94,8 +95,12 @@ const handleSubmitNewCourse = () => {
       <el-form-item label="课程名称">
         <el-input v-model="newCourseForm.name" />
       </el-form-item>
+
+      <el-form-item label="课程代码">
+        <el-input v-model="newCourseForm.code" />
+      </el-form-item>
       <el-form-item label="课程类型 ID">
-        <el-select v-model="newCourseForm.typeId" placeholder="请选择课程类型">
+        <el-select v-model="newCourseForm.courseType" placeholder="请选择课程类型">
           <el-option :value="11" label="通识必修" />
           <el-option :value="12" label="通识选修" />
           <el-option :value="13" label="专业必修" />
