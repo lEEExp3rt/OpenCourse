@@ -29,10 +29,10 @@ coursesStore.fetchAllCourses(departmentId)
 
 const get_typename_by_id = (courseType) => {
   const map = {
-    11: '通识必修',
-    12: '通识选修',
-    13: '专业必修',
-    14: '专业选修'
+    0: '通识必修',
+    1: '通识选修',
+    2: '专业必修',
+    3: '专业选修'
   }
   return map[courseType] || `未知类型（ID: ${courseType})`
 }
@@ -101,10 +101,10 @@ const handleSubmitNewCourse = () => {
       </el-form-item>
       <el-form-item label="课程类型 ID">
         <el-select v-model="newCourseForm.courseType" placeholder="请选择课程类型">
-          <el-option :value="11" label="通识必修" />
-          <el-option :value="12" label="通识选修" />
-          <el-option :value="13" label="专业必修" />
-          <el-option :value="14" label="专业选修" />
+          <el-option :value="0" label="通识必修" />
+          <el-option :value="1" label="通识选修" />
+          <el-option :value="2" label="专业必修" />
+          <el-option :value="3" label="专业选修" />
         </el-select>
       </el-form-item>
       <el-form-item label="学分">

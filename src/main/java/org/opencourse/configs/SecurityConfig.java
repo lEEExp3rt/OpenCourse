@@ -1,4 +1,4 @@
-package org.opencourse.configs;
+front_end/web/src/api/course.jspackage org.opencourse.configs;
 
 import org.opencourse.utils.security.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +57,7 @@ public class SecurityConfig {
 
                 .requestMatchers("/user/register").permitAll()
                 .requestMatchers("/user/login").permitAll()
-                .requestMatchers("user/register/send-code").permitAll()
+                .requestMatchers("/user/register/send-code").permitAll()
                 // Swagger UI和API文档
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 // 静态资源
