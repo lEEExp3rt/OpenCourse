@@ -206,3 +206,76 @@ create table `History` if not exists (
 | `action_type` | 操作类型         |
 | `object_id`   | 操作对象 ID      |
 | `timestamp`   | 操作时间戳       |
+
+## E-R Graph
+
+```mermaid
+erDiagram
+    Department {
+        tinyint id PK "院系ID"
+        varchar name UK "院系名称"
+    }
+    
+    Course {
+        smallint id PK "课程ID"
+        varchar name "课程名称"
+        varchar code UK "课程代码"
+        tinyint department_id FK "所属院系ID"
+        enum course_type "课程类型"
+        decimal credits "学分"
+    }
+    
+    User {
+        int id PK "用户ID"
+        varchar name UK "用户名"
+        varchar email UK "用户邮箱"
+        varchar password "用户密码"
+        enum role "用户角色"
+        int activity "用户活跃度"
+        timestamp created_at "创建时间"
+        timestamp updated_at "更新时间"
+    }
+    
+    Resource {
+        int id PK "资源ID"
+        varchar name "资源名称"
+        varchar description "资源描述"
+        enum resourse_type "资源类型"
+        enum file_type "文件类型"
+        decimal file_size "文件大小"
+        varchar file_path "文件路径"
+        timestamp created_at "创建时间"
+        smallint course_id FK "所属课程ID"
+        int user_id FK "上传用户ID"
+        int views "浏览次数"
+        int likes "点赞数"
+        int dislikes "点踩数"
+    }
+    
+    Interaction {
+        int id PK "评论ID"
+        smallint course_id FK "所属课程ID"
+        int user_id FK "评论者用户ID"
+        text content "评论内容"
+        tinyint rating "课程评分"
+        int likes "被点赞数"
+        int dislikes "被点踩数"
+        datetime created_at "发表时间"
+    }
+    
+    History {
+        bigint id PK "历史记录ID"
+        int user_id FK "用户ID"
+        enum action_type "操作类型"
+        int object_id "操作对象ID"
+        timestamp timestamp "操作时间戳"
+    }
+
+    %% 关系定义
+    Department ||--o{ Course : "一个院系有多个课程"
+    Course ||--o{ Resource : "一个课程有多个资源"
+    Course ||--o{ Interaction : "一个课程有多个评论"
+    User ||--o{ Resource : "一个用户可以上传多个资源"
+    User ||--o{ Interaction : "一个用户可以发表多个评论"
+    User ||--o{ History : "一个用户有多个操作历史"
+```

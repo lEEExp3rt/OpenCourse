@@ -10,6 +10,7 @@ import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.User;
 // import org.opencourse.services.UserService;
 import org.opencourse.services.UserManager;
+import org.opencourse.utils.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,6 +34,30 @@ public class AuthController {
     // }
     public AuthController(UserManager userManager) {
         this.userManager = userManager;
+    }
+
+    /**
+     * 获取当前登录用户信息
+     * @return 当前用户信息
+     */
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getCurrentUser() {
+        // User user = userService.getCurrentUser();
+        User user = SecurityUtils.getCurrentUser();
+        if (user == null) {
+            return ResponseEntity.status(401).body(ApiResponse.error("未登录或会话已过期"));
+        }
+
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("id", user.getId());
+        userData.put("name", user.getName());
+        userData.put("email", user.getEmail());
+        userData.put("role", user.getRole().name());
+        userData.put("activity", user.getActivity());
+        userData.put("createdAt", user.getCreatedAt());
+        userData.put("updatedAt", user.getUpdatedAt());
+
+        return ResponseEntity.ok(ApiResponse.success("获取用户信息成功", userData));
     }
 
     /**
@@ -96,13 +121,21 @@ public class AuthController {
         }
 
         Map<String, Object> result = new HashMap<>();
+        // result.put("token", token);
+        // result.put("user", Map.of(
+        //         "id", user.getId(),
+        //         "name", user.getName(),
+        //         "email", user.getEmail(),
+        //         "role", user.getRole().name()
+        // ));
         result.put("token", token);
-        result.put("user", Map.of(
-                "id", user.getId(),
-                "name", user.getName(),
-                "email", user.getEmail(),
-                "role", user.getRole().name()
-        ));
+        result.put("id", user.getId());
+        result.put("name", user.getName());
+        result.put("email", user.getEmail());
+        result.put("role", user.getRole().name());
+        result.put("activity", user.getActivity());
+        result.put("createdAt", user.getCreatedAt());
+        result.put("updatedAt", user.getUpdatedAt());
 
         return ResponseEntity.ok(ApiResponse.success("登录成功", result));
     }

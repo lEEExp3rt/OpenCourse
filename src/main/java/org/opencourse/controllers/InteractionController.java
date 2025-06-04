@@ -42,17 +42,19 @@ public class InteractionController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> addInteraction(
-            @RequestParam Short courseId,
-            @RequestParam(required = false) String content,
-            @RequestParam(required = false) Byte rating) {
+//            @RequestParam Short courseId,
+//            @RequestParam(required = false) String content,
+//            @RequestParam(required = false) Byte rating
+           @RequestBody InteractionCreationDto interactionCreationDto) {
         
         User user = SecurityUtils.getCurrentUser();
         
         // 添加评论
         try {
-            InteractionCreationDto dto = new InteractionCreationDto(courseId, content, rating);
-            Interaction interaction = interactionManager.addInteraction(dto, user);
-            
+//            InteractionCreationDto dto = new InteractionCreationDto(courseId, content, rating);
+//            Interaction interaction = interactionManager.addInteraction(dto, user);
+            Interaction interaction = interactionManager.addInteraction(interactionCreationDto, user);
+
             if (interaction == null) {
                 return ResponseEntity.badRequest().body(ApiResponse.error("您已经对该课程发表过评论"));
             }
@@ -63,7 +65,8 @@ public class InteractionController {
             data.put("rating", interaction.getRating());
             data.put("courseId", interaction.getCourse().getId());
             data.put("userId", interaction.getUser().getId());
-            data.put("userName", interaction.getUser().getName());
+            // data.put("userName", interaction.getUser().getName());
+            data.put("likes", interaction.getLikes());
             data.put("createdAt", interaction.getCreatedAt());
             
             return ResponseEntity.ok(ApiResponse.success("评论添加成功", data));
@@ -102,7 +105,8 @@ public class InteractionController {
             data.put("rating", interaction.getRating());
             data.put("courseId", interaction.getCourse().getId());
             data.put("userId", interaction.getUser().getId());
-            data.put("userName", interaction.getUser().getName());
+            // data.put("userName", interaction.getUser().getName());
+            data.put("likes", interaction.getLikes());
             data.put("createdAt", interaction.getCreatedAt());
             
             return ResponseEntity.ok(ApiResponse.success("评论更新成功", data));
@@ -128,10 +132,11 @@ public class InteractionController {
         data.put("id", interaction.getId());
         data.put("content", interaction.getContent());
         data.put("rating", interaction.getRating());
-        data.put("likes", interaction.getLikes());
-        data.put("dislikes", interaction.getDislikes());
+        // data.put("dislikes", interaction.getDislikes());
+        data.put("courseId", interaction.getCourse().getId());
         data.put("userId", interaction.getUser().getId());
-        data.put("userName", interaction.getUser().getName());
+        // data.put("userName", interaction.getUser().getName());
+        data.put("likes", interaction.getLikes());
         data.put("createdAt", interaction.getCreatedAt());
         
         return ResponseEntity.ok(ApiResponse.success("获取指定id评论成功", data));
@@ -160,9 +165,11 @@ public class InteractionController {
             interactionData.put("content", interaction.getContent());
             interactionData.put("rating", interaction.getRating());
             interactionData.put("likes", interaction.getLikes());
-            interactionData.put("dislikes", interaction.getDislikes());
+            // interactionData.put("dislikes", interaction.getDislikes());
+            interactionData.put("courseId", interaction.getCourse().getId());
             interactionData.put("userId", interaction.getUser().getId());
-            interactionData.put("userName", interaction.getUser().getName());
+
+            // interactionData.put("userName", interaction.getUser().getName());
             interactionData.put("createdAt", interaction.getCreatedAt());
             
             // 添加当前用户是否已点赞/点踩的信息
@@ -188,7 +195,7 @@ public class InteractionController {
      * @param interactionId 评论ID
      * @return 操作结果
      */
-    @PostMapping("/interaction/like/{id}")
+    @PostMapping("/{interactionId}/like")
     public ResponseEntity<ApiResponse<Void>> likeInteraction(@PathVariable Integer interactionId) {
         // 获取当前登录用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
