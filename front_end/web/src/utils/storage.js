@@ -1,7 +1,7 @@
 export function getItem(key) {
   const value = localStorage.getItem(key)
   try {
-    return value ? JSON.parse(value) : null
+    return value ? value : null
   } catch (e) {
     console.warn(`getItem: 无法解析本地存储 key=${key} 的值：`, e)
     return null
