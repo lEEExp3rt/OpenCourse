@@ -24,31 +24,33 @@ const index=createRouter({
     },
     {
       path: '/dashboard',
-      redirect: '/dashboard/course',
+      redirect: '/dashboard/department',
       component: () => import('@/views/DashboardView.vue'),
       meta: {requiresAuth: false},
       children:[
-        {
-          path: 'course',
-          component: () => import('@/views/dashboard/CourseView.vue'),
-          children:[
-            {
-              path: ':id',
-              component: () => import('@/views/dashboard/CourseDetail.vue')
-            }
-          ]
-        },
-        {
-          path: 'user',
-          component: () => import('@/views/dashboard/UserView.vue'),
-        },
+          {
+            path: 'department',
+            component: () => import('@/views/dashboard/Department.vue'),
+          },
+          {
+            path: 'department/:department_id/course',
+            component: () => import('@/views/dashboard/CourseView.vue'),
+          },
+          {
+            path: 'department/:department_id/course/:id',
+            component: () => import('@/views/dashboard/CourseDetail.vue')
+          },
+          {
+            path: 'user',
+            component: () => import('@/views/dashboard/UserView.vue'),
+          },
       ]
     },
-    // {
-    //   path: '/:pathMatch(.*)*',
-    //   redirect: '/404',
-    //   meta: {requiresAuth: false},
-    // }
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/404',
+      meta: {requiresAuth: false},
+    }
   ],
   history: createWebHistory()
 })

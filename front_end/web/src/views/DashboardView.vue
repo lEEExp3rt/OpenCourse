@@ -21,18 +21,20 @@ const userModule = useUserModule()
     </el-header>
 
     <el-container class="base-body">
-      <el-aside class="base-aside">
-        <el-menu router>
-          <el-menu-item index="/dashboard/course">
-            <el-icon size="20" style="margin-right: 20px"> <Collection /> </el-icon>
-            <span style="font-size: 15px"> 课程中心 </span>
-          </el-menu-item>
+      <el-aside class="base-aside"> 
+        <el-scrollbar>
+          <el-menu router>
+            <el-menu-item index="/dashboard/course">
+              <el-icon size="20" style="margin-right: 20px"> <Collection /> </el-icon>
+              <span style="font-size: 15px"> 课程中心 </span>
+            </el-menu-item>
 
-          <el-menu-item index="/dashboard/user">
-            <el-icon size="20" style="margin-right: 20px"> <User /> </el-icon>
-            <span style="font-size: 15px"> 个人中心 </span>
-          </el-menu-item>
-        </el-menu>
+            <el-menu-item index="/dashboard/user">
+              <el-icon size="20" style="margin-right: 20px"> <User /> </el-icon>
+              <span style="font-size: 15px"> 个人中心 </span>
+            </el-menu-item>
+          </el-menu>
+        </el-scrollbar>
       </el-aside>
 
       <el-main class="base-main">
