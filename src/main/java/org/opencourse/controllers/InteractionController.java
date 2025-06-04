@@ -193,7 +193,7 @@ public class InteractionController {
      * @param interactionId 评论ID
      * @return 操作结果
      */
-    @PostMapping("/interaction/like/{id}")
+    @PostMapping("/{interactionId}/like")
     public ResponseEntity<ApiResponse<Void>> likeInteraction(@PathVariable Integer interactionId) {
         // 获取当前登录用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
