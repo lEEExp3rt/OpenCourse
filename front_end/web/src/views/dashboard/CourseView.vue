@@ -76,8 +76,8 @@ const handleSubmitNewCourse = () => {
       <el-col :span="20">
         <div>课程名称：{{ course.name }}</div>
         <div>课程代码：{{ course.code }}</div>
-        <div>课程类型：{{ get_typename_by_id(course.courseType) }}</div>
-        <div> 评分：{{   course.credits }}</div>
+        <div>课程类型：{{ course.courseType.description }}</div>
+        <div> 学分：{{   course.credits }}</div>
       </el-col>
       <el-col :span="4" style="text-align: right">
         <el-button type="danger" @click="(event) =>handleDelete(course.id,event)">删除</el-button>

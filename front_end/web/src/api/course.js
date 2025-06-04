@@ -8,10 +8,10 @@ const CourseApi = {
     return request.get('/course/department/' + department_id)
   },
   query(id) {
-    return request.get(`/course/`, id);
+    return request.get(`/course/` + id);
   },
   delete(id){
-    return request.delete('/course/',id)
+    return request.delete('/course/' + id)
   },
   newcourse(course){
     return request.post('/course',course)
