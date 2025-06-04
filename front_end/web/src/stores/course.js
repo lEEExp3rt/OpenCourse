@@ -14,7 +14,7 @@ export const useCourseStore = defineStore('course', () => {
     let tempList = []
     try {
       // 假设接口返回结构：{ code: '1', data: [...] }
-      const res = await CourseApi.get_all_courses()
+      const res = await ResourceApi.get_resource(course_id)
       if (res.success === true && Array.isArray(res.data)) {
         tempList = res.data
       } else {
