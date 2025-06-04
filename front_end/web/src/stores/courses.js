@@ -40,6 +40,8 @@ export const useCoursesStore = defineStore('courses', () => {
 
   const CreateCourse = async (newCourse) => {
     try {
+      const departmentStore = useDepartmentsStore()
+      const currentDepartment = departmentStore.currentDepartment
       newCourse.typeId = currentDepartment.id
       const res = await CourseApi.newcourse(newCourse)
       if (res.success === true) {
