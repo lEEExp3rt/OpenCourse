@@ -63,7 +63,10 @@ export const useCoursesStore = defineStore('courses', () => {
         code: "CS3140M（21120520）",
         name: "计算理论",
         departmentId: 1,
-        typeId: 11,
+        courseType:
+        {
+          description:"通识选修"
+        },
         credits: 3
       },
       {
@@ -71,7 +74,10 @@ export const useCoursesStore = defineStore('courses', () => {
         code: "CS3136M（21121340）",
         name: "计算机网络",
         departmentId: 2,
-        typeId: 12,
+        courseType:
+        {
+          description:"通识选修"
+        },
         credits: 4
       },
       {
@@ -79,7 +85,10 @@ export const useCoursesStore = defineStore('courses', () => {
         code: "CS2055M（21186033）",
         name: "计算机组成",
         departmentId: 3,
-        typeId: 13,
+        courseType:
+        {
+          description:"通识选修"
+        },
         credits: 4
       },
       {
@@ -87,7 +96,10 @@ export const useCoursesStore = defineStore('courses', () => {
         code: "CS3097M（21121160）",
         name: "Java应用技术",
         departmentId: 4,
-        typeId: 14,
+        courseType:
+        {
+          description:"通识选修"
+        },
         credits: 2
       }
     ]

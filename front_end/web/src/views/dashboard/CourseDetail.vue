@@ -5,7 +5,7 @@ import { useCourseStore } from '@/stores/course'
 
 const route = useRoute()
 const courseStore = useCourseStore()
-const courseId = route.params.id
+const courseId = Number(route.params.id)
 
 const dialogVisible = ref(false)
 const uploadFile = ref(null)
