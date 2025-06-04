@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 
 import org.opencourse.utils.typeinfo.CourseType;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 /**
  * DTO for course creation requests.
  * 
@@ -62,7 +64,7 @@ public class CourseCreationDto {
         this.name = name;
         this.code = code;
         this.departmentId = departmentId;
-        this.courseType = CourseType.getById(courseTypeId.byteValue());
+        this.courseType = CourseType.getById(courseTypeId);
         this.credits = credits;
     }
 
@@ -96,8 +98,9 @@ public class CourseCreationDto {
         return courseType;
     }
 
-    public void setCourseType(CourseType courseType) {
-        this.courseType = courseType;
+    @JsonSetter("typeId")
+    public void setCourseType(Byte courseTypeId) {
+        this.courseType = CourseType.getById(courseTypeId);
     }
 
     public BigDecimal getCredits() {
