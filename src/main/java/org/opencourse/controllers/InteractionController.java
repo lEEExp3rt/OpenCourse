@@ -63,7 +63,8 @@ public class InteractionController {
             data.put("rating", interaction.getRating());
             data.put("courseId", interaction.getCourse().getId());
             data.put("userId", interaction.getUser().getId());
-            data.put("userName", interaction.getUser().getName());
+            // data.put("userName", interaction.getUser().getName());
+            data.put("likes", interaction.getLikes());
             data.put("createdAt", interaction.getCreatedAt());
             
             return ResponseEntity.ok(ApiResponse.success("评论添加成功", data));
@@ -102,7 +103,8 @@ public class InteractionController {
             data.put("rating", interaction.getRating());
             data.put("courseId", interaction.getCourse().getId());
             data.put("userId", interaction.getUser().getId());
-            data.put("userName", interaction.getUser().getName());
+            // data.put("userName", interaction.getUser().getName());
+            data.put("likes", interaction.getLikes());
             data.put("createdAt", interaction.getCreatedAt());
             
             return ResponseEntity.ok(ApiResponse.success("评论更新成功", data));
@@ -128,10 +130,11 @@ public class InteractionController {
         data.put("id", interaction.getId());
         data.put("content", interaction.getContent());
         data.put("rating", interaction.getRating());
-        data.put("likes", interaction.getLikes());
-        data.put("dislikes", interaction.getDislikes());
+        // data.put("dislikes", interaction.getDislikes());
+        data.put("courseId", interaction.getCourse().getId());
         data.put("userId", interaction.getUser().getId());
-        data.put("userName", interaction.getUser().getName());
+        // data.put("userName", interaction.getUser().getName());
+        data.put("likes", interaction.getLikes());
         data.put("createdAt", interaction.getCreatedAt());
         
         return ResponseEntity.ok(ApiResponse.success("获取指定id评论成功", data));
@@ -160,9 +163,11 @@ public class InteractionController {
             interactionData.put("content", interaction.getContent());
             interactionData.put("rating", interaction.getRating());
             interactionData.put("likes", interaction.getLikes());
-            interactionData.put("dislikes", interaction.getDislikes());
+            // interactionData.put("dislikes", interaction.getDislikes());
+            interactionData.put("courseId", interaction.getCourse().getId());
             interactionData.put("userId", interaction.getUser().getId());
-            interactionData.put("userName", interaction.getUser().getName());
+
+            // interactionData.put("userName", interaction.getUser().getName());
             interactionData.put("createdAt", interaction.getCreatedAt());
             
             // 添加当前用户是否已点赞/点踩的信息
