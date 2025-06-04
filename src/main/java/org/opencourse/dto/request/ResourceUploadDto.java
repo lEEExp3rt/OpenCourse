@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import org.opencourse.utils.typeinfo.ResourceType;
+
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import org.opencourse.models.Resource.ResourceFile.FileType;
 
 /**
@@ -105,20 +108,13 @@ public class ResourceUploadDto {
         return resourceType;
     }
 
-    public void setResourceType(ResourceType resourceType) {
-        this.resourceType = resourceType;
-    }
-
+    @JsonSetter("typeId")
     public void setResourceType(Byte resourceTypeId) {
-        this.resourceType = ResourceType.getById(resourceTypeId.byteValue());
+        this.resourceType = ResourceType.getById(resourceTypeId);
     }
 
     public FileType getFileType() {
         return fileType;
-    }
-
-    public void setFileType(FileType fileType) {
-        this.fileType = fileType;
     }
 
     public void setFileType(String fileTypeName) {
