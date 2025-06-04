@@ -42,17 +42,19 @@ public class InteractionController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> addInteraction(
-            @RequestParam Short courseId,
-            @RequestParam(required = false) String content,
-            @RequestParam(required = false) Byte rating) {
+//            @RequestParam Short courseId,
+//            @RequestParam(required = false) String content,
+//            @RequestParam(required = false) Byte rating
+           @RequestBody InteractionCreationDto interactionCreationDto) {
         
         User user = SecurityUtils.getCurrentUser();
         
         // 添加评论
         try {
-            InteractionCreationDto dto = new InteractionCreationDto(courseId, content, rating);
-            Interaction interaction = interactionManager.addInteraction(dto, user);
-            
+//            InteractionCreationDto dto = new InteractionCreationDto(courseId, content, rating);
+//            Interaction interaction = interactionManager.addInteraction(dto, user);
+            Interaction interaction = interactionManager.addInteraction(interactionCreationDto, user);
+
             if (interaction == null) {
                 return ResponseEntity.badRequest().body(ApiResponse.error("您已经对该课程发表过评论"));
             }
