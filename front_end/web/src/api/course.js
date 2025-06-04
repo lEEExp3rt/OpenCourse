@@ -11,10 +11,7 @@ const CourseApi = {
     return request.get(`/course/`, id);
   },
   delete(id){
-    return request.delete('/course/',id)
-  },
-  newcourse(course){
-    return request.post('/course',course)
+    return request.delete(`/course/`, id)
   }
   
 };
