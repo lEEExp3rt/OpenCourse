@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 const ResourceApi = {
   get_resource(id) {
-    return request.post(`/resource/course/` + id);
+    return request.get(`/resource/course/` + id);
   },
   delete_resource(id){
     return request.delete('/resource/' + id);
