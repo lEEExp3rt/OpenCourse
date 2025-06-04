@@ -2,8 +2,12 @@
 <script setup>
 import { useCoursesStore } from '@/stores/courses'
 import { onMounted,ref } from 'vue'
+import { useRoute } from 'vue-router'
 const coursesStore = useCoursesStore()
 
+const route = useRoute()
+const departmentId = route.params.department_id
+console.log("departmentId = ",departmentId)
 const handleCardClick = (course_id) => {
   const currentUrl = window.location.href
   // 这里简单拼接 course_id，假设是直接追加在末尾
@@ -20,7 +24,7 @@ const newCourseForm = ref({
 
 onMounted(() => {
 console.log("enter course page")
-coursesStore.fetchAllCourses()
+coursesStore.fetchAllCourses(departmentId)
 })
 
 const get_typename_by_id = (typeId) => {
@@ -44,12 +48,13 @@ const handleDelete = (id, event) => {
 }
 
 const handleSubmitNewCourse = () => {
+  newCourseForm.value.departmentId=departmentId
   coursesStore.CreateCourse({ ...newCourseForm.value })
   dialogVisible.value = false
   // 清空表单
   newCourseForm.value = {
     name: '',
-    departmentId: 0,
+    departmentId: departmentId,
     typeId: 0,
     credits: 0,
   }

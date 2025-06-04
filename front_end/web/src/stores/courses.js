@@ -2,20 +2,16 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import CourseApi from '@/api/course'
-import { useDepartmentsStore } from '@/stores/departments'
 
 export const useCoursesStore = defineStore('courses', () => {
   const courseList = ref([])
   const loaded = ref(false)
 
-  const fetchAllCourses = async () => {
+  const fetchAllCourses = async (department_id) => {
     if (loaded.value) return
-
-    const departmentStore = useDepartmentsStore()
-    const currentDepartment = departmentStore.currentDepartment
     // console.log("course get ",currentDepartment.name,"id = ",currentDepartment.id)
 
-    if (currentDepartment.id == null) {
+    if (department_id == null) {
       console.warn('部门无id，无法获取课程')
       return
     }
@@ -23,7 +19,7 @@ export const useCoursesStore = defineStore('courses', () => {
     let tempList = []
 
     try {
-      const res = await CourseApi.get_all_course_in_department(currentDepartment.id)
+      const res = await CourseApi.get_all_course_in_department(department_id)
       if (res.success === true && Array.isArray(res.data)) {
         tempList = res.data
       } else {
@@ -40,9 +36,6 @@ export const useCoursesStore = defineStore('courses', () => {
 
   const CreateCourse = async (newCourse) => {
     try {
-      const departmentStore = useDepartmentsStore()
-      const currentDepartment = departmentStore.currentDepartment
-      newCourse.typeId = currentDepartment.id
       const res = await CourseApi.newcourse(newCourse)
       if (res.success === true) {
         courseList.value.push(res.data)
