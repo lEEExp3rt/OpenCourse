@@ -1,4 +1,4 @@
-front_end/web/src/api/course.jspackage org.opencourse.configs;
+package org.opencourse.configs;
 
 import org.opencourse.utils.security.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
