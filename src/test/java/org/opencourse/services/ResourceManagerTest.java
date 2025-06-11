@@ -20,6 +20,7 @@ import org.opencourse.models.User;
 import org.opencourse.repositories.CourseRepo;
 import org.opencourse.repositories.ResourceRepo;
 import org.opencourse.repositories.UserRepo;
+import org.opencourse.services.storage.FileInfo;
 import org.opencourse.services.storage.FileStorageService;
 import org.opencourse.utils.typeinfo.CourseType;
 import org.opencourse.utils.typeinfo.ResourceType;
@@ -698,17 +699,19 @@ class ResourceManagerTest {
 
     @Test
     @DisplayName("Should successfully view resource")
-    void viewResource_WithValidData_ShouldReturnInputStream() {
+    void viewResource_WithValidData_ShouldReturnFileInfo() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
+        when(resourceRepo.save(eq(testResource))).thenReturn(testResource);
         when(fileStorageService.getFile(testResourceFile)).thenReturn(mockInputStream);
 
         // When.
-        InputStream result = resourceManager.viewResource(1, testUser);
+        FileInfo result = resourceManager.viewResource(1, testUser);
 
         // Then.
-        assertThat(result).isEqualTo(mockInputStream);
+        assertThat(result).isNotNull();
+        assertThat(result.getFile()).isEqualTo(mockInputStream);
 
         verify(resourceRepo).findById(1);
 
@@ -718,6 +721,8 @@ class ResourceManagerTest {
         verify(testCreator).addActivity(5);
 
         verify(userRepo).save(eq(testCreator));
+        verify(testResource).addView();
+        verify(resourceRepo).save(eq(testResource));
         verify(historyManager).logViewResource(testUser, testResource);
         verify(fileStorageService).getFile(testResourceFile);
     }
@@ -738,20 +743,26 @@ class ResourceManagerTest {
     }
 
     @Test
-    @DisplayName("Should return null when file service returns null")
-    void viewResource_WithFileServiceReturnsNull_ShouldReturnNull() {
+    @DisplayName("Should return FileInfo with null InputStream when file service returns null")
+    void viewResource_WithFileServiceReturnsNull_ShouldReturnFileInfoWithNullStream() {
         // Given.
         when(resourceRepo.findById(1)).thenReturn(Optional.of(testResource));
         when(userRepo.save(eq(testCreator))).thenReturn(testCreator);
+        when(resourceRepo.save(eq(testResource))).thenReturn(testResource);
         when(fileStorageService.getFile(testResourceFile)).thenReturn(null);
 
         // When.
-        InputStream result = resourceManager.viewResource(1, testUser);
+        FileInfo result = resourceManager.viewResource(1, testUser);
 
         // Then.
-        assertThat(result).isNull();
+        assertThat(result).isNotNull();
+        assertThat(result.getFile()).isNull();
+
         verify(resourceRepo).findById(1);
+        verify(testCreator).addActivity(5);
         verify(userRepo).save(eq(testCreator));
+        verify(testResource).addView();
+        verify(resourceRepo).save(eq(testResource));
         verify(historyManager).logViewResource(testUser, testResource);
         verify(fileStorageService).getFile(testResourceFile);
     }
