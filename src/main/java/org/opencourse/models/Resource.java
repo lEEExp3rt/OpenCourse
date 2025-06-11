@@ -288,6 +288,10 @@ public class Resource extends Model<Integer> {
         return views;
     }
 
+    public void addView() {
+        this.views++;
+    }
+
     public void setViews(Integer views) {
         this.views = views;
     }

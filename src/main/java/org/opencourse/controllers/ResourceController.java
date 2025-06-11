@@ -6,6 +6,7 @@ import org.opencourse.dto.response.ApiResponse;
 import org.opencourse.models.Resource;
 import org.opencourse.models.User;
 import org.opencourse.services.ResourceManager;
+import org.opencourse.services.storage.FileInfo;
 import org.opencourse.utils.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -15,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -226,15 +226,15 @@ public class ResourceController {
                 return ResponseEntity.notFound().build();
             }
 
-            InputStream inputStream = resourceManager.viewResource(resourceId, user);
+            FileInfo fileInfo = resourceManager.viewResource(resourceId, user);
 
-            if (inputStream == null) {
+            if (fileInfo == null || fileInfo.getFile() == null) {
                 return ResponseEntity.badRequest().body(ApiResponse.error("无法获取资源文件"));
             }
 
             // 设置响应头
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getName() + "\"");
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileInfo.getFileName() + "\"");
 
             // 根据文件类型设置Content-Type
             MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
@@ -255,7 +255,7 @@ public class ResourceController {
             return ResponseEntity.ok()
                     .headers(headers)
                     .contentType(mediaType)
-                    .body(new InputStreamResource(inputStream));
+                    .body(new InputStreamResource(fileInfo.getFile()));
 
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error("参数错误: " + e.getMessage()));
