@@ -1,118 +1,168 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCourseStore } from '@/stores/course'
+import { genFileId, type UploadInstance, type UploadProps, type UploadRawFile } from 'element-plus'
 
 const route = useRoute()
 const courseStore = useCourseStore()
 const courseId = Number(route.params.id)
 
 const dialogVisible = ref(false)
-const uploadFile = ref(null)
+const uploadFile = ref<UploadFile | null>(null)
+
+const upload = ref<UploadInstance>()  // ✅ 新增：用于控制 el-upload
+const fileList = ref<UploadFile[]>([])  // 控制 UI 列表
+const maxFileSize = 50 * 1024 * 1024  
 const form = reactive({
   description: '',
   name: '',
-  typeId: 1,
-  fileTypeId: 1,
+  fileTypeId: null as number | null
 })
+
+// 下拉选项数组，对应传入枚举类型
+const fileTypeOptions = [
+  { label: '历年卷', value: 51 },
+  { label: '作业', value: 52 },
+  { label: '笔记', value: 53 },
+  { label: '教材', value: 54 },
+  { label: '课件', value: 55 },
+  { label: '其它', value: 56 },
+]
 
 const fetchCourseDetail = async () => {
   await courseStore.fetchCourseResources(courseId)
 }
 
-// 删除资源方法
-const handleDelete = async (id) => {
-  await courseStore.deleteCourseResource(id, courseId)
+const handleDelete = async (id: number) => {
+  await courseStore.deleteResource(id)
+  await fetchCourseDetail()
 }
-
-// 添加资源方法（简化示例，真实场景中可能需要弹窗上传等）
 
 onMounted(() => {
   fetchCourseDetail()
 })
 
-
 const handleAdd = () => {
   dialogVisible.value = true
 }
 
+// before-upload 控制文件
+const handleBeforeUpload = (file: UploadRawFile) => { 
+  if (file.size > 50 * 1024 * 1024) {
+    alert('文件大小不能超过50MB')
+    return false
+  }
+  console.log('handleChange here')
+  // 如果已有文件，则先清除
+  if (upload.value) {
+    upload.value.clearFiles()
+  }
+  file.uid = genFileId()
+  uploadFile.value = file
+  upload.value!.handleStart(file)
+  return false // 阻止自动上传
+}
+
+// 自动替换上传文件
+const handleFileChange: UploadProps['onChange'] = (file, files) => {
+  if (file.raw!.size > maxFileSize) {
+    // 超大则清空列表
+    fileList.value = []
+    alert('文件大小不能超过50MB')
+    return
+  } else {
+    // 保持只保留最后一个文件
+    fileList.value = files.slice(-1)
+  }
+  uploadFile.value = file
+}
 const submitUpload = async () => {
   if (!uploadFile.value) {
     alert('请先选择文件')
+    return
+  }
+  if (!form.name) {
+    alert('请填写资源名称')
     return
   }
   if (!form.description) {
     alert('请填写描述')
     return
   }
-  // 这里实际上传文件和获取路径逻辑要结合后台API
-  // 假设上传成功返回路径 path
-  // 这里模拟路径写死或者后续替换成实际接口调用
-
-  // 模拟文件大小
-  const fileSize = uploadFile.value.size
-
-  // 模拟文件路径为文件名，实际根据后台返回调整
-  const filePath = '/uploads/' + uploadFile.value.name
-
-  const newResource = {
-    name: form.name || uploadFile.value.name,
-    description: form.description,
-    typeId: form.typeId,
-    fileTypeId: form.fileTypeId,
-    fileSize: fileSize,
-    filePath: filePath,
-    course: courseId,
-    user: 'admin',
+  if (!form.fileTypeId) {
+    alert('请选择资源类型')
+    return
   }
+  console.log('提交上传', form, uploadFile.value)
+  console.log('上传文件', uploadFile.value.raw)
 
-  await courseStore.addCourseResource(newResource, courseId)
+  // 读取二进制数据
+  const buffer = await new Promise<ArrayBuffer>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as ArrayBuffer)
+    reader.onerror = (e) => reject(e)
+    reader.readAsArrayBuffer(uploadFile.value!.raw!)
+  })
+  console.log('buffer length:', buffer.byteLength)
+  // 构造新资源对象，包含 body 二进制内容
 
-  // 重置状态，关闭弹窗
+  const formData = new FormData()
+  formData.append('name', form.name)
+  formData.append('description', form.description)
+  formData.append('fileTypeId', String(form.fileTypeId!))
+  formData.append('courseId', String(courseId))
+  formData.append('file', uploadFile.value.raw!)  // 关键是这里
+  // 添加资源
+  await courseStore.addResource(formData)
+  await fetchCourseDetail()
+
+  // 重置状态
   dialogVisible.value = false
-  uploadFile.value = null
   form.description = ''
   form.name = ''
-}
-
-// 监听文件选择，存储文件
-const handleFileChange = (file) => {
-  uploadFile.value = file.raw
-  return false // 阻止自动上传，改为手动处理
+  form.fileTypeId = null
+  uploadFile.value = null
+  fileList.value = []
 }
 
 </script>
 
+
 <template>
   <div>
     <h1>课程资源</h1>
+
     <div v-if="courseStore.resourceList.length > 0">
       <ul>
-        <li v-for="resource in courseStore.resourceList"  :key="resource.id"  class="resource-item">
-        <div class="resource-row">
-          <div class="resource-info">
-            <p><strong>{{ resource.name }}</strong>（{{ resource.fileSize }} bytes）</p>
-            <p>{{ resource.description }}</p>
-            <p>类型: {{ resource.typeId }} | 上传者: {{ resource.user }}</p>
-            <p>👍 {{ resource.likes }} 👎 {{ resource.dislikes }} 👁️ {{ resource.views }}</p>
-          </div>
+        <li
+          v-for="resource in courseStore.resourceList"
+          :key="resource.id"
+          class="resource-item"
+        >
+          <div class="resource-row">
+            <div class="resource-info">
+              <p><strong>{{ resource.name }}</strong>（{{ resource.fileSize }} bytes）</p>
+              <p>{{ resource.description }}</p>
+              <p>类型: {{ resource.typeId }} | 上传者: {{ resource.user }}</p>
+              <p>👍 {{ resource.likes }} 👎 {{ resource.dislikes }} 👁️ {{ resource.views }}</p>
+            </div>
 
-          <div class="resource-actions">
-            <a
-              :href="resource.filePath"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="action-link"
-            >
-              查看
-            </a>
-            <el-button type="danger" size="small" @click="handleDelete(resource.id)">
-              删除
-            </el-button>
+            <div class="resource-actions">
+              <a
+                :href="resource.filePath"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="action-link"
+              >
+                查看
+              </a>
+              <el-button type="danger" size="small" @click="handleDelete(resource.id)">
+                删除
+              </el-button>
+            </div>
           </div>
-        </div>
-      </li>
-
+        </li>
       </ul>
     </div>
 
@@ -126,37 +176,53 @@ const handleFileChange = (file) => {
 
     <el-dialog v-model="dialogVisible" title="上传新资源">
       <el-upload
-        :before-upload="handleFileChange"
-        :show-file-list="false"
+        ref="upload"
+        class="upload-demo"
+        :auto-upload="false"
         accept="*/*"
+        :file-list="fileList"
+        :on-change="handleFileChange"
       >
-        <el-button>选择文件</el-button>
-        <span v-if="uploadFile">{{ uploadFile.name }}</span>
-      </el-upload>
+      <el-button>选择文件</el-button>
+      <span v-if="uploadFile">{{ uploadFile.name }}</span>
+    </el-upload>
+    <el-form label-position="top" style="margin-top: 1rem;">
+      <!-- 资源名称 -->
+      <el-form-item label="资源名称">
+        <el-input v-model="form.name" placeholder="默认文件名"></el-input>
+      </el-form-item>
 
-      <el-form label-position="top" style="margin-top: 1rem;">
-        <el-form-item label="资源名称">
-          <el-input v-model="form.name" placeholder="默认文件名"></el-input>
-        </el-form-item>
+      <!-- 资源描述 -->
+      <el-form-item label="资源描述" required>
+        <el-input
+          type="textarea"
+          v-model="form.description"
+          placeholder="请输入资源描述"
+          :rows="3"
+        ></el-input>
+      </el-form-item>
 
-        <el-form-item label="资源描述" required>
-          <el-input
-            type="textarea"
-            v-model="form.description"
-            placeholder="请输入资源描述"
-            rows="3"
-          ></el-input>
-        </el-form-item>
-      </el-form>
+      <!-- 资源类型下拉选择框 -->
+      <el-form-item label="资源类型" required>
+        <el-select v-model="form.fileTypeId" placeholder="请选择资源类型">
+          <el-option
+            v-for="item in fileTypeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
+      </el-form-item>
+    </el-form>
+
 
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitUpload">确认上传</el-button>
       </template>
     </el-dialog>
-</div>
-
-
+    <span v-if="uploadFile">{{ uploadFile.name }}</span>
+  </div>
 </template>
 
 <style scoped>
@@ -166,37 +232,20 @@ const handleFileChange = (file) => {
   padding-bottom: 1rem;
 }
 
-.resource-header {
+.resource-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 }
 
-.icon {
-  cursor: pointer;
-  color: #555;
-  transition: color 0.2s;
-}
-.icon:hover {
-  color: red;
+.resource-info {
+  flex: 1;
 }
 
-.add-button {
-  margin-top: 2rem;
+.resource-actions {
   display: flex;
-  align-items: center;
-  cursor: pointer;
-  color: #007bff;
-  font-weight: bold;
-}
-.add-button .icon {
-  margin-right: 0.5rem;
-}
-
-.resource-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-left: 2rem;
 }
 
 .upload-button-container {

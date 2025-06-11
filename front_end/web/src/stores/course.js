@@ -32,7 +32,7 @@ export const useCourseStore = defineStore('course', () => {
   const addResource = async (newResource) => {
     try {
       const res = await ResourceApi.add_resource(newResource)
-      if (res.code === '1' && res.data) {
+      if (res.success === true && res.data) {
         resourceList.value.push(res.data)
         console.log("添加成功：", res.data)
       } else {
