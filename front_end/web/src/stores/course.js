@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import ResourceApi from '@/api/resource'
+import { getItem } from "@/utils/storage"
 
 export const useCourseStore = defineStore('course', () => {
   const resourceList = ref([])
@@ -97,18 +98,14 @@ export const useCourseStore = defineStore('course', () => {
     try {
       const res = await ResourceApi.get_resource_view(resource.id)
       if (res) {
-      // const response = await fetch("/images/open_course.png")
-      // if(response.ok) {
-      //   const contentType = response.headers.get('Content-Type')
-      //   console.log(`下载资源 ${resource.id}，响应内容类型：${contentType}`)
-      //   const blob = await response.blob()
         // 创建 Blob 并生成下载链接
         const blob = new Blob([res], { type: 'application/octet-stream' })
         const url = window.URL.createObjectURL(blob)
 
         const link = document.createElement('a')
         link.href = url
-        link.download = resource.name || '下载文件'
+        
+        link.download = getItem('download-filename')|| resource.name || '下载文件'
         document.body.appendChild(link)
         link.click()
 
