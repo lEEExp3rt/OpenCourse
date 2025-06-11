@@ -103,7 +103,7 @@ export const useCourseStore = defineStore('course', () => {
       //   console.log(`下载资源 ${resource.id}，响应内容类型：${contentType}`)
       //   const blob = await response.blob()
         // 创建 Blob 并生成下载链接
-        // const blob = new Blob([res.data], { type: 'application/octet-stream' })
+        const blob = new Blob([res.data], { type: 'application/octet-stream' })
         const url = window.URL.createObjectURL(blob)
 
         const link = document.createElement('a')
