@@ -146,7 +146,7 @@ public class ResourceController {
                 data.put("id", resource.getId());
                 data.put("name", resource.getName());
                 data.put("description", resource.getDescription());
-                data.put("resourceType", resource.getResourceType());
+                data.put("resourceTypeId", resource.getResourceType().getId());
                 data.put("user", Map.of(
                         "id", resource.getUser().getId(),
                         "name", resource.getUser().getName()));

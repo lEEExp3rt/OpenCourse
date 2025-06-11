@@ -144,7 +144,7 @@ const handleLike = async (resourceId: number) => {
             <div class="resource-info">
               <p><strong>{{ resource.name }}</strong>（{{ resource.fileSize }} bytes）</p>
               <p>{{ resource.description }}</p>
-              <p>类型: {{ getFileTypeLabel(resource.resourceType) }} |  <span class="usertype">{{ resource.user }}</span> 上传于 {{ resource.createdAt }}</p>
+              <p>类型: {{ getFileTypeLabel(resource.resourceTypeId) }} |  <span class="usertype">{{ resource.user.name }}</span> 上传于 {{ Date(resource.createdAt).toLocaleString() }}</p>
               <div class="resource-meta">
                 <button
                   class="vote-button"
