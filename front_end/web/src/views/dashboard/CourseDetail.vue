@@ -117,6 +117,15 @@ const downloadResource = (resource: any) => {
   courseStore.downloadResource(resource)
 }
 
+function getFileTypeLabel(fileTypeId) {
+  const item = fileTypeOptions.find(opt => opt.value === fileTypeId);
+  return item ? item.label : '未知类型';
+}
+
+const handleLike = async (resourceId: number) => {
+  await courseStore.likeResource(resourceId)
+  await fetchCourseDetail()
+}
 </script>
 
 
@@ -135,8 +144,37 @@ const downloadResource = (resource: any) => {
             <div class="resource-info">
               <p><strong>{{ resource.name }}</strong>（{{ resource.fileSize }} bytes）</p>
               <p>{{ resource.description }}</p>
-              <p>类型: {{ resource.typeId }} | 上传者: {{ resource.user }}</p>
-              <p>👍 {{ resource.likes }} 👎 {{ resource.dislikes }} 👁️ {{ resource.views }}</p>
+              <p>类型: {{ getFileTypeLabel(resource.resourceType) }} | {{ resource.user }} 上传于 {{ resource.createdAt }}</p>
+              <div class="resource-meta">
+                <button
+                  class="vote-button"
+                  :aria-label="`赞同 ${count}`"
+                  aria-live="polite"
+                  type="button"
+                  @click="handleLike(resource.id)"
+                >
+                  <span style="display: inline-flex; align-items: center;">
+                    <svg
+                      width="10"
+                      height="10"
+                      viewBox="0 0 24 24"
+                      class="icon-triangle"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M13.792 3.681c-.781-1.406-2.803-1.406-3.584 0l-7.79 14.023c-.76 1.367.228 3.046 1.791 3.046h15.582c1.563 0 2.55-1.68 1.791-3.046l-7.79-14.023Z"
+                      />
+                    </svg>
+                  </span>
+                  赞同 {{ resource.likes }}
+                </button>
+
+                <div class="comment-count" :aria-label="`${count} 条评论`">
+                  {{ resource.views }} 次下载
+                </div>
+              </div>
             </div>
 
             <div class="resource-actions">
@@ -206,6 +244,8 @@ const downloadResource = (resource: any) => {
     </el-form>
 
 
+
+
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitUpload">确认上传</el-button>
@@ -248,4 +288,45 @@ const downloadResource = (resource: any) => {
   cursor: pointer;
 }
 
+.vote-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  font-size: 14px;
+  background-color: white;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #1e80ff;
+  transition: all 0.2s ease;
+}
+
+.vote-button:hover {
+  background-color: #f0f8ff;
+  border-color: #409eff;
+}
+
+.icon-triangle {
+  fill: currentColor;
+}
+
+
+.comment-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #8590a6;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+  transition: color 0.2s ease;
+}
+
+.resource-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* 控制按钮与下载数之间的间距 */
+  margin-top: 8px;
+}
 </style>
