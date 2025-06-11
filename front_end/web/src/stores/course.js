@@ -73,7 +73,8 @@ export const useCourseStore = defineStore('course', () => {
         user: "admin",
         views: 0,
         likes: 0,
-        dislikes: 0
+        dislikes: 0,
+        liked: true
       },
       {
         id: 1,
@@ -87,7 +88,8 @@ export const useCourseStore = defineStore('course', () => {
         user: "admin",
         views: 0,
         likes: 0,
-        dislikes: 0
+        dislikes: 0,
+        liked: false
       }
     ]
   }

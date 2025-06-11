@@ -148,7 +148,8 @@ const handleLike = async (resourceId: number) => {
               <div class="resource-meta">
                 <button
                   class="vote-button"
-                  :aria-label="`赞同 ${count}`"
+                  :class="{ liked: resource.liked }"
+                  :aria-label="`赞同 ${resource.likes}`"
                   aria-live="polite"
                   type="button"
                   @click="handleLike(resource.id)"
@@ -159,6 +160,7 @@ const handleLike = async (resourceId: number) => {
                       height="10"
                       viewBox="0 0 24 24"
                       class="icon-triangle"
+                      :style="{ color: resource.liked ? '#1e80ff' : 'currentColor' }"
                       fill="currentColor"
                     >
                       <path
@@ -168,8 +170,9 @@ const handleLike = async (resourceId: number) => {
                       />
                     </svg>
                   </span>
-                  赞同 {{ resource.likes }}
+                  {{ resource.liked ? '已赞同' : '赞同' }} {{ resource.likes }}
                 </button>
+
 
                 <div class="comment-count" :aria-label="`${count} 条评论`">
                   {{ resource.views }} 次下载
@@ -335,4 +338,18 @@ const handleLike = async (resourceId: number) => {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
 }
+
+
+.vote-button.liked {
+  background-color: #e8f3ff;
+  border-color: #1e80ff;
+  color: #1e80ff;
+  font-weight: 600;
+}
+
+.vote-button.is-liked .icon-triangle {
+  color: #1e80ff;
+  transform: scale(1.2);
+}
+
 </style>
