@@ -18,6 +18,7 @@ import org.opencourse.models.Department;
 import org.opencourse.models.Resource;
 import org.opencourse.models.User;
 import org.opencourse.services.ResourceManager;
+import org.opencourse.services.storage.FileInfo;
 import org.opencourse.utils.security.SecurityUtils;
 import org.opencourse.utils.typeinfo.CourseType;
 import org.opencourse.utils.typeinfo.ResourceType;
@@ -430,16 +431,22 @@ class ResourceControllerTest {
             byte[] fileContent = "test file content".getBytes();
             InputStream inputStream = new ByteArrayInputStream(fileContent);
             
+            // 创建 FileInfo mock 对象
+            FileInfo mockFileInfo = mock(FileInfo.class);
+            when(mockFileInfo.getFile()).thenReturn(inputStream);
+            when(mockFileInfo.getFileName()).thenReturn("test.pdf");
+            
             try (var mockedSecurityUtils = mockStatic(SecurityUtils.class)) {
                 mockedSecurityUtils.when(SecurityUtils::getCurrentUser).thenReturn(testUser);
                 when(resourceManager.getResource(eq(1))).thenReturn(testResource);
-                when(resourceManager.viewResource(eq(1), eq(testUser))).thenReturn(inputStream);
+                when(resourceManager.viewResource(eq(1), eq(testUser))).thenReturn(mockFileInfo);
 
                 // When & Then
                 mockMvc.perform(get("/resource/1/view"))
                         .andExpect(status().isOk())
-                        .andExpect(header().string("Content-Disposition", "attachment; filename=\"Test Resource\""))
-                        .andExpect(content().contentType(MediaType.APPLICATION_PDF));
+                        .andExpect(header().string("Content-Disposition", "attachment; filename=\"test.pdf\""))
+                        .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+                        .andExpect(content().bytes(fileContent));
 
                 verify(resourceManager).getResource(eq(1));
                 verify(resourceManager).viewResource(eq(1), eq(testUser));
@@ -464,8 +471,8 @@ class ResourceControllerTest {
         }
 
         @Test
-        @DisplayName("Should return bad request when file stream is null")
-        void viewResource_WhenFileStreamIsNull_ShouldReturnBadRequest() throws Exception {
+        @DisplayName("Should return bad request when FileInfo is null")
+        void viewResource_WhenFileInfoIsNull_ShouldReturnBadRequest() throws Exception {
             // Given
             try (var mockedSecurityUtils = mockStatic(SecurityUtils.class)) {
                 mockedSecurityUtils.when(SecurityUtils::getCurrentUser).thenReturn(testUser);
@@ -477,6 +484,98 @@ class ResourceControllerTest {
                         .andExpect(status().isBadRequest())
                         .andExpect(jsonPath("$.success").value(false))
                         .andExpect(jsonPath("$.message").value("无法获取资源文件"));
+
+                verify(resourceManager).getResource(eq(1));
+                verify(resourceManager).viewResource(eq(1), eq(testUser));
+            }
+        }
+
+        @Test
+        @DisplayName("Should return bad request when file stream is null")
+        void viewResource_WhenFileStreamIsNull_ShouldReturnBadRequest() throws Exception {
+            // Given
+            FileInfo mockFileInfo = mock(FileInfo.class);
+            when(mockFileInfo.getFile()).thenReturn(null);
+            when(mockFileInfo.getFileName()).thenReturn("test.pdf");
+            
+            try (var mockedSecurityUtils = mockStatic(SecurityUtils.class)) {
+                mockedSecurityUtils.when(SecurityUtils::getCurrentUser).thenReturn(testUser);
+                when(resourceManager.getResource(eq(1))).thenReturn(testResource);
+                when(resourceManager.viewResource(eq(1), eq(testUser))).thenReturn(mockFileInfo);
+
+                // When & Then
+                mockMvc.perform(get("/resource/1/view"))
+                        .andExpect(status().isBadRequest())
+                        .andExpect(jsonPath("$.success").value(false))
+                        .andExpect(jsonPath("$.message").value("无法获取资源文件"));
+
+                verify(resourceManager).getResource(eq(1));
+                verify(resourceManager).viewResource(eq(1), eq(testUser));
+            }
+        }
+
+        @Test
+        @DisplayName("Should handle different file types correctly")
+        void viewResource_WithDifferentFileTypes_ShouldSetCorrectContentType() throws Exception {
+            // Given
+            byte[] fileContent = "text content".getBytes();
+            InputStream inputStream = new ByteArrayInputStream(fileContent);
+            
+            FileInfo mockFileInfo = mock(FileInfo.class);
+            when(mockFileInfo.getFile()).thenReturn(inputStream);
+            when(mockFileInfo.getFileName()).thenReturn("test.txt");
+
+            // 创建 TEXT 类型的资源文件
+            Resource.ResourceFile textResourceFile = new Resource.ResourceFile(
+                    Resource.ResourceFile.FileType.TEXT,
+                    new BigDecimal("0.5"),
+                    "/path/to/test.txt");
+            when(testResource.getResourceFile()).thenReturn(textResourceFile);
+            
+            try (var mockedSecurityUtils = mockStatic(SecurityUtils.class)) {
+                mockedSecurityUtils.when(SecurityUtils::getCurrentUser).thenReturn(testUser);
+                when(resourceManager.getResource(eq(1))).thenReturn(testResource);
+                when(resourceManager.viewResource(eq(1), eq(testUser))).thenReturn(mockFileInfo);
+
+                // When & Then
+                mockMvc.perform(get("/resource/1/view"))
+                        .andExpect(status().isOk())
+                        .andExpect(header().string("Content-Disposition", "attachment; filename=\"test.txt\""))
+                        .andExpect(content().contentType(MediaType.TEXT_PLAIN));
+
+                verify(resourceManager).getResource(eq(1));
+                verify(resourceManager).viewResource(eq(1), eq(testUser));
+            }
+        }
+
+        @Test
+        @DisplayName("Should handle unknown file types with default content type")
+        void viewResource_WithUnknownFileType_ShouldUseDefaultContentType() throws Exception {
+            // Given
+            byte[] fileContent = "unknown content".getBytes();
+            InputStream inputStream = new ByteArrayInputStream(fileContent);
+            
+            FileInfo mockFileInfo = mock(FileInfo.class);
+            when(mockFileInfo.getFile()).thenReturn(inputStream);
+            when(mockFileInfo.getFileName()).thenReturn("test.unknown");
+
+            // 创建其他类型的资源文件
+            Resource.ResourceFile unknownResourceFile = new Resource.ResourceFile(
+                    Resource.ResourceFile.FileType.OTHER, // 假设这个会触发 default case
+                    new BigDecimal("0.5"),
+                    "/path/to/test.unknown");
+            when(testResource.getResourceFile()).thenReturn(unknownResourceFile);
+            
+            try (var mockedSecurityUtils = mockStatic(SecurityUtils.class)) {
+                mockedSecurityUtils.when(SecurityUtils::getCurrentUser).thenReturn(testUser);
+                when(resourceManager.getResource(eq(1))).thenReturn(testResource);
+                when(resourceManager.viewResource(eq(1), eq(testUser))).thenReturn(mockFileInfo);
+
+                // When & Then
+                mockMvc.perform(get("/resource/1/view"))
+                        .andExpect(status().isOk())
+                        .andExpect(header().string("Content-Disposition", "attachment; filename=\"test.unknown\""))
+                        .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
 
                 verify(resourceManager).getResource(eq(1));
                 verify(resourceManager).viewResource(eq(1), eq(testUser));

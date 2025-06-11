@@ -10,6 +10,7 @@ import org.opencourse.models.User;
 import org.opencourse.repositories.CourseRepo;
 import org.opencourse.repositories.ResourceRepo;
 import org.opencourse.repositories.UserRepo;
+import org.opencourse.services.storage.FileInfo;
 import org.opencourse.services.storage.FileStorageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.transaction.Transactional;
-import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -264,10 +264,11 @@ public class ResourceManager {
      * 
      * @param id The resource id.
      * @param user The user.
+     * @return The file content and information of the resource.
      * @throws IllegalArgumentException If the resource is not found.
      */
     @Transactional
-    public InputStream viewResource(Integer id, User user) throws IllegalArgumentException {
+    public FileInfo viewResource(Integer id, User user) throws IllegalArgumentException {
         // Get the resource.
         Resource resource = resourceRepo.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Resource not found"));
@@ -276,7 +277,12 @@ public class ResourceManager {
         creator.addActivity(applicationConfig.getActivity().getResource().getView());
         userRepo.save(creator);
         // Add a view history record.
+        resource.addView();
+        resource = resourceRepo.save(resource);
         historyManager.logViewResource(user, resource);
-        return fileStorageService.getFile(resource.getResourceFile());
+        return new FileInfo(
+            fileStorageService.getFile(resource.getResourceFile()),
+            resource
+        );
     }
 }
