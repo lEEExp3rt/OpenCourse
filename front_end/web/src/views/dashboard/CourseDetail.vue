@@ -144,7 +144,7 @@ const handleLike = async (resourceId: number) => {
             <div class="resource-info">
               <p><strong>{{ resource.name }}</strong>（{{ resource.fileSize }} bytes）</p>
               <p>{{ resource.description }}</p>
-              <p>类型: {{ getFileTypeLabel(resource.resourceType) }} | {{ resource.user }} 上传于 {{ resource.createdAt }}</p>
+              <p>类型: {{ getFileTypeLabel(resource.resourceType) }} |  <span class="usertype">{{ resource.user }}</span> 上传于 {{ resource.createdAt }}</p>
               <div class="resource-meta">
                 <button
                   class="vote-button"
@@ -328,5 +328,11 @@ const handleLike = async (resourceId: number) => {
   align-items: center;
   gap: 12px; /* 控制按钮与下载数之间的间距 */
   margin-top: 8px;
+}
+.usertype{
+  color: #3366FF; /* 知乎蓝色，也可以用 #5176D5 或 #2F54EB */
+  font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
 }
 </style>
