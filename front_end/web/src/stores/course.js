@@ -62,7 +62,7 @@ export const useCourseStore = defineStore('course', () => {
     return [
       {
         id: 0,
-        name: "示例资源",
+        name: "open_course.png",
         description: "这是一个默认资源",
         resourceType: 1,
         fileSize: 1024,
@@ -91,10 +91,44 @@ export const useCourseStore = defineStore('course', () => {
     ]
   }
 
+
+  // 下载资源
+  const downloadResource = async (resource) => {
+    try {
+      const res = await ResourceApi.get_resource_view(resource.id)
+      if (res) {
+      // const response = await fetch("/images/open_course.png")
+      // if(response.ok) {
+      //   const contentType = response.headers.get('Content-Type')
+      //   console.log(`下载资源 ${resource.id}，响应内容类型：${contentType}`)
+      //   const blob = await response.blob()
+        // 创建 Blob 并生成下载链接
+        // const blob = new Blob([res.data], { type: 'application/octet-stream' })
+        const url = window.URL.createObjectURL(blob)
+
+        const link = document.createElement('a')
+        link.href = url
+        link.download = resource.name || '下载文件'
+        document.body.appendChild(link)
+        link.click()
+
+        // 清理链接
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+        console.log(`资源 ${resource.id} 下载成功`)
+      } else {
+        console.warn(`下载资源失败：响应为空`)
+      }
+    } catch (err) {
+      console.error(`下载资源 ${resource.id} 时出错：`, err)
+    }
+  }
+
   return {
     resourceList,
     fetchCourseResources,
     addResource,
-    deleteResource
+    deleteResource, 
+    downloadResource
   }
 })

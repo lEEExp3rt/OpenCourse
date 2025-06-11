@@ -32,7 +32,6 @@ const fileTypeOptions = [
 ]
 
 const fetchCourseDetail = async () => {
-  console.log("Fetching course resources for course ID:", courseId)
   await courseStore.fetchCourseResources(courseId)
 }
 
@@ -114,6 +113,10 @@ const submitUpload = async () => {
   fileList.value = []
 }
 
+const downloadResource = (resource: any) => {
+  courseStore.downloadResource(resource)
+}
+
 </script>
 
 
@@ -137,14 +140,13 @@ const submitUpload = async () => {
             </div>
 
             <div class="resource-actions">
-              <a
-                :href="resource.filePath"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="action-link"
+              <a href="javascript:void(0);"
+                @click="downloadResource(resource)"
+                class="action-link download-link"
               >
-                查看
+                下载
               </a>
+
               <el-button type="danger" size="small" @click="handleDelete(resource.id)">
                 删除
               </el-button>
@@ -240,4 +242,10 @@ const submitUpload = async () => {
   margin-top: 2rem;
   text-align: center;
 }
+.download-link {
+  color: purple;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 </style>

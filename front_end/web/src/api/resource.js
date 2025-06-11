@@ -13,6 +13,9 @@ const ResourceApi = {
         'Content-Type': 'multipart/form-data'
       }
     });
+  },
+  get_resource_view(id) {
+    return request.get(`/resource/' + id + '/view`);
   }
 };
 
