@@ -18,6 +18,9 @@ const ResourceApi = {
     return request.get('/resource/' + id + '/view', {
       responseType: 'blob'
     });
+  },
+  like_resource(id) {
+    return request.put('/resource/like' + id );
   }
 };
 

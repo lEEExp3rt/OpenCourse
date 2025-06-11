@@ -64,7 +64,7 @@ export const useCourseStore = defineStore('course', () => {
         id: 0,
         name: "open_course.png",
         description: "这是一个默认资源",
-        resourceType: 1,
+        resourceType: 51,
         fileSize: 1024,
         filePath: "/images/open_course.png",
         createdAt: "2024-01-01T00:00:00Z",
@@ -78,7 +78,7 @@ export const useCourseStore = defineStore('course', () => {
         id: 1,
         name: "示例资源",
         description: "这是一个默认资源",
-        resourceType: 1,
+        resourceType: 52,
         fileSize: 1024,
         filePath: "/images/open_course.png",
         createdAt: "2024-01-01T00:00:00Z",
@@ -124,11 +124,24 @@ export const useCourseStore = defineStore('course', () => {
     }
   }
 
+  // 点赞资源
+  const likeResource = async (resource_id) => {
+    try {
+      const res = await ResourceApi.like_resource(resource_id)
+      if (res.success !== true) {
+        console.warn(`点赞资源失败：res =`, res)
+      }
+    } catch (err) {
+      console.error(`点赞资源 ${resource_id} 时出错：`, err)
+    }
+  }
+
   return {
     resourceList,
     fetchCourseResources,
     addResource,
     deleteResource, 
-    downloadResource
+    downloadResource,
+    likeResource
   }
 })
