@@ -21,6 +21,14 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   (response) => {
     const res = response.data
+    const disposition = response.headers['content-disposition']
+    if (disposition) {
+      const match = disposition.match(/filename="?([^"]+)"?/)
+      if (match) {
+        const filename = decodeURIComponent(match[1])  // 防止中文乱码
+        localStorage.setItem('download-filename', filename)
+      }
+    }
     return res
   },
   (error) => {
