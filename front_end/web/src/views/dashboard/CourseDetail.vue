@@ -17,7 +17,8 @@ const maxFileSize = 50 * 1024 * 1024
 const form = reactive({
   description: '',
   name: '',
-  fileTypeId: null as number | null
+  resourceTypeId: null as number | null,
+  fileType: ''
 })
 
 // 下拉选项数组，对应传入枚举类型
@@ -47,23 +48,6 @@ const handleAdd = () => {
   dialogVisible.value = true
 }
 
-// before-upload 控制文件
-const handleBeforeUpload = (file: UploadRawFile) => { 
-  if (file.size > 50 * 1024 * 1024) {
-    alert('文件大小不能超过50MB')
-    return false
-  }
-  console.log('handleChange here')
-  // 如果已有文件，则先清除
-  if (upload.value) {
-    upload.value.clearFiles()
-  }
-  file.uid = genFileId()
-  uploadFile.value = file
-  upload.value!.handleStart(file)
-  return false // 阻止自动上传
-}
-
 // 自动替换上传文件
 const handleFileChange: UploadProps['onChange'] = (file, files) => {
   if (file.raw!.size > maxFileSize) {
@@ -76,6 +60,15 @@ const handleFileChange: UploadProps['onChange'] = (file, files) => {
     fileList.value = files.slice(-1)
   }
   uploadFile.value = file
+  const filename = file.name
+  const ext = filename.split('.').pop()?.toLowerCase() || ''
+
+  if(ext === 'pdf' || ext == 'txt'){
+    form.fileType = ext  
+  }
+  else{
+    form.fileType = 'other'  // 默认类型
+  }
 }
 const submitUpload = async () => {
   if (!uploadFile.value) {
@@ -86,17 +79,10 @@ const submitUpload = async () => {
     alert('请填写资源名称')
     return
   }
-  if (!form.description) {
-    alert('请填写描述')
-    return
-  }
-  if (!form.fileTypeId) {
+  if (!form.resourceTypeId) {
     alert('请选择资源类型')
     return
   }
-  console.log('提交上传', form, uploadFile.value)
-  console.log('上传文件', uploadFile.value.raw)
-
   // 读取二进制数据
   const buffer = await new Promise<ArrayBuffer>((resolve, reject) => {
     const reader = new FileReader()
@@ -110,9 +96,10 @@ const submitUpload = async () => {
   const formData = new FormData()
   formData.append('name', form.name)
   formData.append('description', form.description)
-  formData.append('fileTypeId', String(form.fileTypeId!))
+  formData.append('resourceTypeId', String(form.resourceTypeId!))
   formData.append('courseId', String(courseId))
-  formData.append('file', uploadFile.value.raw!)  // 关键是这里
+  formData.append('fileType', form.fileType)
+  formData.append('file', uploadFile.value.raw!)  
   // 添加资源
   await courseStore.addResource(formData)
   await fetchCourseDetail()
@@ -121,7 +108,7 @@ const submitUpload = async () => {
   dialogVisible.value = false
   form.description = ''
   form.name = ''
-  form.fileTypeId = null
+  form.resourceTypeId = null
   uploadFile.value = null
   fileList.value = []
 }
@@ -188,12 +175,12 @@ const submitUpload = async () => {
     </el-upload>
     <el-form label-position="top" style="margin-top: 1rem;">
       <!-- 资源名称 -->
-      <el-form-item label="资源名称">
+      <el-form-item label="资源名称"  required>
         <el-input v-model="form.name" placeholder="默认文件名"></el-input>
       </el-form-item>
 
       <!-- 资源描述 -->
-      <el-form-item label="资源描述" required>
+      <el-form-item label="资源描述">
         <el-input
           type="textarea"
           v-model="form.description"
@@ -204,7 +191,7 @@ const submitUpload = async () => {
 
       <!-- 资源类型下拉选择框 -->
       <el-form-item label="资源类型" required>
-        <el-select v-model="form.fileTypeId" placeholder="请选择资源类型">
+        <el-select v-model="form.resourceTypeId" placeholder="请选择资源类型">
           <el-option
             v-for="item in fileTypeOptions"
             :key="item.value"
