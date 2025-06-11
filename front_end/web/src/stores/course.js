@@ -47,7 +47,7 @@ export const useCourseStore = defineStore('course', () => {
   const deleteResource = async (resource_id) => {
     try {
       const res = await ResourceApi.delete_resource(resource_id)
-      if (res.code === '1') {
+      if (res.success === true) {
         resourceList.value = resourceList.value.filter(item => item.id !== resource_id)
         console.log(`资源 ${resource_id} 删除成功`)
       } else {

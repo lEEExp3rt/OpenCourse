@@ -32,6 +32,7 @@ const fileTypeOptions = [
 ]
 
 const fetchCourseDetail = async () => {
+  console.log("Fetching course resources for course ID:", courseId)
   await courseStore.fetchCourseResources(courseId)
 }
 
