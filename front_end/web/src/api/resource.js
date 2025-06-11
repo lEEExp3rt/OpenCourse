@@ -15,7 +15,9 @@ const ResourceApi = {
     });
   },
   get_resource_view(id) {
-    return request.get(`/resource/' + id + '/view`);
+    return request.get('/resource/' + id + '/view', {
+      responseType: 'blob'
+    });
   }
 };
 
