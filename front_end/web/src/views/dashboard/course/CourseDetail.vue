@@ -172,7 +172,7 @@ const handleTabClick = (tab: any) => {
               <div class="resource-meta">
                 <button
                   class="vote-button"
-                  :class="{ liked: resource.liked }"
+                  :class="{ likeStatus: resource.likeStatus }"
                   :aria-label="`赞同 ${resource.likes}`"
                   aria-live="polite"
                   type="button"
@@ -184,7 +184,7 @@ const handleTabClick = (tab: any) => {
                       height="10"
                       viewBox="0 0 24 24"
                       class="icon-triangle"
-                      :style="{ color: resource.liked ? '#1e80ff' : 'currentColor' }"
+                      :style="{ color: resource.likeStatus ? '#1e80ff' : 'currentColor' }"
                       fill="currentColor"
                     >
                       <path
@@ -194,7 +194,7 @@ const handleTabClick = (tab: any) => {
                       />
                     </svg>
                   </span>
-                  {{ resource.liked ? '已赞同' : '赞同' }} {{ resource.likes }}
+                  {{ resource.likeStatus ? '已赞同' : '赞同' }} {{ resource.likes }}
                 </button>
 
 
@@ -364,14 +364,14 @@ const handleTabClick = (tab: any) => {
 }
 
 
-.vote-button.liked {
+.vote-button.likeStatus {
   background-color: #e8f3ff;
   border-color: #1e80ff;
   color: #1e80ff;
   font-weight: 600;
 }
 
-.vote-button.is-liked .icon-triangle {
+.vote-button.is-likeStatus .icon-triangle {
   color: #1e80ff;
   transform: scale(1.2);
 }
