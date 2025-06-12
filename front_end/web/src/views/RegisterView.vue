@@ -74,7 +74,7 @@ watch(
 
     <el-card class="primary-card" style="margin-top: 25px">
       <el-form :model="userRegisterDTO" label-position="top">
-        <el-form-item label="账号">
+        <el-form-item label="邮箱">
           <el-input class="primary-input" v-model="userRegisterDTO.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="用户名">
