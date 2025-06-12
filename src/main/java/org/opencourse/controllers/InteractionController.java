@@ -169,7 +169,7 @@ public class InteractionController {
             interactionData.put("courseId", interaction.getCourse().getId());
             interactionData.put("userId", interaction.getUser().getId());
 
-            // interactionData.put("userName", interaction.getUser().getName());
+            interactionData.put("userName", interaction.getUser().getName());
             interactionData.put("createdAt", interaction.getCreatedAt());
             
             // 添加当前用户是否已点赞/点踩的信息
