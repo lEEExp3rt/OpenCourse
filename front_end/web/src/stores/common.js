@@ -33,7 +33,7 @@ export const useCommonModule = defineStore('common', {
 
     // 使用 dayjs + timezone 格式化时间
     formatDate(dateStr, timeZone = 'Asia/Shanghai', format = 'YYYY年MM月DD日 HH:mm:ss') {
-      return dayjs(dateStr).tz(timeZone).format(format)
+      return dayjs.utc(dateStr).tz(timeZone).format(format)
     }
   }
 })

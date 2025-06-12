@@ -12,6 +12,9 @@ const userApi = {
   },
   logout() {
     return request.post('/user/logout');
+  },
+  get_me_info() {
+    return request.get('/user/me');
   }
 };
 
