@@ -140,6 +140,7 @@ public class ResourceController {
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getResourcesByCourse(@PathVariable Short courseId) {
         try {
             List<Resource> resources = resourceManager.getResourcesByCourse(courseId);
+            User user = SecurityUtils.getCurrentUser();
 
             List<Map<String, Object>> responseData = resources.stream().map(resource -> {
                 Map<String, Object> data = new HashMap<>();
@@ -153,7 +154,7 @@ public class ResourceController {
                 data.put("views", resource.getViews());
                 data.put("likes", resource.getLikes());
                 data.put("createdAt", resource.getCreatedAt());
-                data.put("likeStatus", resourceManager.getLikeStatus(resource.getUser(), resource));
+                data.put("likeStatus", resourceManager.getLikeStatus(user, resource));
                 return data;
             }).toList();
 
