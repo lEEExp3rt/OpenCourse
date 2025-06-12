@@ -183,7 +183,7 @@ const handleTabClick = (tab: any) => {
         >
           <div class="resource-row">
             <div class="resource-info">
-              <p><strong>{{ resource.name }}</strong>（{{ resource.fileSize }} bytes）</p>
+              <p><strong>{{ resource.name }}</strong></p>
               <p>{{ resource.description }}</p>
               <p>类型: {{ getFileTypeLabel(resource.resourceTypeId) }} |  <span class="usertype">{{ resource.user.name }}</span> 上传于 {{ formatDate(resource.createdAt)}}</p>
               <div class="resource-meta">
