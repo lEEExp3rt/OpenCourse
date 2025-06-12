@@ -19,14 +19,15 @@ const fetchCourseInteration = async () => {
   console.log('Fetching course interaction data for course ID:', courseId)
   try {
     await InteractionStore.fetchCourseInteration(courseId)
-    const userComment = InteractionStore.commentList.find(comment => comment.isUser === true)
+
+  } catch (error) {
+    console.error('获取课程讨论区数据失败:', error)
+  }
+  const userComment = InteractionStore.commentList.find(comment => comment.isOwner === true)
 
   if (userComment) {
     newPost.value.content = userComment.content
     newPost.value.rating = userComment.rating || 0
-  }
-  } catch (error) {
-    console.error('获取课程讨论区数据失败:', error)
   }
 }
 
