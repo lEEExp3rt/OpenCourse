@@ -25,28 +25,25 @@ const fetchCourseInteration = async () => {
 }
 
 const newPost = ref({
-  title: '',
+  rating: 0,
   content: '',
-  author: ''
 })
 
 const submitPost = () => {
-  if (!newPost.value.title || !newPost.value.content || !newPost.value.author) {
-    alert('请填写完整的帖子信息')
+  if (!newPost.value.content) {
+    alert('请输入您的看法')
     return
   }
-
-  posts.value.unshift({
-    id: postIdCounter.value++,
-    title: newPost.value.title,
-    content: newPost.value.content,
-    author: newPost.value.author
+  InteractionStore.postComment({
+    courseId: courseId,
+    content:  newPost.value.content,
+    rating: newPost.value.rating == 0 ? null : newPost.value.rating,
   })
 
   // 清空输入框
-  newPost.value.title = ''
+  newPost.value.rating = null
   newPost.value.content = ''
-  newPost.value.author = ''
+
 }
 
 
@@ -154,11 +151,18 @@ function handleDelete(post)
           <el-icon color="#fff" size="18"><Delete /></el-icon>
         </div>
       </div>
-      <div class="new-post mb-6 p-4 border rounded shadow-sm bg-white">
-        <h3 class="text-lg font-semibold mb-2">发表新帖</h3>
-        <input v-model="newPost.author" class="input" placeholder="昵称" />
-        <input v-model="newPost.title" class="input mt-2" placeholder="标题" />
-        <textarea v-model="newPost.content" class="textarea mt-2" placeholder="内容" rows="4" />
+      <div class="new-post">
+        <h4 class="text-lg font-semibold mb-2">发布看法</h4>
+           <!-- 星星评分 -->
+        <span class="text-sm text-gray-600">评分：</span>
+        <el-rate v-model="newPost.rating" allow-half  />
+        <el-input
+          v-model="newPost.content"
+          style="width: 100%; "
+          type="textarea"
+          placeholder="请输入您的看法"
+          :rows="15"
+        />
         <button class="submit-btn mt-2" @click="submitPost">发布</button>
       </div>
     </div>  
@@ -286,6 +290,16 @@ function handleDelete(post)
 
 .reply .reply-floor:hover {
   background-color: #532927; /* hover 效果 */
+}
+
+.new-post {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  position: relative;
+  margin-left: 20px;
 }
 </style>
 

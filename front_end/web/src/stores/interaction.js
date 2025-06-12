@@ -23,9 +23,9 @@ export const useInteractionStore = defineStore('interaction', () => {
   }
 
   // 发布评论
-  const postComment = async (resource_id, content) => {
+  const postComment = async (content) => {
     try {
-      const res = await InteractionApi.post_comment({ resourceId: resource_id, content })
+      const res = await InteractionApi.post_comment(content)
       if (res.success === true && res.data) {
         commentList.value.push(res.data)
         console.log("评论发布成功：", res.data)

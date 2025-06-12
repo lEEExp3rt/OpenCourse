@@ -12,6 +12,9 @@ const InteractionApi = {
   },
   delete_comment(comment_id) {
     return request.delete('/interaction/' + comment_id);
+  },
+  post_comment(content) {
+    return request.post('/interaction', content);
   }
 };
 
