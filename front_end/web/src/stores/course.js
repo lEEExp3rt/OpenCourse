@@ -135,6 +135,17 @@ export const useCourseStore = defineStore('course', () => {
     }
   }
 
+  const unlikeResource = async (resource_id) => {
+    try {
+      const res = await ResourceApi.unlike_resource(resource_id)
+      if (res.success !== true) {
+        console.warn(`取消点赞资源失败：res =`, res)
+      }
+    } catch (err) {
+      console.error(`取消点赞资源 ${resource_id} 时出错：`, err)
+    }
+  }
+
   return {
     resourceList,
     fetchCourseResources,

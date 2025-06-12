@@ -21,6 +21,10 @@ const ResourceApi = {
   },
   like_resource(id) {
     return request.post('/resource/' + id + '/like');
+  },
+
+  unlike_resource(id) {
+    return request.post('/resource/' + id + '/unlike');
   }
 };
 

@@ -127,8 +127,14 @@ function getFileTypeLabel(fileTypeId) {
   return item ? item.label : '未知类型';
 }
 
-const handleLike = async (resourceId: number) => {
-  await courseStore.likeResource(resourceId)
+const handleLike = async (resource: number) => {
+  if(resource.likeStatus) {
+    // 如果已经点赞，则取消点赞
+    await courseStore.unlikeResource(resource.id)
+  } else {
+    // 如果未点赞，则点赞
+    await courseStore.likeResource(resource.id)
+  }
   await fetchCourseDetail()
 }
 
@@ -176,7 +182,7 @@ const handleTabClick = (tab: any) => {
                   :aria-label="`赞同 ${resource.likes}`"
                   aria-live="polite"
                   type="button"
-                  @click="handleLike(resource.id)"
+                  @click="handleLike(resource)"
                 >
                   <span style="display: inline-flex; align-items: center;">
                     <svg
