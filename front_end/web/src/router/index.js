@@ -5,7 +5,7 @@ const index=createRouter({
     {
       path: '/',
       redirect: '/dashboard',
-      meta: {requiresAuth: false},
+      meta: {requiresAuth: true},
     },
     {
       path: '/404',
@@ -26,7 +26,7 @@ const index=createRouter({
       path: '/dashboard',
       redirect: '/dashboard/department',
       component: () => import('@/views/DashboardView.vue'),
-      meta: {requiresAuth: false},
+      meta: {requiresAuth: true},
       children:[
           {
             path: 'department',
