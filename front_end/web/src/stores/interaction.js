@@ -9,7 +9,7 @@ export const useInteractionStore = defineStore('interaction', () => {
   // 获取某课程下的所有评论
   const fetchCourseInteration = async (course_id) => {
     try {
-      const res = await InteractionApi.get_all_interactions(resource_id)
+      const res = await InteractionApi.get_all_interactions(course_id)
       if (res.success === true && Array.isArray(res.data)) {
         commentList.value = res.data
       } else {

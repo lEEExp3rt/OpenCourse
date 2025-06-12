@@ -3,7 +3,7 @@ import { onMounted, ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useInteractionStore } from '@/stores/interaction'
 import { ElTabs, ElTabPane, ElButton, ElInput, ElTextarea } from 'element-plus'
-
+import { ThumbsUp, ThumbsUpFilled } from 'lucide-vue-next'
 const route = useRoute()
 const activeTab = ref('forum') // 默认选中资源列表标签
 const courseId = Number(route.params.id)
@@ -24,19 +24,11 @@ const fetchCourseInteration = async () => {
   }
 }
 
-// 模拟帖子的列表
-const posts = ref([
-  { id: 1, title: '欢迎来到讨论区！', content: '可以在这里畅所欲言～', author: '管理员' },
-  { id: 2, title: '课程第二章的问题', content: '有没有人弄懂2-3节的推导？', author: '小张' }
-])
-
 const newPost = ref({
   title: '',
   content: '',
   author: ''
 })
-
-const postIdCounter = ref(3)
 
 const submitPost = () => {
   if (!newPost.value.title || !newPost.value.content || !newPost.value.author) {
@@ -66,25 +58,34 @@ const switch_to_Resources = () => {
 }
 
 onMounted(() => {
-  fetchCourseInteration()
+  fetchCourseInteration(courseId)
 })
 
-function getRandomAvatar(name) {
-  const avatars = [
-    "https://www.cc98.org/static/images/default_avatar_girl.png",
-    "https://www.cc98.org/static/images/default_avatar_boy.png",
-    "/static/images/心灵头像.gif",
-  ];
-  return avatars[name.length % avatars.length];
+
+const formatDate = (dateStr) =>{
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const minute = String(date.getMinutes()).padStart(2, '0');
+    const second = String(date.getSeconds()).padStart(2, '0');
+    return `${year}年${month}月${day}日 ${hour}:${minute}:${second}`;
 }
 
-function like(comment) {
-
+function handleLike(post) {
+  if (post.isLiked) {
+    // 如果已经点赞，取消点赞
+    InteractionStore.unlikeComment(post.id)
+  } else {
+    // 如果未点赞，执行点赞操作
+    InteractionStore.likeComment(post.id)
+  }
 }
 
-function formatDate(dateStr) {
-  const date = new Date(dateStr);
-  return date.toLocaleString();
+function handleDelete(post)
+{
+  InteractionStore.deleteComment(post.id)
 }
 </script>
 
@@ -124,26 +125,18 @@ function formatDate(dateStr) {
             <div class="comment1">
               <!-- 时间信息 -->
               <div style="width: 40rem; margin-left: 1.2rem; font-size: 0.8rem;">
-                <span>发表于 {{ publishTime }}</span>
-                <span style="margin-left: 1rem;" v-if="editedTime">该帖最后由 匿名 在 {{ editedTime }} 编辑</span>
+                <span>{{post.userName }}发表于 {{ formatDate(post.createdAt)}}</span>
               </div>
 
               <!-- 点赞/点踩/操作 -->
               <div class="row" style="align-items: center;">
-                <div :id="'like' + postId" class="upup" style="margin-right: 0.7rem;" @click="handleLike">
-                  <i title="赞" class="fa fa-thumbs-o-up fa-lg"></i>
-                  <span class="commentProp"> {{ likes }}</span>
-                </div>
-                <div :id="'dislike' + postId" class="downdown" @click="handleDislike">
-                  <i title="踩" class="fa fa-thumbs-o-down fa-lg"></i>
-                  <span class="commentProp"> {{ dislikes }}</span>
-                </div>
-                <div id="commentlike">
-                  <div class="operation1" @click="handleRate">评分</div>
-                  <div class="operation1" @click="handleQuote">引用</div>
-                  <div class="operation1">
-                    <a :href="`/topic/${topicId}/postid/${postId}`">追踪</a>
-                  </div>
+                <div  class="upup" style="margin-right: 0.7rem;" @click="handleLike(post)">
+                    <ThumbsUp 
+                      :size="15"
+                      :color="post.isLiked ? '#e74c3c' : '#000000'"
+                      style="margin-right: 4px;"
+                    />
+                    <span class="commentProp"> {{ post.likes }} </span>
                 </div>
               </div>
               <div class="row" style="width: 100%; justify-content: center;">  </div>
@@ -257,7 +250,9 @@ function formatDate(dateStr) {
   align-items: center;
   justify-content: space-between;
 }
-
+.commentProp {
+  margin-left: .2rem;
+}
 .upup {
   cursor: pointer;
   display: flex;
