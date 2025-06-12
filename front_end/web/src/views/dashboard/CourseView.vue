@@ -11,7 +11,7 @@ console.log("departmentId = ",departmentId)
 const handleCardClick = (course_id) => {
   const currentUrl = window.location.href
   // 这里简单拼接 course_id，假设是直接追加在末尾
-  window.open(currentUrl + '/' +course_id)
+  window.open(currentUrl + '/' +course_id + '/resources')
 }
 
 const dialogVisible = ref(false)

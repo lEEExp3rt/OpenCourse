@@ -37,8 +37,12 @@ const index=createRouter({
             component: () => import('@/views/dashboard/CourseView.vue'),
           },
           {
-            path: 'department/:department_id/course/:id',
-            component: () => import('@/views/dashboard/CourseDetail.vue')
+            path: 'department/:department_id/course/:id/resources',
+            component: () => import('@/views/dashboard/course/CourseDetail.vue')
+          },
+          {
+            path: 'department/:department_id/course/:id/forum',
+            component: () => import('@/views/dashboard/course/CourseForum.vue')
           },
           {
             path: 'user',
@@ -46,11 +50,11 @@ const index=createRouter({
           },
       ]
     },
-    {
-      path: '/:pathMatch(.*)*',
-      redirect: '/404',
-      meta: {requiresAuth: false},
-    }
+    // {
+    //   path: '/:pathMatch(.*)*',
+    //   redirect: '/404',
+    //   meta: {requiresAuth: false},
+    // }
   ],
   history: createWebHistory()
 })

@@ -4,13 +4,13 @@ import { useRoute } from 'vue-router'
 import { useCourseStore } from '@/stores/course'
 import { genFileId, type UploadInstance, type UploadProps, type UploadRawFile } from 'element-plus'
 
+
 const route = useRoute()
 const courseStore = useCourseStore()
 const courseId = Number(route.params.id)
 
 const dialogVisible = ref(false)
 const uploadFile = ref<UploadFile | null>(null)
-
 const upload = ref<UploadInstance>()  // ✅ 新增：用于控制 el-upload
 const fileList = ref<UploadFile[]>([])  // 控制 UI 列表
 const maxFileSize = 50 * 1024 * 1024  
@@ -20,6 +20,9 @@ const form = reactive({
   resourceTypeId: null as number | null,
   fileType: ''
 })
+
+
+const activeTab = ref('resource') // 默认选中资源列表标签
 
 // 下拉选项数组，对应传入枚举类型
 const fileTypeOptions = [
@@ -31,6 +34,7 @@ const fileTypeOptions = [
   { label: '其它', value: 56 },
 ]
 
+
 const fetchCourseDetail = async () => {
   await courseStore.fetchCourseResources(courseId)
 }
@@ -39,6 +43,7 @@ const handleDelete = async (id: number) => {
   await courseStore.deleteResource(id)
   await fetchCourseDetail()
 }
+
 
 onMounted(() => {
   fetchCourseDetail()
@@ -126,12 +131,31 @@ const handleLike = async (resourceId: number) => {
   await courseStore.likeResource(resourceId)
   await fetchCourseDetail()
 }
+
+const switch_to_Forum = () => {
+  // 切换到讨论区 
+  const currentUrl = window.location.href
+  const newUrl = currentUrl.replace(/\/resources$/, '/forum')
+  window.location.href = newUrl
+}
+
+const handleTabClick = (tab: any) => {
+  if (tab.paneName === 'forum') {
+    switch_to_Forum()
+  }
+  else if (tab.paneName === 'forum') {
+    fetchCourseDetail()
+  }
+}
 </script>
 
 
 <template>
   <div>
-    <h1>课程资源</h1>
+    <el-tabs v-model="activeTab" @tab-click="handleTabClick">
+      <el-tab-pane label="资源列表" name="resource"></el-tab-pane>
+      <el-tab-pane label="讨论区" name="forum"></el-tab-pane>
+    </el-tabs>
 
     <div v-if="courseStore.resourceList.length > 0">
       <ul>
