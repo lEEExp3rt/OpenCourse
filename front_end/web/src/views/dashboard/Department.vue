@@ -27,11 +27,8 @@ function createNewDepartment() {
 
 <template>
     <div class="p-4">
-      <el-page-header>
-        <template #content>
-          <span class="text-large font-600 mr-3"> 开课学院 </span>
-        </template>
-      </el-page-header>
+      <h1 class="text-large font-600 mr-3"> 开课学院 </h1>
+
   
       <el-row :gutter="20">
         <el-col
