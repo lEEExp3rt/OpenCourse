@@ -24,7 +24,7 @@ const userModule = useUserModule()
       <el-aside class="base-aside"> 
         <el-scrollbar>
           <el-menu router>
-            <el-menu-item index="/dashboard/course">
+            <el-menu-item index="/dashboard/department">
               <el-icon size="20" style="margin-right: 20px"> <Collection /> </el-icon>
               <span style="font-size: 15px"> 课程中心 </span>
             </el-menu-item>

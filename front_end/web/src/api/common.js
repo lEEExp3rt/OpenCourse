@@ -5,7 +5,7 @@ const CommonApi = {
     return request.post(`/upload`, data);
   },
   captcha(data) {
-    return request.post(`/captcha`, data);
+    return request.post(`/user/register/send-code`, data);
   }
 };
 
