@@ -5,13 +5,16 @@ import { useUserModule } from '@/stores/user'
 import {useCommonModule} from '@/stores/common.js'
 const UserStore = useUserModule()
 
-const fetchCourseInteration = async () => {
+const fetchUserInfo = async () => {
   try {
     await UserStore.getUserInfo()
   } catch (error) {
     console.error('获取用户信息失败:', error)
   }
 }
+onMounted(() => {
+  fetchUserInfo()
+})
 </script>
 
 <template>
