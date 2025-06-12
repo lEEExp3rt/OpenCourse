@@ -19,6 +19,12 @@ const fetchCourseInteration = async () => {
   console.log('Fetching course interaction data for course ID:', courseId)
   try {
     await InteractionStore.fetchCourseInteration(courseId)
+    const userComment = InteractionStore.commentList.find(comment => comment.isUser === true)
+
+  if (userComment) {
+    newPost.value.content = userComment.content
+    newPost.value.rating = userComment.rating || 0
+  }
   } catch (error) {
     console.error('获取课程讨论区数据失败:', error)
   }
@@ -42,8 +48,6 @@ const submitPost = async() => {
 
   // 清空输入框
   fetchCourseInteration()
-  newPost.value.rating = null
-  newPost.value.content = ''
 
 }
 
@@ -167,7 +171,7 @@ const handleDelete = async(post) =>
         <h4 class="text-lg font-semibold mb-2">发布看法</h4>
            <!-- 星星评分 -->
         <span class="text-sm text-gray-600">评分：</span>
-        <el-rate v-model="newPost.rating" allow-half  />
+        <el-rate v-model="newPost.rating"  />
         <el-input
           v-model="newPost.content"
           style="width: 100%; "
