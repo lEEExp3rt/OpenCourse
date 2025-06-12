@@ -153,6 +153,7 @@ public class ResourceController {
                 data.put("views", resource.getViews());
                 data.put("likes", resource.getLikes());
                 data.put("createdAt", resource.getCreatedAt());
+                data.put("likeStatus", resourceManager.getLikeStatus(resource.getUser(), resource));
                 return data;
             }).toList();
 

@@ -285,4 +285,15 @@ public class ResourceManager {
             resource
         );
     }
+
+    /**
+     * Get the like status of a resource by a user.
+     * 
+     * @param user The user.
+     * @param resource The resource.
+     * @return True if the user has liked the resource, false otherwise.
+     */
+    public boolean getLikeStatus(User user, Resource resource) {
+        return historyManager.getLikeStatus(user, resource);
+    }
 }
