@@ -28,7 +28,7 @@ async function handleRegister() {
     registerLoading.value = true
     const res = await userModule.register(userRegisterDTO)
     if (res.success === true) {
-      router.push('/')
+      router.push('/login')
     } else {
       message.error(res.msg || '注册失败')
       registerLoading.value = false
