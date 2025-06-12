@@ -15,6 +15,15 @@ const fetchUserInfo = async () => {
 onMounted(() => {
   fetchUserInfo()
 })
+
+const handleLogout = async () => {
+  try {
+    await UserStore.logout()
+    window.location.href = '/login'
+  } catch (error) {
+    console.error('注销失败:', error)
+  }
+}
 </script>
 
 <template>
@@ -45,7 +54,14 @@ onMounted(() => {
       <el-descriptions-item label="创建时间">
         {{ UserStore.createdAt ? '创建于' + useCommonModule().formatDate(UserStore.createdAt) : '' }}
       </el-descriptions-item>
+        <el-descriptions-item label="更新时间" v-if="UserStore.updatedAt">
+        {{ UserStore.updatedAt ? '更新于' + useCommonModule().formatDate(UserStore.updatedAt) : '' }}">
+      </el-descriptions-item>
     </el-descriptions>
+      <!-- 注销按钮 -->
+    <div style="margin-top: 20px; text-align: center;">
+      <el-button type="danger" @click="handleLogout">注销</el-button>
+    </div>
   </div>
 </template>
 
