@@ -66,8 +66,9 @@ public class AuthController {
      * @return 操作结果
      */
     @PostMapping("/register/send-code")
-    public ResponseEntity<ApiResponse<Void>> sendRegistrationVerificationCode(@RequestParam String email) {
+    public ResponseEntity<ApiResponse<Void>> sendRegistrationVerificationCode(@RequestBody Map<String, String> requestBody) {
         try {
+            String email = requestBody.get("email");
             // boolean result = userService.sendRegistrationVerificationCode(email);
             boolean result = userManager.sendRegistrationVerificationCode(email);
             if (result) {
