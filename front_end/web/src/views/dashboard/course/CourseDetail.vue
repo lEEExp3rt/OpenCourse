@@ -3,7 +3,7 @@ import { onMounted, ref, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useCourseStore } from '@/stores/course'
 import { genFileId, type UploadInstance, type UploadProps, type UploadRawFile } from 'element-plus'
-
+import {useCommonModule} from '@/stores/common.js'
 
 const route = useRoute()
 const courseStore = useCourseStore()
@@ -42,17 +42,6 @@ const fetchCourseDetail = async () => {
 const handleDelete = async (id: number) => {
   await courseStore.deleteResource(id)
   await fetchCourseDetail()
-}
-
-const formatDate = (dateStr) =>{
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = String(date.getHours()).padStart(2, '0');
-    const minute = String(date.getMinutes()).padStart(2, '0');
-    const second = String(date.getSeconds()).padStart(2, '0');
-    return `${year}年${month}月${day}日 ${hour}:${minute}:${second}`;
 }
 
 onMounted(() => {
@@ -184,7 +173,7 @@ const handleTabClick = (tab: any) => {
             <div class="resource-info">
               <p><strong>{{ resource.name }}</strong></p>
               <p>{{ resource.description }}</p>
-              <p>类型: {{ getFileTypeLabel(resource.resourceTypeId) }} |  <span class="usertype">{{ resource.user.name }}</span> 上传于 {{ formatDate(resource.createdAt)}}</p>
+              <p>类型: {{ getFileTypeLabel(resource.resourceTypeId) }} |  <span class="usertype">{{ resource.user.name }}</span> 上传于 {{ useCommonModule().formatDate(resource.createdAt)}}</p>
               <div class="resource-meta">
                 <button
                   class="vote-button"

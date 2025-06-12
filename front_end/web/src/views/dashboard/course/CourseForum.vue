@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { useInteractionStore } from '@/stores/interaction'
 import { ElTabs, ElTabPane, ElButton, ElInput, ElTextarea } from 'element-plus'
 import { ThumbsUp, ThumbsUpFilled } from 'lucide-vue-next'
+import {useCommonModule} from '@/stores/common.js'
 const route = useRoute()
 const activeTab = ref('forum') // 默认选中资源列表标签
 const courseId = Number(route.params.id)
@@ -16,7 +17,6 @@ const handleTabClick = (tab: any) => {
 }
 
 const fetchCourseInteration = async () => {
-  console.log('Fetching course interaction data for course ID:', courseId)
   try {
     await InteractionStore.fetchCourseInteration(courseId)
 
@@ -64,17 +64,6 @@ onMounted(() => {
   fetchCourseInteration(courseId)
 })
 
-
-const formatDate = (dateStr) =>{
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始
-    const day = String(date.getDate()).padStart(2, '0');
-    const hour = String(date.getHours()).padStart(2, '0');
-    const minute = String(date.getMinutes()).padStart(2, '0');
-    const second = String(date.getSeconds()).padStart(2, '0');
-    return `${year}年${month}月${day}日 ${hour}:${minute}:${second}`;
-}
 
 const handleLike = async(post)=> {
   if (post.isLiked) {
@@ -139,7 +128,7 @@ const handleDelete = async(post) =>
             <div class="comment1">
               <!-- 时间信息 -->
               <div style="width: 40rem; margin-left: 1.2rem; font-size: 0.8rem;">
-                <span>{{post.userName }}发表于 {{ formatDate(post.createdAt)}}</span>
+                <span>{{post.userName }}发表于 {{ useCommonModule().formatDate(post.createdAt)}}</span>
               </div>
 
               <!-- 点赞/点踩/操作 -->

@@ -1,7 +1,19 @@
 <script setup>
+import { ref } from 'vue'
 import { useUserModule } from "@/stores/user";
 
 const userModule = useUserModule()
+const username = ref('')
+const getUserName = () => {
+  if(username.value) {
+    return username.value
+  }
+  if(!userModule.name) {
+    userModule.getName()
+  }
+  username.value = userModule.name || '未登录用户'
+  return username.value
+}
 </script>
 
 <template>
@@ -9,11 +21,13 @@ const userModule = useUserModule()
     <el-header class="base-header">
       <div style="display: flex; align-items: center;">
         <el-image src="/images/open_course.png" style="width: 50px; height: 50px; margin-right: 10px; filter: invert(100%)" />
-        <el-text tag="b" style="font-size: larger"> OpenCourse </el-text>
+        <el-text class="mx-1"  size="default" style="color: var(--el-color-white)"> OpenCourse </el-text>
       </div>
 
       <div style="display: flex; padding-right: 20px; align-items: center; justify-content: space-between;">
-        <el-text style="margin-right: 20px; font-size: large"> {{ userModule.id }} </el-text>
+        <el-text style="color: var(--el-color-white); margin: 1rem;">
+          {{ getUserName() }}
+        </el-text>
         <el-avatar>
           <el-icon size="30"> <User /> </el-icon>
         </el-avatar>
@@ -58,9 +72,6 @@ const userModule = useUserModule()
   justify-content: space-between;
 }
 
-.base-header .el-text {
-  color: var(--el-color-white);
-}
 
 .base-aside {
   width: 200px;
@@ -78,5 +89,6 @@ const userModule = useUserModule()
   color: var(--el-text-color-primary);
   background: var(--el-color-primary-light-9);
 }
+
 </style>
 

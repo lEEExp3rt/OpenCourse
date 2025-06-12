@@ -23,6 +23,7 @@ export const useUserModule = defineStore('user', {
       this.activity = userVO.activity
       this.createdAt = userVO.createdAt
       this.updatedAt = userVO.updatedAt
+      setItem('opencourse_username', userVO.name)  // 存储用户名
     },
     resetInfo() {
       this.id = ''
@@ -50,7 +51,7 @@ export const useUserModule = defineStore('user', {
       }
       try {
         const response = await UserApi.info(this.id)
-        if (response.code === '1') {
+        if (response.success === true) {
           this.setInfo(response.data)
         }
         return response
@@ -84,10 +85,12 @@ export const useUserModule = defineStore('user', {
       }
     },
 
+
+
     async logout() {
       try {
         const response = await UserApi.logout()
-        if (response.code === '1') {
+        if (response.success === true) {
           this.resetInfo()
           this.resetToken()
         }
@@ -96,5 +99,27 @@ export const useUserModule = defineStore('user', {
         throw new Error(error.message)
       }
     },
+    getName() {
+      const storedName = getItem('opencourse_username')
+      if (storedName) {
+        this.name = storedName
+      }
+    },
+
+    getUserInfo: async function () {
+      try {
+        const response = await UserApi.get_me_info()
+        if (response.success === true) {
+          this.setInfo(response.data)
+          return response
+        } else {
+          throw new Error(response.message || '获取用户信息失败')
+        }
+      } catch (error) {
+        throw new Error(error.message)
+      }
+    }
+    
+    
   }
 })
