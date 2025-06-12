@@ -51,11 +51,11 @@ const handleLogout = async () => {
       <el-descriptions-item label="角色">
         <el-tag size="small">{{UserStore.role}}</el-tag>
       </el-descriptions-item>
-      <el-descriptions-item label="创建时间" label-width = 100%>
+      <el-descriptions-item label="创建时间" span="3">
         {{ UserStore.createdAt ? '创建于' + useCommonModule().formatDate(UserStore.createdAt) : '' }}
       </el-descriptions-item>
-        <el-descriptions-item label="更新时间" v-if="UserStore.updatedAt" label-width = 100%>
-        {{ UserStore.updatedAt ? '更新于' + useCommonModule().formatDate(UserStore.updatedAt) : '' }}">
+        <el-descriptions-item label="更新时间" v-if="UserStore.updatedAt" span="3">
+        {{ UserStore.updatedAt ? '更新于' + useCommonModule().formatDate(UserStore.updatedAt) : '' }}
       </el-descriptions-item>
     </el-descriptions>
       <!-- 注销按钮 -->
