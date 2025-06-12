@@ -29,18 +29,19 @@ const newPost = ref({
   content: '',
 })
 
-const submitPost = () => {
+const submitPost = async() => {
   if (!newPost.value.content) {
     alert('请输入您的看法')
     return
   }
-  InteractionStore.postComment({
+  await InteractionStore.postComment({
     courseId: courseId,
     content:  newPost.value.content,
     rating: newPost.value.rating == 0 ? null : newPost.value.rating,
   })
 
   // 清空输入框
+  fetchCourseInteration()
   newPost.value.rating = null
   newPost.value.content = ''
 
@@ -70,19 +71,21 @@ const formatDate = (dateStr) =>{
     return `${year}年${month}月${day}日 ${hour}:${minute}:${second}`;
 }
 
-function handleLike(post) {
+const handleLike = async(post)=> {
   if (post.isLiked) {
     // 如果已经点赞，取消点赞
-    InteractionStore.unlikeComment(post.id)
+    await InteractionStore.unlikeComment(post.id)
   } else {
     // 如果未点赞，执行点赞操作
-    InteractionStore.likeComment(post.id)
+    await InteractionStore.likeComment(post.id)
   }
+  await fetchCourseInteration() // 刷新评论列表
 }
 
-function handleDelete(post)
+const handleDelete = async(post) =>
 {
-  InteractionStore.deleteComment(post.id)
+  await InteractionStore.deleteComment(post.id)
+  await fetchCourseInteration() // 刷新评论列表
 }
 </script>
 
@@ -113,7 +116,16 @@ function handleDelete(post)
           <!-- 正文内容 -->
           <div class="reply-content">
             <div style="align-self: center; margin-top: 1rem; margin-bottom: -1rem;"></div>
+
             <div class="substance">
+              <el-rate
+              v-if="post.rating !== null"
+              v-model="post.rating"
+              disabled
+              show-score
+              text-color="#ff9900"
+              score-template="{value} points"
+            />
               <article class="content-article">{{ post.content }}</article>
             </div>
           </div>
@@ -147,7 +159,7 @@ function handleDelete(post)
         </div>
 
         <!-- 删除 -->
-        <div class="reply-floor" :style="{ visibility: post.isOwner ? 'visible' : 'hidden' }" @click="handleDelete(post.id)">
+        <div class="reply-floor" :style="{ visibility: post.isOwner ? 'visible' : 'hidden' }" @click="handleDelete(post)">
           <el-icon color="#fff" size="18"><Delete /></el-icon>
         </div>
       </div>
@@ -170,13 +182,15 @@ function handleDelete(post)
 </template>
 
 <style scoped>
-
 .center {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 71.2rem;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 1rem;
+  margin: 0 auto;
 }
 
 .reply {
@@ -216,6 +230,7 @@ function handleDelete(post)
 
 .reply-content {
 	width: 100%;
+  overflow-x: auto;     /* 横向滚动条 */
 	display: flex;
 	align-self: flex-start;
 	flex-direction: column;
@@ -224,12 +239,13 @@ function handleDelete(post)
 
 .substance {
   display: flex;
-  margin-top: 2rem;
+  margin-top: 1rem;
   margin-left: 1.5rem;
   width: 52rem;
   word-wrap: break-word;
   color: #000;
   font-family: 微软雅黑;
+  flex-direction: column;
 }
 .awardInfo {
   margin-top: 1rem;

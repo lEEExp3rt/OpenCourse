@@ -117,7 +117,7 @@ export const useInteractionStore = defineStore('interaction', () => {
                 她说，“你凭什么教我说话？凭什么堵我的嘴？非要让我跪着求你的态度吗？”
                 我说不过她，于是后来所有的这些细节发生后我都会保持沉默与木讷。所以我话越来越少，很多时候都是因为对方的指责在自己内耗。
                 我感到深刻的绝望，因为这件事在我眼里已经是无法沟通、无法解决的了。`,
-        rating: 10,
+        rating: 5,
         userName: "周树人",
         likes: 5,
         createdAt: "2024-01-01T00:00:00Z",
@@ -127,7 +127,7 @@ export const useInteractionStore = defineStore('interaction', () => {
       {
         id: 1,
         content: "内容不错，建议加点实战案例。",
-        rating: 8,
+        rating: null,
         userName: "李白",
         likes: 3,
         createdAt: "2024-02-14T15:30:00Z",
@@ -137,7 +137,7 @@ export const useInteractionStore = defineStore('interaction', () => {
       {
         id: 2,
         content: "讲解有点快，适合有基础的同学。",
-        rating: 7,
+        rating: 0.5,
         userName: "杜甫",
         likes: 1,
         createdAt: "2024-03-10T09:45:00Z",
@@ -147,7 +147,7 @@ export const useInteractionStore = defineStore('interaction', () => {
       {
         id: 3,
         content: "真的太棒了！看完秒懂！",
-        rating: 9,
+        rating: 4,
         userName: "王小明",
         likes: 12,
         createdAt: "2024-04-01T18:20:00Z",
@@ -157,7 +157,7 @@ export const useInteractionStore = defineStore('interaction', () => {
       {
         id: 4,
         content: "资源有点旧了，希望能更新一下。",
-        rating: 6,
+        rating: 3,
         userName: "林黛玉",
         likes: 0,
         createdAt: "2024-05-05T22:00:00Z",
@@ -167,7 +167,7 @@ export const useInteractionStore = defineStore('interaction', () => {
       {
         id: 5,
         content: "支持一下，是干货。",
-        rating: 8,
+        rating: 2,
         userName: "鲁迅",
         likes: 4,
         createdAt: "2024-06-01T11:00:00Z",
