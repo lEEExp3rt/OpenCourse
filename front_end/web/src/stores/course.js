@@ -6,11 +6,9 @@ import { getItem } from "@/utils/storage"
 
 export const useCourseStore = defineStore('course', () => {
   const resourceList = ref([])
-  const loaded = ref(false)
 
   // 获取指定课程的所有资源
   const fetchCourseResources = async (course_id) => {
-    if (loaded.value) return
 
     let tempList = []
     try {
@@ -26,7 +24,6 @@ export const useCourseStore = defineStore('course', () => {
       tempList = getDefaultResources()
     }
     resourceList.value = tempList
-    loaded.value = true
   }
 
   // 添加资源
@@ -152,6 +149,7 @@ export const useCourseStore = defineStore('course', () => {
     addResource,
     deleteResource, 
     downloadResource,
-    likeResource
+    likeResource,
+    unlikeResource
   }
 })
