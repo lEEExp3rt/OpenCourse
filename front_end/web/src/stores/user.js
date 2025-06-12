@@ -60,10 +60,9 @@ export const useUserModule = defineStore('user', {
     },
 
     async register(userRegisterDTO) {
-      let { email, password } = userRegisterDTO
-      email = email.trim()
+      userRegisterDTO.email = userRegisterDTO.email.trim()
       try {
-        const response = await UserApi.register({ email: email, password: password })
+        const response = await UserApi.register({ email: userRegisterDTO.email, password: userRegisterDTO.password, name: userRegisterDTO.name , verifycationCode: userRegisterDTO.captcha })
         return response
       } catch (error) {
         throw new Error(error.message)

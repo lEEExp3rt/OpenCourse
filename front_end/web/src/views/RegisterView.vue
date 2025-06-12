@@ -13,7 +13,7 @@ const commonModule = useCommonModule()
 const registerLoading = ref(false)
 const userRegisterDTO = reactive({
   email: '',
-  username: '',
+  那么: '',
   password: '',
   captcha: '',
 })
@@ -27,7 +27,7 @@ async function handleRegister() {
   try {
     registerLoading.value = true
     const res = await userModule.register(userRegisterDTO)
-    if (String(res.code) === '1') {
+    if (res.success === true) {
       router.push('/')
     } else {
       message.error(res.msg || '注册失败')
@@ -44,7 +44,7 @@ async function handleCaptcha() {
     captchaLoading.value = true
     captchaDTO.email = userRegisterDTO.email
     const res = await commonModule.captcha(captchaDTO)
-    if (String(res.code) === '1') {
+    if (res.success === true) {
       message.success('验证码已发送')
     } else {
       message.error(res.msg || '验证码发送失败，请重试')
@@ -78,7 +78,7 @@ watch(
           <el-input class="primary-input" v-model="userRegisterDTO.email" placeholder="请输入邮箱" />
         </el-form-item>
         <el-form-item label="用户名">
-          <el-input class="primary-input" v-model="userRegisterDTO.username" placeholder="请输入用户名" />
+          <el-input class="primary-input" v-model="userRegisterDTO.name" placeholder="请输入用户名" />
         </el-form-item>
         <el-form-item label="密码">
           <el-input class="primary-input" v-model="userRegisterDTO.password" type="password" placeholder="请输入密码" show-password />
