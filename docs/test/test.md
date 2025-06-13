@@ -29,6 +29,12 @@
 ## 2 Table Of Content
 
 - 仓库层
+  - [CourseRepo         测试文档](./repositories/CourseRepoTest.md)
+  - [DepartmentRepo     测试文档](./repositories/DepartmentRepoTest.md)
+  - [HistoryRepo        测试文档](./repositories/HistoryRepoTest.md)
+  - [InteractionRepo    测试文档](./repositories/InteractionRepoTest.md)
+  - [ResourceRepo       测试文档](./repositories/ResourceRepoTest.md)
+  - [UserRepo           测试文档](./repositories/UserRepoTest.md)
 - 服务层
   - [CourseManager      测试文档](./services/CourseManagerTest.md)
   - [DepartmentManager  测试文档](./services/DepartmentManagerTest.md)
@@ -37,4 +43,5 @@
   - [Resourcemanager    测试文档](./services/ResourceManagerTest.md)
     - [MinioFileStorageService 单元测试文档](./services/storage/MinioFileStorageServiceTest.md)
     - [MinioFileStorageService 集成测试文档](./services/storage/MinioFileStorageServiceIntegrationTest.md)
+  - [UserManager        测试文档](./services/UserManagerTest.md)
 - 控制层
