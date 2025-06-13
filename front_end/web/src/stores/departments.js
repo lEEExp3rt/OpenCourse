@@ -8,7 +8,6 @@ export const useDepartmentsStore = defineStore('departments', () => {
 
   // 新增：当前选中的部门
   const currentDepartment = ref(null)
-
   const fetchAllDepartments = async () => {
     if (loaded.value) return
 
