@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
+    "concurrently": "^9.1.2",
     "element-plus": "^2.9.11",
     "install": "^0.13.0",
     "pinia": "^3.0.2",
