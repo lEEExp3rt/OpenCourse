@@ -7,13 +7,12 @@
 	"forwardPorts": [
 		8080, // Spring Boot Application.
 		3307, // MySQL Database.
+		9000, // MinIO
 		6379  // Redis.
 	],
 
 	"postStartCommand": "clear && echo 'Welcome to OpenCourse Dev-Container!'",
-	"postCreateCommand": "mvn clean dependency:go-offline",
 	"shutdownAction": "stopCompose",
-
 
 	"remoteUser": "opencourse"
 }
