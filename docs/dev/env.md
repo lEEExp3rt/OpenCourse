@@ -35,8 +35,8 @@ git
 开发容器构建流程：
 
 1. 确保已安装 [Docker Desktop](https://www.docker.com/products/docker-desktop/)，并保持运行
-2. 初次运行容器构建脚本 `bash build.sh` ，创建[环境变量](#121-environment-variables)目录 `.envs/`，用于配置容器环境，请根据需要创建所有环境变量
-3. 再次运行容器构建脚本 `bash build.sh`，等待容器构建完成（注：构建时间可能较久）
+2. 运行环境变量脚本 `bash scripts/env.sh` ，创建[环境变量](#121-environment-variables)目录 `.envs/`，用于配置容器环境，请根据需要创建所有环境变量
+3. 运行容器构建脚本 `bash scripts/setup.sh`，等待容器构建完成（注：构建时间可能较久）
 4. 构建完成后，容器会自动后台启动
 5. 连接到容器，进行开发
 
@@ -89,8 +89,6 @@ MINIO_DOMAIN=localhost
 
 ### 1.3 Build And Run
 
-初次进入开发容器后，请在项目工作目录下 `~/OpenCourse` 运行 `mvn dependency:go-offline` 完成所有依赖下载，初次安装用时较久
-
 项目所需依赖已在 `pom.xml` 中给出，如果有未添加的项目依赖直接在 `<dependencies><dependencies/>` 中添加
 
 ```shell
@@ -104,30 +102,83 @@ mvn package            # 打包项目
 
 ### 1.4 Code Structures
 
-后端部分的所有代码均在 `src/` 下，其结构如下：
-
 ```shell
-src/
-├── main/                         # 后端代码目录
-│   ├── java/
-│   │   └── org/
-│   │       └── opencourse/
-│   │           ├── dto/          # 数据传输对象层：负责接收客户端请求并整合成参数
-│   │           ├── controllers/  # 控制层：负责处理客户端请求并返回响应
-│   │           ├── services/     # 服务层：核心业务逻辑
-│   │           ├── repositories/ # 数据层：处理服务端逻辑对象和持久化数据
-│   │           ├── models/       # 模型层：业务实体定义
-│   │           ├── configs/      # 配置相关
-│   │           ├── utils/        # 其它工具
-│   │           └── Main.java     # 主程序
-│   │ 
-│   └── resources/            # 资源目录
-│       ├── application.yml   # 程序的配置信息，如数据库连接路径
-│       └── schema.sql        # 数据库表定义和初始化脚本
+backend/
+├── src/ # 后端源代码目录
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── org/
+│   │   │       └── opencourse/
+│   │   │           ├── dto/          # 数据传输对象层：负责接收客户端请求并整合成参数
+│   │   │           ├── controllers/  # 控制层：负责处理客户端请求并返回响应
+│   │   │           ├── services/     # 服务层：核心业务逻辑
+│   │   │           ├── repositories/ # 数据层：处理服务端逻辑对象和持久化数据
+│   │   │           ├── models/       # 模型层：业务实体定义
+│   │   │           ├── configs/      # 配置相关
+│   │   │           ├── utils/        # 其它工具
+│   │   │           └── Main.java     # 主程序
+│   │   │ 
+│   │   └── resources/            # 资源目录
+│   │       ├── application.yml   # 程序的配置信息，如数据库连接路径
+│   │       └── schema.sql        # 数据库表定义和初始化脚本
+│   │
+│   └── test/                     # 测试目录
+│       ├── java/                 # 测试代码
+│       └── resources/            # 测试资源
 │
-└── test/                     # 测试目录
-    ├── java/                 # 测试代码
-    └── resources/            # 测试资源
+└── pom.xml # 后端项目配置文件
 ```
 
-运行 `build.sh` 初始化脚本会自动帮你创建好所有目录关系，**如果你没有运行初始化脚本，请自行创建上述目录关系，项目代码将严格遵守这个框架**
+## 2 Frontend
+
+### 2.1 Dependencies
+
+环境配置如下：
+
+- 包管理器：npm 18.19.1
+- 前端框架：Vue.js + Vite
+- 组件库：Element-Plus
+
+### 2.2 Environment
+
+直接在开发容器中或你的本地环境中安装即可
+
+### 2.3 Build And Run
+
+使用以下脚本安装环境：
+
+```shell
+curl -fsSL https://fnm.vercel.app/install | bash
+source /home/opencourse/.config/fish/conf.d/fnm.fish
+fnm install 18.19.1
+fnm default 18.19.1
+fnm use 18.19.1
+```
+
+启动前端：
+
+```shell
+npm run dev
+```
+
+### 2.4 Code Structures
+
+```shell
+frontend/
+├── index.html        # 入口 HTML 文件
+├── package.json      # 前端项目配置文件
+├── package-lock.json
+├── vite.config.js    # Vite 构建工具配置
+├── public/
+│   └── images/       # 项目图片
+│
+└── src/              # 前端源代码目录
+    ├── api/          # API 接口封装
+    ├── router/       # 路由配置
+    ├── scripts/      # 业务脚本
+    ├── stores/       # Pinia 状态管理
+    ├── views/        # 页面级 Vue 组件
+    ├── utils/        # 工具库
+    ├── main.js       # Vue 应用入口文件
+    └── App.vue       # Vue 根组件
+```
