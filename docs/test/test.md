@@ -43,4 +43,5 @@
   - [Resourcemanager    测试文档](./services/ResourceManagerTest.md)
     - [MinioFileStorageService 单元测试文档](./services/storage/MinioFileStorageServiceTest.md)
     - [MinioFileStorageService 集成测试文档](./services/storage/MinioFileStorageServiceIntegrationTest.md)
+  - [UserManager        测试文档](./services/UserManagerTest.md)
 - 控制层
