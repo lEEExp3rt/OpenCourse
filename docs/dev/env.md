@@ -11,7 +11,7 @@
 环境配置如下：
 
 - Java 版本：JDK 21
-- 框架：SpringBoot 3.1.0
+- 框架：SpringBoot 3.4.5
 - 构建工具：mvn 3.6.3
 - 数据库：MySQL 8.0+
 - 中间件：Redis 7.2-alpine
