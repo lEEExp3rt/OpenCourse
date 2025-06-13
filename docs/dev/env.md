@@ -158,6 +158,7 @@ fnm use 18.19.1
 启动前端：
 
 ```shell
+npm install
 npm run dev
 ```
 
