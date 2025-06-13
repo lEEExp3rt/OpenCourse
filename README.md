@@ -31,34 +31,7 @@
 
 ## Build And Run
 
-后端运行方式：
-
-```shell
-cd backend/
-
-# 首次运行前先安装项目依赖
-mvn dependency:go-offline
-
-# 启动后端
-mvn spring-boot:run
-```
-
-前端运行方式：
-
-```shell
-cd frontend/
-
-# 首次运行前先安装项目依赖
-curl -fsSL https://fnm.vercel.app/install | bash
-source /home/opencourse/.config/fish/conf.d/fnm.fish
-fnm install 18.19.1
-fnm default 18.19.1
-fnm use 18.19.1
-npm install
-
-# 启动前端
-npm run dev
-```
+运行 `bash scripts/run.sh` 以快捷启动整个应用，运行 `bash scripts/clean.sh` 以清楚所有构建产物
 
 ## Features
 
