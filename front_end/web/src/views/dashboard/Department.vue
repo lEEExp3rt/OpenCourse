@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { useDepartmentsStore } from '@/stores/departments'
 import { useRouter } from 'vue-router'  // 导入路由
 import { Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const departmentStore = useDepartmentsStore()
 const router = useRouter()
@@ -19,8 +20,31 @@ function chooseDepartment(department) {
 
 }
 
-function createNewDepartment() {
-  alert('点击新增学院')
+async function createNewDepartment() {
+  try {
+    const { value } = await ElMessageBox.prompt('请输入学院名称', '新增学院', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      inputPattern: /^.{1,50}$/,
+      inputErrorMessage: '学院名称不能为空且长度不超过50个字符',
+      inputPlaceholder: '请输入学院名称'
+    })
+
+    if (value && value.trim()) {
+      const newDepartment = {
+        name: value.trim()
+      }
+      
+      await departmentStore.createDepartment(newDepartment)
+      ElMessage.success('学院创建成功')
+    }
+  } catch (error) {
+    // 用户取消操作或其他错误
+    if (error !== 'cancel') {
+      console.error('创建学院时出错：', error)
+      ElMessage.error('创建学院失败，请重试')
+    }
+  }
 }
 </script>
 
