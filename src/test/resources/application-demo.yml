@@ -29,6 +29,12 @@ minio:
   secret-key: YOUR_MINIO_SECRET_KEY
   bucket-name: "opencourse-test"
 
+# JWT settings.
+jwt:
+  secret: YOUR_JWT_SECRET_HERE # Change to your jwt secret key.
+  expiration: 86400000
+  refresh-expiration: 604800000
+
 logging:
   level:
     # Root logging level.
@@ -44,7 +50,8 @@ logging:
     org.opencourse: "WARN"
 
 app:
-  # User activity settings.
+  verification-code:
+    expiration: 300000
   activity:
     resource:
       add: 1

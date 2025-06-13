@@ -111,6 +111,9 @@ jwt:
 
 # Application-specific settings.
 app:
+  # Verification code settings.
+  verification-code:
+    expiration: 300000
   # User activity settings.
   activity:
     resource:
