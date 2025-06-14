@@ -31,7 +31,7 @@
 
 ## Build And Run
 
-运行 `bash scripts/run.sh` 以快捷启动整个应用，运行 `bash scripts/clean.sh` 以清楚所有构建产物
+运行 `bash scripts/run.sh` 以快捷启动整个应用，运行 `bash scripts/clean.sh` 以清理所有构建产物
 
 ## Features
 
