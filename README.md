@@ -65,9 +65,10 @@
 
 请参考 `docs/` 下的所有文档以获取更详细全面的文档
 
-- [软件需求规划说明书](./docs/pdf/SRS.pdf)
-- [总体设计报告](./docs/pdf/HLD.pdf)
-- [设计模式报告](./docs/pdf/DPR.pdf)
+- [软件需求规划说明书](./docs/pdf/Software-Requirements-Specification.pdf)
+- [总体设计报告](./docs/pdf/High-Level-Design.pdf)
+- [设计模式报告](./docs/pdf/Design-Pattern-Report.pdf)
+- [总体报告](./docs/pdf/Comprehensive-Report.pdf)
 - [开发文档](./docs/dev/main.md)
 - [测试文档](./docs/test/test.md)
 
