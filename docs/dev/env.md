@@ -103,30 +103,30 @@ mvn package            # 打包项目
 ### 1.4 Code Structures
 
 ```shell
-backend/
-├── src/ # 后端源代码目录
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── org/
-│   │   │       └── opencourse/
-│   │   │           ├── dto/          # 数据传输对象层：负责接收客户端请求并整合成参数
-│   │   │           ├── controllers/  # 控制层：负责处理客户端请求并返回响应
-│   │   │           ├── services/     # 服务层：核心业务逻辑
-│   │   │           ├── repositories/ # 数据层：处理服务端逻辑对象和持久化数据
-│   │   │           ├── models/       # 模型层：业务实体定义
-│   │   │           ├── configs/      # 配置相关
-│   │   │           ├── utils/        # 其它工具
-│   │   │           └── Main.java     # 主程序
-│   │   │ 
-│   │   └── resources/            # 资源目录
-│   │       ├── application.yml   # 程序的配置信息，如数据库连接路径
-│   │       └── schema.sql        # 数据库表定义和初始化脚本
-│   │
-│   └── test/                     # 测试目录
-│       ├── java/                 # 测试代码
-│       └── resources/            # 测试资源
-│
-└── pom.xml # 后端项目配置文件
+.
+├── pom.xml # 项目配置文件
+├── target/ # 项目构建产物目录
+└── src/    # 源代码目录
+    ├── main/
+    │   ├── java/
+    │   │   └── org/
+    │   │       └── opencourse/
+    │   │           ├── dto/          # 数据传输对象层：负责接收客户端请求并整合成参数
+    │   │           ├── controllers/  # 控制层：负责处理客户端请求并返回响应
+    │   │           ├── services/     # 服务层：核心业务逻辑
+    │   │           ├── repositories/ # 数据层：处理服务端逻辑对象和持久化数据
+    │   │           ├── models/       # 模型层：业务实体定义
+    │   │           ├── configs/      # 配置相关
+    │   │           ├── utils/        # 其它工具
+    │   │           └── Main.java     # 主程序
+    │   │ 
+    │   └── resources/            # 资源目录
+    │       ├── application.yml   # 程序的配置信息，如数据库连接路径
+    │       └── schema.sql        # 数据库表定义和初始化脚本
+    │
+    └── test/                     # 测试目录
+        ├── java/                 # 测试代码
+        └── resources/            # 测试资源
 ```
 
 ## 2 Frontend
@@ -165,21 +165,23 @@ npm run dev
 ### 2.4 Code Structures
 
 ```shell
-frontend/
-├── index.html        # 入口 HTML 文件
-├── package.json      # 前端项目配置文件
+.
+├── package.json          # 项目配置文件
 ├── package-lock.json
-├── vite.config.js    # Vite 构建工具配置
-├── public/
-│   └── images/       # 项目图片
-│
-└── src/              # 前端源代码目录
-    ├── api/          # API 接口封装
-    ├── router/       # 路由配置
-    ├── scripts/      # 业务脚本
-    ├── stores/       # Pinia 状态管理
-    ├── views/        # 页面级 Vue 组件
-    ├── utils/        # 工具库
-    ├── main.js       # Vue 应用入口文件
-    └── App.vue       # Vue 根组件
+├── node_modules/
+└── web/                  # 源代码目录
+    ├── index.html        # 入口 HTML 文件
+    ├── vite.config.js    # Vite 构建工具配置
+    ├── public/
+    │   └── images/       # 项目图片
+    │
+    └── src/              # 前端源代码目录
+        ├── api/          # API 接口封装
+        ├── router/       # 路由配置
+        ├── scripts/      # 业务脚本
+        ├── stores/       # Pinia 状态管理
+        ├── views/        # 页面级 Vue 组件
+        ├── utils/        # 工具库
+        ├── main.js       # Vue 应用入口文件
+        └── App.vue       # Vue 根组件
 ```

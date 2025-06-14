@@ -39,8 +39,6 @@ check_dependencies() {
     fi
 
     # Check if the frontend dependencies are installed.
-    cd frontend
-
     if [ ! -d "node_modules" ]; then
         echo -e "${YELLOW}📦 Using npm to install packages...${NC}"
         npm install
@@ -50,8 +48,6 @@ check_dependencies() {
         echo -e "${YELLOW}📦 Installing concurrently...${NC}"
         npm install --save-dev concurrently
     fi
-
-    cd ..
 
     echo -e "${GREEN}✅ Dependencies checked.${NC}"
 }
@@ -94,13 +90,12 @@ start_application() {
     echo -e "${YELLOW}Press Ctrl+C to stop the application${NC}"
     echo ""
 
-    cd frontend
     npx concurrently \
         --names "backend,frontend" \
         --prefix-colors "blue,green" \
         --prefix "[{name}]" \
         --kill-others-on-fail \
-        "cd ../backend && mvn spring-boot:run" \
+        "mvn spring-boot:run" \
         "npm run dev"
 }
 

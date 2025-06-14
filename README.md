@@ -17,16 +17,21 @@
 
 ```shell
 .
-├── .devcontainer/ # Docker 开发容器配置目录
-├── .envs/         # 环境变量目录
-├── .gitignore     # Git 忽略文件
-├── docs/          # 项目文档目录
-├── backend/       # 后端源代码目录
-├── frontend/      # 前端源代码目录
-├── scripts/       # 脚本目录
-├── LICENSE        # 项目许可证
-├── CONTRIBUTERS   # 开发者名单
-└── README.md      # 自述文件
+├── .devcontainer/    # Docker 开发容器配置目录
+├── .envs/            # 环境变量目录
+├── .gitignore
+├── docs/             # 项目文档目录
+├── scripts/          # 脚本目录
+├── web/              # 前端源代码目录
+├── src/              # 后端源代码目录
+├── pom.xml
+├── package.json
+├── package-lock.json
+├── target/
+├── node_modules/
+├── LICENSE           # 项目许可证
+├── CONTRIBUTERS      # 开发者名单
+└── README.md         # 自述文件
 ```
 
 ## Build And Run
