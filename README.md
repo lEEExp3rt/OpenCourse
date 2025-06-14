@@ -30,7 +30,7 @@
 ├── target/
 ├── node_modules/
 ├── LICENSE           # 项目许可证
-├── CONTRIBUTERS      # 开发者名单
+├── CONTRIBUTERS.md   # 开发者名单
 └── README.md         # 自述文件
 ```
 
